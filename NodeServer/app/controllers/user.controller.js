@@ -66,6 +66,11 @@ exports.registerUser = (req, res) => {
 
 };
 
+exports.test=(req, res,next)=>{
+console.log("inside controller");
+next();
+}
+
 exports.validateLogin = (req, res) => {
     User.findOne({ email: req.body.email })
         .then(async data => {
