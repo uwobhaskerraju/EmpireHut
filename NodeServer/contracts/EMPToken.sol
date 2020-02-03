@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity >=0.5.0;
 // variable names should be different from function names or else we will get compilation errors
 //reading data from ethereum is free but writing data is costly
 // implementing as per ethereum standards
@@ -15,7 +15,10 @@ library SafeMath {
       return c;
     }
 }
+
+
 contract EMPToken{
+
     uint256 private _totalSupply;
     mapping(address => uint256) _balances;
     mapping(address => mapping (address => uint256)) public _allowance;
@@ -29,6 +32,11 @@ contract EMPToken{
     event Transfer(address indexed _from, address indexed _to, uint256 _tokens);
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
+    modifier onlyOwner(){
+        require(_tokenowner == msg.sender,"Only owner can trigger");
+        _;
+    }
 
     //in case you want to use arguments here.the values for this arguments must be passed in the respective
     //contract migration deploy file.
