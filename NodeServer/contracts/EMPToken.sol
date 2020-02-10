@@ -21,7 +21,7 @@ contract EMPToken{
 
     uint256 private _totalSupply;
     mapping(address => uint256) _balances;
-    mapping(address => mapping (address => uint256)) public _allowance;
+    mapping(address => mapping (address => uint256)) _allowance;
     // first address is approvers, second address is "_spender" and third is how much value are we
     //allowing him to take from our wallet
     string private constant _name = "EmpireHut";
@@ -71,7 +71,7 @@ contract EMPToken{
     function balanceOf(address _owner) public view returns (uint256 balance){
         return _balances[_owner];
     }
-    function transfer(address _to, uint256 _value) public returns (bool success){
+    function transfer(address _to, uint256 _value) public payable returns (bool success){
         //require - if condition is true,go ahead or else throw the string
         require(_balances[msg.sender] >= _value,"Insufficient Funds here");
         require(_value>=0,"Value cannot be less than zero");

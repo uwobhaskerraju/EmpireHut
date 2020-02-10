@@ -12,4 +12,8 @@ module.exports = (app) => {
     app.post('/user/reg',web3.registerUser);
 
     app.post('/user/bal',web3.getBalance);
+
+    app.post('/user/trans',web3.transferTo);
+
+  
 }

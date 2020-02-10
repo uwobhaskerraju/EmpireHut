@@ -66,6 +66,7 @@ app.use('/api', router);
 
 // import other routes from 'app' folder.
 require('./app/routes/user.route.js')(router);
+require('./app/routes/admin.route.js')(router);
 // listen for requests
 
 app.listen(port, () => {
