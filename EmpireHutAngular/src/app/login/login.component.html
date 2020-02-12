@@ -1,1 +1,158 @@
-<p>login works!</p>
+<nav class="light-blue">
+    <div class="nav-wrapper">
+        <a href="javascript:void(0)" class="brand-logo"><i class="material-icons">polymer</i>Empire Hut</a>
+        <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        <ul class="right hide-on-med-and-down">
+            <li><a routerLink="/">Home</a></li>
+            <li><a routerLink="/login">Login / Sign Up</a></li>
+        </ul>
+    </div>
+</nav>
+
+<ul class="sidenav" id="mobile-demo">
+    <li><a routerLink="/">Home</a></li>
+    <li><a routerLink="/login">Login / Sign Up</a></li>
+</ul>
+
+
+<br>
+<br>
+
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s6"><a href="#test1">Sign Up</a></li>
+                <li class="tab col s6"><a class="active" href="#test2">Sign In</a></li>
+
+            </ul>
+        </div>
+        <div id="test1" class="col s12">
+
+            <!-- <div class="row">
+                <form class="col s12" #regForm="ngForm" (ngSubmit)="registerUser(regForm)">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="uName" name="uName" type="text" class="validate" ngModel>
+                            <label for="uName">User Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="password" name="uPass" type="text" class="validate" ngModel>
+                            <label for="password">Password</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="email" name="email" type="email" class="validate" ngModel>
+                            <label for="email">Email</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                            <i class="material-icons right">send</i>
+                        </button> </div>
+                </form>
+            </div> -->
+
+            <div class="card horizontal">
+                <div class="card-image">
+                    <img src="{{imagePath}}signup.png">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <div class="container">
+
+                            <div class="row">
+                                <div class="input-field">
+                                    <i class="material-icons prefix">person</i>
+                                    <input name="nameSignUp" type="text" class="validate" data-length="15"
+                                        [(ngModel)]="signUp.name">
+                                    <label for="nameSignUp">User Name</label>
+                                    <!-- <span class="helper-text" data-error="" data-success="Perfect"></span> -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <i class="material-icons prefix">enhanced_encryption</i>
+                                    <input name="passSignUp" type="password" class="validate" data-length="10"
+                                        [(ngModel)]="signUp.pass">
+                                    <label for="passSignUp">Password</label>
+                                    <!-- <span class="helper-text" data-error="" data-success="Perfect"></span> -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <i class="material-icons prefix">email</i>
+                                    <input name="emailSignUp" type="email" class="validate" [(ngModel)]="signUp.email">
+                                    <label for="emailSignUp">Email</label>
+                                    <!-- <span class="helper-text" data-error="Invalid Email" data-success="Perfect"></span> -->
+                                </div>
+                            </div>
+                            <div class="row center-align ">
+                                <a (click)="registerUser()"
+                                    class="btn-floating btn-large waves-effect waves-light red tooltipped"
+                                    data-position="bottom" data-tooltip="Sign Up"><i
+                                        class="material-icons">play_arrow</i></a>
+                            </div>
+                            <div class="row">
+                                <ul>
+                                    <li>Username can start or end only with a letter and cannot contain consecutive
+                                        spaces</li>
+                                    <li>Password must have one upper&lower case English letter,one digit and special
+                                        character and between 8 & 10 in length</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end of horizontal-->
+
+
+        </div>
+        <div id="test2" class="col s12">
+            <div class="col s12">
+
+                <div class="card horizontal">
+                    <div class="card-image">
+                        <img src="{{imagePath}}login.jpg">
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <div class="container">
+
+                                <div class="row">
+                                    <div class="input-field">
+                                        <i class="material-icons prefix">email</i>
+                                        <input name="email" #emailLogin type="email" class="validate">
+                                        <label for="email" class="active">Email</label>
+                                        <span class="helper-text" data-error="Invalid Email"
+                                            data-success="Perfect"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field">
+                                        <i class="material-icons prefix">enhanced_encryption</i>
+                                        <input name="password" #passLogin type="password"
+                                            class="validate" data-length="10">
+                                        <label for="password" class="active">Password</label>
+                                        <span class="helper-text" data-error="Invalid Email/Password"
+                                            data-success=""></span>
+                                    </div>
+                                </div>
+
+                                <div class="row center-align ">
+                                    <a (click)="ValidateLogin(emailLogin.value,passLogin.value)"
+                                        class="btn-floating btn-large waves-effect waves-light red"><i
+                                            class="material-icons">play_arrow</i></a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end of horizontal-->
+            </div>
+
+
+        </div>
+    </div>
+</div>

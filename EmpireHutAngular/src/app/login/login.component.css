@@ -1,0 +1,9 @@
+tabs .tab a:hover, .tabs .tab a.active {
+    background-color: transparent;
+    color: #03a9f4 !important;
+}
+
+.tabs .indicator {
+    background-color: #03a9f4 !important;
+    
+}
