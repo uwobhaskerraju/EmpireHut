@@ -52,7 +52,7 @@ try {
         const details = async () => {
             var tokenIDs = req.app.tokenIDs
             for (var token of tokenIDs) {
-                const ret = await returnNum(token);
+                const ret = await getDetails(token);
                 if (ret.length > 0) {
                     var filtered = ret.filter(function () { return true });
                     result.push(filtered);
@@ -60,7 +60,7 @@ try {
 
             }
         }
-        const returnNum = x => {
+        const getDetails = x => {
             return new Promise((resolve, reject) => {
                 Asset.find({ tokenID: x })
                     .select('-_id')
