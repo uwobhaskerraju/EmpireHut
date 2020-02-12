@@ -85,7 +85,8 @@ try {
 
     }
 
-    exports.createAsset = (req,next, res) => {
+    exports.insertAssetweb3 = (req, res, next) => {
+        //exports.insertAssetweb3 = (req, res) => {
         try {
             // var adminAddr = req.body.userID;
             var rndStr = web3.utils.soliditySha3(req.app.randomStr);
@@ -101,13 +102,14 @@ try {
                             req.app.tokenID = event[0]["returnValues"]["tokenId"];
                             // update mongoDB
                             next();
-                            //res.send({ statusCode: 200, data: { address: adminAddr, TokenID: tokenID } });
+                            //res.send({ statusCode: 200, data: { address: adminAddr} });
                         }
                     });
                 })
                 .on('error', function (error, receipt) {
                     res.send({ statusCode: 500, data: { error: error, message: receipt } });
                 })
+
         } catch (error) {
             res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
         }
@@ -125,16 +127,22 @@ try {
 
     }
 
-    exports.getTokensOfUser = (req, res) => {
-        assetcontract.methods.ownedTokensOfUser(adminAddr).call()
+    exports.getTokensOfUser = (req, res,next) => {
+        var user =adminAddr;
+       // var user = req.body.userID;
+        assetcontract.methods.ownedTokensOfUser(user).call()
             .then(r => {
-                res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
+                //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
+                req.app.tokenIDs = r;
+                next();
             })
             .catch(err => {
                 res.send({ statusCode: 500, data: { error: err } });
             });
 
-    }
+    };
+
+
 } catch (error) {
     console.log("in catch")
     process.kill(process.pid, 'SIGTERM')

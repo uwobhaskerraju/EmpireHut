@@ -5,7 +5,7 @@ var AssetSchema = mongoose.Schema({
     tokenID: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     address: { type: String, required: true },
-    owner: { type: string,  required: true },
+    //owner: { type: String,  required: true },
     area: { type: Number, default: 0 },
     price: { type: Number, default: 0 },
     latlong: { type: String},
