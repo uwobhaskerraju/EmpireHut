@@ -53,9 +53,10 @@ try {
             var tokenIDs = req.app.tokenIDs
             for (var token of tokenIDs) {
                 const ret = await getDetails(token);
+               // console.log(ret)
                 if (ret.length > 0) {
                     var filtered = ret.filter(function () { return true });
-                    result.push(filtered);
+                    result.push(filtered[0]);
                 }
 
             }

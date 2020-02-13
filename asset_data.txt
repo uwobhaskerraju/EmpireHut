@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Xavier House",
+        "address": "Uint 60, 70 Chapman Court",
+        "area": "50",
+        "userID": "0xD821d0af2024958E71Ca1bfaEBFc87522effbdc8"
+    },
+    {
+        "name": "Nikhils House",
+        "address": "Unit 170, Cherry Hill Village",
+        "area": "35",
+        "userID": "0xD821d0af2024958E71Ca1bfaEBFc87522effbdc8"
+    }
+]

@@ -1,1 +1,37 @@
-<p>adminhome works!</p>
+<br>
+<nav>
+    <div class="nav-wrapper">
+        <form>
+            <div class="input-field">
+                <input placeholder="Search Assets" (input)="onSearchChange($event.target.value)" type="search" required>
+                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                <i class="material-icons">close</i>
+            </div>
+        </form>
+    </div>
+</nav>
+<div class="row">
+    <blockquote>
+        <h3>Assets in your Region</h3>
+    </blockquote>
+</div>
+<div class="row" *ngIf="allAssets">
+    <div class="col s3" *ngFor="let asset of allAssets">
+        <div class="card small hoverable z-depth-4">
+            <div class="card-image">
+                <img src="{{imagePath}}{{asset.picture}}">
+                <!-- <span class="card-title">{{song.Name}}</span> -->
+            </div>
+            <div class="card-content center-align">
+                <p class="blue-text"> {{asset.name}}</p>
+            </div>
+            <div class="card-action ">
+                <a href="javascript:void(0)" id="{{asset._id}}" class="blue-text" (click)="showDetails($event)">Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row center-align" *ngIf="allAssets?.length == 0">
+ <h3 class="blue-text">No Assets</h3>
+</div>

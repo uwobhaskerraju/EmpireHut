@@ -8,6 +8,7 @@ try {
     const web3 = new Web3(rpcURL)
 
     //console.log(web3.version) //1.2.4
+    // get count of contracts
     console.log("web3.js connected to " + web3.currentProvider["host"]);
     var adminAddr = null;
     web3.eth.getAccounts().then(r => { adminAddr = r[0] })
@@ -85,6 +86,7 @@ try {
 
     }
 
+    //edit userID here
     exports.insertAssetweb3 = (req, res, next) => {
         //exports.insertAssetweb3 = (req, res) => {
         try {
@@ -93,12 +95,13 @@ try {
             assetcontract.methods.createAsset(rndStr).send({ from: adminAddr, gas: 1000000 })
                 .on('confirmation', function (confirmationNumber, receipt) {
                     console.log("confirmation")
+                    console.log(receipt)
                     assetcontract.getPastEvents('Transfer', function (error, event) {
                         if (error) {
                             res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
                         }
                         else {
-                            // console.log(event);
+                             console.log(event);
                             req.app.tokenID = event[0]["returnValues"]["tokenId"];
                             // update mongoDB
                             next();
