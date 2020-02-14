@@ -12,6 +12,7 @@ import { NotfoundComponent } from './notfound/notfound.component';
 import { AdminComponent } from './admin/admin.component';
 import { AdminhomeComponent } from './admin/adminhome/adminhome.component';
 import { AdminhomdetailsComponent } from './admin/adminhomdetails/adminhomdetails.component';
+import { UserComponent } from './user/user.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { AdminhomdetailsComponent } from './admin/adminhomdetails/adminhomdetail
     NotfoundComponent,
     AdminComponent,
     AdminhomeComponent,
-    AdminhomdetailsComponent
+    AdminhomdetailsComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,

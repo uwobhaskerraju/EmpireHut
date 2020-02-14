@@ -34,7 +34,8 @@ try {
 
     exports.getBalance = async (req, res) => {
         try {
-            var usrAddress = (await web3.eth.getAccounts())[3];
+            var usrAddress = req.body.userID
+            //var usrAddress = (await web3.eth.getAccounts())[3];
             //console.log(usrAddress);
             EMPContract.methods.balanceOf(usrAddress).call()
                 .then(bal => {

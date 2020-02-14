@@ -36,9 +36,9 @@ exports.registerUser = (req, res) => {
                         .then(data => {
                             var objToken = {
                                 "email": userObj.email,
-                                "id": data["_id"],
+                                "address": data["address"],
                                 "name": userObj.username,
-                                "emailverified": data["emailverified"],
+                                //"emailverified": data["emailverified"],
                                 "userType": data["usertype"]
                             }
                             req.app.usrAddress=null;
@@ -80,9 +80,9 @@ exports.validateLogin = (req, res) => {
 
                     var objToken = {
                         "email": data.email,
-                        "id": data["_id"],
+                        "address": data["address"],
                         "name": data.username,
-                        "emailverified": data["emailverified"],
+                        //"emailverified": data["emailverified"],
                         "userType": data["usertype"]
                     }
                     let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });

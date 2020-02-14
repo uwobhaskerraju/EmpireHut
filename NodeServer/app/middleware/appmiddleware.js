@@ -66,7 +66,7 @@ function validateUserName(uName) {
 
 function userRegistrationCheck(req, res, next) {
     gblErrMsg = '';
-   // var inputs = sanitizeInputs(req);
+    // var inputs = sanitizeInputs(req);
     if (!req.body.email) return res.send({ statusCode: 500, result: errMsg })
     if (!req.body.username) return res.send({ statusCode: 500, result: errMsg })
     if (!req.body.password) return res.send({ statusCode: 500, result: errMsg })
@@ -110,7 +110,99 @@ function userLoginCheck(req, res, next) {
 
 }
 
+function checkToken(req, res, next) {
+    //console.log(req.headers)
+    // console.log("inside checktoken")
+    var bearerHeader = req.headers["authorization"]
+    if (bearerHeader === undefined) {
+        return res.send({ statusCode: 500, message: errMsg })
+    }
+    else {
+
+        var reqToken = bearerHeader.split(' ')[1]
+        jwt.verify(reqToken, secret, (err, decoded) => {
+            if (err) return res.status(500).send({ message: errMsg })
+            req.secret = secret;
+            req.token = reqToken;
+            next();
+        });
+    }
+}
+
+function decodetoken(req, res, next) {
+    var bearerHeader = req.headers["authorization"]
+    console.log(bearerHeader)
+    if (bearerHeader === undefined) {
+        return res.send({ statusCode: 500, message: errMsg })
+    }
+    else {
+        //console.log("herer")
+        var role = ['user', 'admin']
+        var reqToken = bearerHeader.split(' ')[1]
+        jwt.verify(reqToken, secret, (err, decoded) => {
+            //console.log(err)
+            if (err) return res.send({ statusCode: 500, message: errMsg })
+            if (role.includes(decoded["userType"])) {
+                switch (decoded["userType"]) {
+                    case "user":
+                        // if (!(req.url.split('/')[1].toLowerCase() == "open")) {
+
+                        //     return res.status(500).send({ message: errMsg })
+                        // }
+                        // break;
+                        res.send({ statusCode: 200, message: decoded })
+                        //res.send(decoded);
+                    case "admin":
+                        // if (!(req.url.split('/')[1].toLowerCase() == "admin")) {
+                        //     return res.status(500).send({ message: errMsg })
+                        // }
+                        res.send({ statusCode: 200, message: decoded })
+                        //res.send(decoded);
+                    // break;
+                }
+            }
+            else return res.send({ statusCode: 500, message: errMsg })
+
+        });
+    }
+}
+
+function checkRole(req, res, next) {
+    //console.log("inside checkRole")
+    var bearerHeader = req.headers["authorization"]
+    if (bearerHeader === undefined) {
+        return res.send({ statusCode: 500, message: errMsg })
+    }
+    else {
+        var role = ['user', 'admin']
+        var reqToken = bearerHeader.split(' ')[1]
+        jwt.verify(reqToken, secret, (err, decoded) => {
+            if (err) return res.status(500).send({ message: errMsg })
+            //console.log(decoded);
+            if (role.includes(decoded["userType"])) {
+                switch (decoded["userType"]) {
+                    case "user":
+                        if (!(req.url.split('/')[1].toLowerCase() == "open")) {
+                            return res.status(500).send({ message: errMsg })
+                        }
+                        break;
+                    case "admin":
+                        if (!(req.url.split('/')[1].toLowerCase() == "admin")) {
+                            return res.status(500).send({ message: errMsg })
+                        }
+                        break;
+                }
+            }
+            else return res.status(500).send({ message: errMsg })
+            next();
+        });
+    }
+}
+
 module.exports = {
     CheckRegistration: userRegistrationCheck,
-    CheckLogin: userLoginCheck
+    CheckLogin: userLoginCheck,
+    CheckToken: checkToken,
+    CheckRole: checkRole,
+    DecodeToken: decodetoken
 };

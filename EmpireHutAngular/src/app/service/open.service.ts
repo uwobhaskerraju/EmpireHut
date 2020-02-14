@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import{environment} from '../../environments/environment.prod';
+import { environment } from '../../environments/environment.prod';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -12,47 +12,35 @@ export class OpenService {
   ValidateLogin(email: any, pass: any) {
     //console.log("inside validatelogin")
     //let URL = 'http://' + window.location.host + '/insertNewItem'
-    let URL = environment.apiBaseURL + 'user/login'
+    let URL = environment.apiBaseURL + 'open/login'
     //console.log(URL)
 
     var JsnData = JSON.stringify({
       email: email,
       password: pass
     })
-    //console.log(JsnData)
-    let header = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
-
-    }
-    //console.log(header)
-    return this.http.post(URL, JsnData, header);
+ 
+    return this.http.post(URL, JsnData);
   }
 
   registerUser(name, pass, email) {
 
     //let URL = 'http://' + window.location.host + '/insertNewItem'
-    let URL = environment.apiBaseURL + 'user/register'
-    console.log(URL)
+    let URL = environment.apiBaseURL + 'open/register'
+    //console.log(URL)
 
     var JsnData = JSON.stringify({
       username: name,
       email: email,
       password: pass
     })
-    console.log(JsnData)
-    let header = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
+    //console.log(JsnData)
 
-    }
-    console.log(header)
-    return this.http.post(URL, JsnData, header);
+    return this.http.post(URL, JsnData);
+  }
+
+  validateToken() {
+    let URL = environment.apiBaseURL + 'open/val'
+    return this.http.get(URL);
   }
 }

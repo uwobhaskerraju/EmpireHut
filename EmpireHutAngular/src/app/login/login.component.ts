@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { Router, NavigationExtras } from '@angular/router';
-import {ValidationService} from '../validations/validation.service';
-import {OpenService} from '../service/open.service';
+import { ValidationService } from '../validations/validation.service';
+import { OpenService } from '../service/open.service';
 
 declare var M: any;
 @Component({
@@ -40,36 +40,23 @@ export class LoginComponent implements OnInit {
         .subscribe(data => {
           //console.log(data)
           if (data["statusCode"] == 200) {
-            const navigationExtras: NavigationExtras = {
-              state: {
-                email: data["result"]["email"],
-                id: data["result"]["id"],
-                name: data["result"]["name"],
-                active: data["result"]["emailverified"],
-                type: data["result"]["userType"]
-              }
-            };
-            //console.log(navigationExtras)
+            
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
-            if (!data["result"]["emailverified"]) {
-              this.router.navigate(['/verify'], navigationExtras)
-            }
-            else {
-              // route based on user type
-              if (data["result"]["userType"] == "admin") {
-                this.router.navigate(['/admin'], navigationExtras)
-              }
-              if (data["result"]["userType"] == "user") {
-                this.router.navigate(['/dashboard'], navigationExtras)
-              }
+            switch(data["result"]["userType"]){
+              case "user":
+                this.router.navigate(['user']);
+                break;
 
+              case "admin":
+                this.router.navigate(['admin']);
+                break;
             }
           }
           else {
             // throw a toast
             M.toast({ html: data["result"], classes: 'rounded' })
             //document.getElementById('signinPass').classList.add("invalid")
-           // document.getElementById('signinEmail').classList.add("invalid")
+            // document.getElementById('signinEmail').classList.add("invalid")
 
             //clear the form
           }
@@ -78,17 +65,14 @@ export class LoginComponent implements OnInit {
     }
     else {
       this._valService.generateToast(errMsg)
-      //M.toast({ html: 'Something went wrong. Try Again!', classes: 'rounded' })
-      //document.getElementById('signinPass').classList.add("invalid")
-      // document.getElementById('signinEmail').classList.add("invalid")
     }
 
   }
 
   registerUser() {
-    let email=this.signUp["email"]
-    let pass=this.signUp["pass"]
-    let name=this.signUp["name"]
+    let email = this.signUp["email"]
+    let pass = this.signUp["pass"]
+    let name = this.signUp["name"]
     let errMsg = ''
 
     errMsg = errMsg.concat(this._valService.validateEmail(String(email).trim()))
@@ -99,24 +83,12 @@ export class LoginComponent implements OnInit {
       this._http.registerUser(name, pass, email)
         .subscribe(data => {
           if (data["statusCode"] == 200) {
-            const navigationExtras: NavigationExtras = {
-              state: {
-                email: data["result"]["email"],
-                id: data["result"]["id"],
-                name: data["result"]["name"],
-                emailverified: data["result"]["emailverified"],
-                type: data["result"]["userType"]
-              }
-            };
+
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
             localStorage.setItem("userRole", data["result"]["userType"]);
 
-            if (!data["result"]["emailverified"]) {
-              this.router.navigate(['/verify'], navigationExtras)
-            }
-            if (data["result"]["emailverified"]) {
-              this.router.navigate(['/dashboard'], navigationExtras)
-            }
+            this.router.navigate(['/user'])
+
           }
           else {
             // throw a toast
