@@ -9,13 +9,15 @@ import { AuthGuard } from '../app/auth/auth.guard'
 
 import { AdminComponent } from '../app/admin/admin.component'
 import { AdminhomeComponent } from '../app/admin/adminhome/adminhome.component'
+import {AdminhomdetailsComponent} from '../app/admin/adminhomdetails/adminhomdetails.component'
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'admin', component: AdminComponent, canActivate: [AuthGuard], children: [
-      { path: '', component: AdminhomeComponent }
+      { path: '', component: AdminhomeComponent },
+      {path:'asset/:id',component:AdminhomdetailsComponent}
     ]
   },
   { path: '404', component: NotfoundComponent },

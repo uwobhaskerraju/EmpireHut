@@ -27,6 +27,9 @@ try {
     const asset_abi = AssetToken["abi"]
     const asset_address = AssetToken["networks"][process.env.blockNetwork]["address"]
     const assetcontract = new web3.eth.Contract(asset_abi, asset_address)
+
+    //track 10 ethereum accounts
+    var usrID = [];
     /************************** */
 
     exports.getBalance = async (req, res) => {
@@ -68,13 +71,29 @@ try {
 
     };
 
-    exports.registerUser = async (req, res) => {
+    function randomNumber() {
+        return Math.floor(Math.random() * 10);
+    }
+    exports.registerUser = async (req, res, next) => {
         try {
-            var usrAddress = (await web3.eth.getAccounts())[2];
 
+            var rndInt = null;
+            while (true) {
+                rndInt = randomNumber();
+                if (usrID.includes(rndInt)) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            var usrAddress = (await web3.eth.getAccounts())[rndInt];
             EMPContract.methods.registerUser(usrAddress).send({ from: adminAddr })
                 .then(r => {
-                    res.send({ statusCode: 200, data: { address: usrAddress, result: dataConfig.UserRegistration } });
+                    //res.send({ statusCode: 200, data: { address: usrAddress, result: dataConfig.UserRegistration } });
+                    usrID.push(rndInt);
+                    req.app.usrAddress = usrAddress;
+                    next();
                 })
                 .catch(err => {
                     res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
@@ -101,7 +120,7 @@ try {
                             res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
                         }
                         else {
-                             console.log(event);
+                            console.log(event);
                             req.app.tokenID = event[0]["returnValues"]["tokenId"];
                             // update mongoDB
                             next();
@@ -130,9 +149,25 @@ try {
 
     }
 
-    exports.getTokensOfUser = (req, res,next) => {
-        var user =adminAddr;
-       // var user = req.body.userID;
+    exports.getAssetDetails = (req, res, next) => {
+        //console.log(req.app.assetD);
+        var tokenID = req.app.assetD[0]["tokenID"]
+        var jsnObj = req.app.assetD[0];
+        assetcontract.methods.ownerOf(tokenID).call()
+            .then(r => {
+                jsnObj = jsnObj.toObject();
+                var a = Object.assign(jsnObj, { owner: r });
+                req.app.assetD[0] = a;
+                next();
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            })
+    };
+
+    exports.getTokensOfUser = (req, res, next) => {
+        var user = adminAddr;
+        // var user = req.body.userID;
         assetcontract.methods.ownedTokensOfUser(user).call()
             .then(r => {
                 //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });

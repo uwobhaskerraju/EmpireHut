@@ -9,8 +9,13 @@ export class AdminService {
 
   constructor(private _http:HttpClient) { }
 
-  getAssetDetails(){
+  getAllAssets(){
     let URL = environment.apiBaseURL + '/admin/assets'
+    return this._http.get(URL);
+  }
+
+  getAssetDetails(id:any){
+    let URL=environment.apiBaseURL+'/admin/asset/'+id;
     return this._http.get(URL);
   }
 }

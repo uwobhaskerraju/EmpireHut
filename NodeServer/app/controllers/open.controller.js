@@ -28,6 +28,7 @@ exports.registerUser = (req, res) => {
                         "email": req.body.email,
                         "emailverified": false,
                         "usertype": "user",
+                        "address":req.app.usrAddress,
                         "signupmethod": "registration"
                     };
                     const user = new User(userObj);
@@ -40,6 +41,7 @@ exports.registerUser = (req, res) => {
                                 "emailverified": data["emailverified"],
                                 "userType": data["usertype"]
                             }
+                            req.app.usrAddress=null;
                             let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
                             res.send({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
                         })

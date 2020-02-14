@@ -8,6 +8,8 @@ module.exports = (app) => {
     
     app.post('/admin/count',web3.getTokenCount);
 
-    app.get('/admin/assets',web3.getTokensOfUser,admin.getAssetDetails);
+    app.get('/admin/assets',web3.getTokensOfUser,admin.getAllAssets);
+
+    app.get('/admin/asset/:id',admin.getAssetDetails,web3.getAssetDetails,admin.getUserName);
 
 }

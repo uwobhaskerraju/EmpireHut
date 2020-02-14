@@ -8,8 +8,17 @@ contract AssetToken is ERC721Enumerable{
     //string[] tokensStr;
     //event createAssetEvent(address creator, uint256 _assettoken);
 
+     // Mapping from token ID to owner
+    mapping (uint256 => address) private _tokenOwner;
+
     constructor() public{
         tokenOwner = msg.sender;
+    }
+
+     function ownerOf(uint256 tokenId) public view returns (address) {
+        address owner = _tokenOwner[tokenId];
+        require(owner != address(0), "ERC721: owner query for nonexistent token");
+        return owner;
     }
 
     function tokenCount(address _owner) public view returns(uint){
@@ -22,8 +31,11 @@ contract AssetToken is ERC721Enumerable{
         //require(tokensStr[_tokenStr],'Token already exists');
         //Keccak-256 in Solidity returns a 32 byte array (which could also be represented as a 256 bit string)
       //_mint(msg.sender, bytesToUInt(keccak256(abi.encodePacked(_tokenStr))));
+
       _mint(msg.sender, uint(_tokenStr));
-        return uint(_tokenStr);
+      //add generated token to _tokenOwner 
+      _tokenOwner[uint(_tokenStr)] = msg.sender;
+      return uint(_tokenStr);
     }
 
     // /// @dev Converts a numeric string to it's unsigned integer representation.

@@ -2,6 +2,8 @@ try {
     const dataConfig = require('../config/data.config.js');
     const shortid = require('shortid');
     const Asset = require('../models/asset.model');
+    const User = require('../models/user.model');
+    var mongoose = require('mongoose');
 
     //create a new Asset
     // goes to web3 controller first and comes back here(insertAsset)
@@ -42,18 +44,61 @@ try {
                 })
             });
     };
-
     //end of create asset
 
-    // get asset details
+    //get asset details
+    exports.getAssetDetails = (req, res, next) => {
+        //console.log(req.params.id)
+        var assetID = mongoose.Types.ObjectId(req.params.id)
+        //console.log(assetID)
+        Asset.find({ _id: assetID })
+            .then(r => {
+                //console.log(r)
+                if (r != null || r != undefined) {
+                    req.app.assetD = r;
+                    next();
+                }
+            })
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    };
+
+    exports.getUserName = (req, res) => {
+
+        var asset = req.app.assetD[0];
+        User.find({ address: asset["owner"] })
+            .select({ username: 1, _id: 0 })
+            .then(r => {
+              
+                req.app.assetD[0] = null;
+                //asset = asset.toObject();
+                delete asset.tokenID
+                asset.owner = r[0].username;
+                //console.log(asset)
+                res.send(asset);
+            })
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    };
+    //end of get asset details
+
+    // get all assets
     //https://www.coreycleary.me/why-does-async-await-in-a-foreach-not-actually-await/
-    exports.getAssetDetails = async (req, res) => {
+    exports.getAllAssets = async (req, res) => {
         var result = [];
         const details = async () => {
             var tokenIDs = req.app.tokenIDs
             for (var token of tokenIDs) {
                 const ret = await getDetails(token);
-               // console.log(ret)
+                // console.log(ret)
                 if (ret.length > 0) {
                     var filtered = ret.filter(function () { return true });
                     result.push(filtered[0]);
@@ -64,7 +109,7 @@ try {
         const getDetails = x => {
             return new Promise((resolve, reject) => {
                 Asset.find({ tokenID: x })
-                    .select('-_id')
+                    .select({ "name": 1, "_id": 1, "picture": 1 })
                     .then(data => {
                         resolve(data);
                     })
@@ -74,6 +119,7 @@ try {
             });
         }
         details().then(r => {
+            req.app.tokenIDs = null;
             res.send(result)
         })
             .catch(r => {
