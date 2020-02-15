@@ -66,7 +66,22 @@ try {
                 })
             });
     };
-
+    exports.getUserDetails = (req,res,next)=>{
+        var address = req.body.address;
+        User.find({address:address})
+        .select({username:1,_id:0,email:1,address:1})
+        .then(r=>{
+           // console.log(r)
+            req.app.user=r;
+            next();
+        })
+        .catch(err => {
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+    };
     exports.getUserName = (req, res) => {
 
         var asset = req.app.assetD[0];

@@ -40,9 +40,9 @@ export class LoginComponent implements OnInit {
         .subscribe(data => {
           //console.log(data)
           if (data["statusCode"] == 200) {
-            
+
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
-            switch(data["result"]["userType"]){
+            switch (data["result"]["userType"]) {
               case "user":
                 this.router.navigate(['user']);
                 break;

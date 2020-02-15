@@ -17,13 +17,13 @@ export class AdminhomeComponent implements OnInit {
     this.imagePath = environment.imagePath
     this._http.getAllAssets()
       .subscribe(data => {
-        console.log(data);
+       // console.log(data);
         this.allAssets = data;
       });
   }
 
   showDetails(value: any) {
-    console.log(value.srcElement.id)
+    //console.log(value.srcElement.id)
     this.router.navigate(['asset', value.srcElement.id], { relativeTo: this.route });
   }
 

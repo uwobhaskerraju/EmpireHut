@@ -3,6 +3,7 @@ module.exports = (app) => {
     const checkrequest = require('../middleware/appmiddleware.js');
     const web3 = require('../controllers/web3.controller.js');
     
+    app.post('/admin/udetails',admin.getUserDetails,web3.getUserDetails);
     
     app.post('/admin/create',admin.createAsset,web3.insertAssetweb3,admin.insertAsset);
     

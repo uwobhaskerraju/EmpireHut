@@ -10,6 +10,7 @@ import { AuthGuard } from '../app/auth/auth.guard'
 import { AdminComponent } from '../app/admin/admin.component'
 import { AdminhomeComponent } from '../app/admin/adminhome/adminhome.component'
 import { AdminhomdetailsComponent } from '../app/admin/adminhomdetails/adminhomdetails.component'
+import { CreateassetComponent } from '../app/admin/createasset/createasset.component'
 
 import { UserComponent } from '../app/user/user.component'
 
@@ -17,13 +18,14 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   {
-    path: 'admin', component: AdminComponent, canActivate: [AuthGuard], children: [
+    path: 'admin', component: AdminComponent, children: [
       { path: '', component: AdminhomeComponent },
-      { path: 'asset/:id', component: AdminhomdetailsComponent }
+      { path: 'asset/:id', component: AdminhomdetailsComponent },
+      { path: 'create', component: CreateassetComponent }
     ]
   },
   {
-    path: 'user', component: UserComponent, canActivate: [AuthGuard]
+    path: 'user', component: UserComponent
   },
   { path: '404', component: NotfoundComponent },
   { path: '**', redirectTo: '/404' },

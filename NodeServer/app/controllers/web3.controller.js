@@ -181,6 +181,36 @@ try {
 
     };
 
+    exports.getUserDetails =(req,res)=>{
+        try {
+            var user=req.app.user;
+           // console.log(user)
+            var usrAddress = user[0]["address"]
+            //var usrAddress = (await web3.eth.getAccounts())[3];
+            //console.log(usrAddress);
+            if(web3.utils.isAddress(usrAddress)){
+                EMPContract.methods.balanceOf(usrAddress).call()
+                .then(bal => {
+                   // console.log(bal);
+                    user=user[0].toObject();
+                    user.balance=bal;
+                    req.app.user=null;
+                    res.send({ statusCode: 200, data: user });
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                });
+            }
+            else{
+                throw "something";
+            }
+           
+        } catch (error) {
+            console.log(error)
+            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+        }
+    }
 
 } catch (error) {
     console.log("in catch")

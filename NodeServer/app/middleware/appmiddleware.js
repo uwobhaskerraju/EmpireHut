@@ -199,6 +199,7 @@ function checkRole(req, res, next) {
     }
 }
 
+
 module.exports = {
     CheckRegistration: userRegistrationCheck,
     CheckLogin: userLoginCheck,

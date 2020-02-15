@@ -18,4 +18,17 @@ export class AdminService {
     let URL=environment.apiBaseURL+'/admin/asset/'+id;
     return this._http.get(URL);
   }
+
+  decodeToken(){
+    let URL=environment.apiBaseURL+'/open/val';
+    return this._http.get(URL);
+  }
+
+  getUserDetails(add:String){
+    let URL=environment.apiBaseURL+'/admin/udetails';
+    let jsnData={
+      address:add
+    }
+    return this._http.post(URL,jsnData);
+  }
 }
