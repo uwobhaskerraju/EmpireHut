@@ -17,7 +17,9 @@ try {
         req.app.latlong = Math.floor(Math.random() * (90 - (-90) + 1) + (-90)) + "/" + Math.floor(Math.random() * (180 - (-180) + 1) + (-180))
         next();
     };
-
+    function randomNumber() {
+        return Math.floor(Math.random() * 9)+1;
+    }
     exports.insertAsset = (req, res) => {
         var tokenID = req.app.tokenID;
         //var user = req.body.userID;
@@ -26,6 +28,7 @@ try {
             "name": req.body.name,
             "address": req.body.address,
             //  "owner": user,
+            "picture":randomNumber(),
             "price": req.app.price,
             "area": req.body.area,
             "latlong": req.app.latlong

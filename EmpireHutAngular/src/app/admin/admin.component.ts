@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { AdminService } from '../service/admin.service';
 import { Router } from '@angular/router';
+import {VariableService} from '../service/variable.service';
 
 @Component({
   selector: 'app-admin',
@@ -11,9 +12,10 @@ import { Router } from '@angular/router';
 export class AdminComponent implements OnInit {
   imagePath: String
   userDetails: Object
-  constructor(private _http: AdminService, private router: Router) { }
+  constructor(private _http: AdminService, private router: Router,private _VariableService:VariableService) { }
 
   ngOnInit() {
+    // this should be like this as we are checking token to update userdetails
     this.imagePath = environment.imagePath
     this._http.decodeToken()
       .subscribe(d => {
@@ -22,7 +24,8 @@ export class AdminComponent implements OnInit {
             .subscribe(r => {
               if (r["statusCode"] == 200) {
                 this.userDetails = r["data"]
-                console.log(this.userDetails)
+                this._VariableService.userdetails=r["data"]
+                //console.log(this.userDetails)
               }
             });
         }
@@ -30,6 +33,7 @@ export class AdminComponent implements OnInit {
           this.router.navigate(['']);
         }
       });
+    //console.log(this._VariableService.userdetails)
   }
 
   logout() {

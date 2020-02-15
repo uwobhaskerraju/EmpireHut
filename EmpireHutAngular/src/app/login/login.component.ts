@@ -85,9 +85,15 @@ export class LoginComponent implements OnInit {
           if (data["statusCode"] == 200) {
 
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
-            localStorage.setItem("userRole", data["result"]["userType"]);
+            switch (data["result"]["userType"]) {
+              case "user":
+                this.router.navigate(['user']);
+                break;
 
-            this.router.navigate(['/user'])
+              case "admin":
+                this.router.navigate(['admin']);
+                break;
+            }
 
           }
           else {

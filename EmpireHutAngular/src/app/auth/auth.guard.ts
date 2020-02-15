@@ -2,14 +2,30 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { OpenService } from '../service/open.service';
+import { VariableService } from '../service/variable.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
+  dState: Object;
+  constructor(private router: Router, private _http: OpenService, private _VariableService: VariableService) {
+    this._http.validateToken()
+      .subscribe(d => {
+        console.log("inside auth")
+        if (d["statusCode"] == 200) {
+          this._VariableService.userdetails = d["message"]
+          this.dState = d["message"];
+          console.log("end2")
+          // return true;
 
-  constructor(private router: Router, private _http: OpenService) {
+        }
+        else {
+          this.router.navigate(['/'])
+          // return false;
+        }
 
+      });
   }
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -17,32 +33,16 @@ export class AuthGuard implements CanActivate {
 
     if (localStorage.getItem('ACCESS_TOKEN') != null) {
 
-      // this._http.validateToken()
-      //   .subscribe(d => {
-      //     console.log("inside auth")
-      //     if (d["statusCode"] == 200) {
-      //       // if (d["message"]["userType"] == "admin") {
-      //       //   this.router.navigate(['admin'])
-      //       //   //return true;
-      //       // }
-      //       // if (d["message"]["userType"] == "user") {
-      //       //   this.router.navigate(['user'])
-             
-      //       // }
-      //       //this.router.navigate(['user'])
-      //       this.router.navigate(['/'])
-      //       return true;
-      //     }
-      //     else{
-      //       this.router.navigate(['/'])
-      //       return false;
-      //     }
-
-      //   });
-    
+      if (this.dState == null) {
+        console.log("inside null")
+        this.router.navigate(['/'])
+        return false;
+      }
+      console.log("end")
+      return true;
     }
     else {
-     this.router.navigate(['/'])
+      this.router.navigate(['/'])
       return false;
     }
   }

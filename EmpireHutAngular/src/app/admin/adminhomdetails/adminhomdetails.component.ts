@@ -24,7 +24,7 @@ export class AdminhomdetailsComponent implements OnInit {
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
         this.assetDetails.push(data);
-        console.log(this.assetDetails)
+        //console.log(this.assetDetails)
       });
   }
 
