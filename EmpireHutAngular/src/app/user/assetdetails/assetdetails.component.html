@@ -1,0 +1,62 @@
+<h4><a href="javascript:void(0)" (click)="goBack()"><i class="material-icons">arrow_back</i></a></h4>
+<div class="row" *ngIf="assetDetails">
+    <div class="col s12" *ngFor="let asset of assetDetails">
+        <div class="card large">
+            <div class="card-image">
+                <img src="{{imagePath}}{{asset.picture}}">
+                <span class="card-title"> {{asset.name}}</span>
+            </div>
+            <div class="card-content">
+                <table class="centered responsive-table">
+                    <tbody>
+                        <tr>
+                            <td>
+                                Property Name : {{asset.name}}
+                            </td>
+                            <td>
+                                Owner: {{asset.owner}}
+                            </td>
+                            <td>
+                                Area : {{asset.area}} Sq.Ft
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Address : {{asset.address}}
+                            </td>
+
+                            <td>
+                                Value: <i class="material-icons">attach_money</i> {{asset.price}} EMP
+                            </td>
+                            <td>
+                                Lat/Long : {{asset.latlong}}
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="divider"></div>
+<div class="section center">
+    <h5>Buy Property</h5>
+    <p>Enter an amount for which you wish to purchase this property. A Notification will be sent to
+        the owner for approval.
+    </p>
+    <div class="row">
+        <div class="col s12">
+            Amount:
+            <div class="input-field inline">
+                <input id="propertyamount" type="number" class="validate" [(ngModel)]="amount">
+                <span class="helper-text" data-error="wrong" data-success="right"></span>
+            </div>
+        </div>
+        <div class="row">
+            <a class="btn-floating btn-large waves-effect waves-light red" 
+            (click)="submitProposal()"><i class="material-icons">play_arrow</i></a>
+        </div>
+    </div>
+</div>

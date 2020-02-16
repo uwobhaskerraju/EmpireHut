@@ -3,5 +3,6 @@ module.exports = {
     UnAuthorizedMsg:'[UnAuthorized] Not a Valid Request.',
     UserRegistration:'Registered User Successfully',
     AssetRegistration:'Asset Registered Successfully',
-    pricesqft:2
+    pricesqft:2,
+    Proposal:'Proposal Submitted'
 }

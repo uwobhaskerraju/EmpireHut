@@ -13,6 +13,8 @@ import { AdminhomdetailsComponent } from '../app/admin/adminhomdetails/adminhomd
 import { CreateassetComponent } from '../app/admin/createasset/createasset.component'
 
 import { UserComponent } from '../app/user/user.component'
+import { AssetsComponent } from '../app/user/assets/assets.component'
+import { AssetdetailsComponent } from '../app/user/assetdetails/assetdetails.component'
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -25,7 +27,10 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'user', component: UserComponent
+    path: 'user', component: UserComponent, children: [
+      { path: '', component: AssetsComponent },
+      { path: 'asset/:id', component: AssetdetailsComponent }
+    ]
   },
   { path: '404', component: NotfoundComponent },
   { path: '**', redirectTo: '/404' },

@@ -15,6 +15,8 @@ import { AdminhomdetailsComponent } from './admin/adminhomdetails/adminhomdetail
 import { UserComponent } from './user/user.component';
 import { CreateassetComponent } from './admin/createasset/createasset.component';
 import { EditassetComponent } from './admin/editasset/editasset.component';
+import { AssetsComponent } from './user/assets/assets.component';
+import { AssetdetailsComponent } from './user/assetdetails/assetdetails.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,9 @@ import { EditassetComponent } from './admin/editasset/editasset.component';
     AdminhomdetailsComponent,
     UserComponent,
     CreateassetComponent,
-    EditassetComponent
+    EditassetComponent,
+    AssetsComponent,
+    AssetdetailsComponent
   ],
   imports: [
     BrowserModule,

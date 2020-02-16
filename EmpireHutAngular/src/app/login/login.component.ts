@@ -15,7 +15,12 @@ export class LoginComponent implements OnInit {
   imagePath: String
   public signUp: any = {};
 
-  constructor(private _http: OpenService, private router: Router, private _valService: ValidationService) { }
+  constructor(private _http: OpenService, private router: Router, private _valService: ValidationService) {
+    M.AutoInit();
+    M.updateTextFields();
+    var textNeedCount = document.querySelectorAll('input');
+    M.CharacterCounter.init(textNeedCount);
+  }
 
   ngOnInit() {
     this.imagePath = environment.imagePath

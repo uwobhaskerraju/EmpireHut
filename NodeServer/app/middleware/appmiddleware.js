@@ -131,7 +131,7 @@ function checkToken(req, res, next) {
 
 function decodetoken(req, res, next) {
     var bearerHeader = req.headers["authorization"]
-    console.log(bearerHeader)
+    //console.log(bearerHeader)
     if (bearerHeader === undefined) {
         return res.send({ statusCode: 500, message: errMsg })
     }
@@ -143,23 +143,7 @@ function decodetoken(req, res, next) {
             //console.log(err)
             if (err) return res.send({ statusCode: 500, message: errMsg })
             if (role.includes(decoded["userType"])) {
-                switch (decoded["userType"]) {
-                    case "user":
-                        // if (!(req.url.split('/')[1].toLowerCase() == "open")) {
-
-                        //     return res.status(500).send({ message: errMsg })
-                        // }
-                        // break;
-                        res.send({ statusCode: 200, message: decoded })
-                        //res.send(decoded);
-                    case "admin":
-                        // if (!(req.url.split('/')[1].toLowerCase() == "admin")) {
-                        //     return res.status(500).send({ message: errMsg })
-                        // }
-                        res.send({ statusCode: 200, message: decoded })
-                        //res.send(decoded);
-                    // break;
-                }
+                res.send({ statusCode: 200, message: decoded })
             }
             else return res.send({ statusCode: 500, message: errMsg })
 
@@ -182,7 +166,7 @@ function checkRole(req, res, next) {
             if (role.includes(decoded["userType"])) {
                 switch (decoded["userType"]) {
                     case "user":
-                        if (!(req.url.split('/')[1].toLowerCase() == "open")) {
+                        if (!(req.url.split('/')[1].toLowerCase() == "user")) {
                             return res.status(500).send({ message: errMsg })
                         }
                         break;

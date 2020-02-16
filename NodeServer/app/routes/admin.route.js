@@ -3,14 +3,14 @@ module.exports = (app) => {
     const checkrequest = require('../middleware/appmiddleware.js');
     const web3 = require('../controllers/web3.controller.js');
     
-    app.post('/admin/udetails',admin.getUserDetails,web3.getUserDetails);
+    app.post('/admin/udetails',checkrequest.CheckToken,admin.getUserDetails,web3.getUserDetails);
     
-    app.post('/admin/create',admin.createAsset,web3.insertAssetweb3,admin.insertAsset);
+    app.post('/admin/create',checkrequest.CheckToken,admin.createAsset,web3.insertAssetweb3,admin.insertAsset);
     
-    app.post('/admin/count',web3.getTokenCount);
+    app.post('/admin/count',checkrequest.CheckToken,web3.getTokenCount);
 
-    app.get('/admin/assets',web3.getTokensOfUser,admin.getAllAssets);
+    app.get('/admin/assets',checkrequest.CheckToken,web3.getTokensOfUser,admin.getAllAssets);
 
-    app.get('/admin/asset/:id',admin.getAssetDetails,web3.getAssetDetails,admin.getUserName);
+    app.get('/admin/asset/:id',checkrequest.CheckToken,admin.getAssetDetails,web3.getAssetDetails,admin.getUserName);
 
 }

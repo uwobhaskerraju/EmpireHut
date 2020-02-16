@@ -8,8 +8,9 @@ var AssetSchema = mongoose.Schema({
     //owner: { type: String,  required: true },
     area: { type: Number, default: 0 },
     price: { type: Number, default: 0 },
-    latlong: { type: String},
-    picture: { type: String, default:"asset.jpg"}
+    latlong: { type: String },
+    picture: { type: String, default: "asset.jpg" },
+    hidden: { type: Boolean, default: false }
 }, {
     versionKey: false
 });
