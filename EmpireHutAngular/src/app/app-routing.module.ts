@@ -11,6 +11,10 @@ import { AdminComponent } from '../app/admin/admin.component'
 import { AdminhomeComponent } from '../app/admin/adminhome/adminhome.component'
 import { AdminhomdetailsComponent } from '../app/admin/adminhomdetails/adminhomdetails.component'
 import { CreateassetComponent } from '../app/admin/createasset/createasset.component'
+import { UsersComponent } from '../app/admin/users/users.component'
+import { UserdetailsComponent } from '../app/admin/userdetails/userdetails.component'
+
+
 
 import { UserComponent } from '../app/user/user.component'
 import { AssetsComponent } from '../app/user/assets/assets.component'
@@ -23,7 +27,9 @@ const routes: Routes = [
     path: 'admin', component: AdminComponent, children: [
       { path: '', component: AdminhomeComponent },
       { path: 'asset/:id', component: AdminhomdetailsComponent },
-      { path: 'create', component: CreateassetComponent }
+      { path: 'create', component: CreateassetComponent },
+      { path: 'user', component: UsersComponent },
+      { path: 'user/view/:id', component: UserdetailsComponent }
     ]
   },
   {
@@ -31,9 +37,10 @@ const routes: Routes = [
       { path: '', component: AssetsComponent },
       { path: 'asset/:id', component: AssetdetailsComponent }
     ]
-  },
-  { path: '404', component: NotfoundComponent },
-  { path: '**', redirectTo: '/404' },
+  }
+  // ,
+  // { path: '404', component: NotfoundComponent },
+  // { path: '**', redirectTo: '/404' },
 ];
 
 

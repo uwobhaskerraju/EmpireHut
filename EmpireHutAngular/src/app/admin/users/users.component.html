@@ -1,0 +1,23 @@
+<blockquote>
+    <h3>All Users</h3>
+</blockquote>
+
+
+<div class="row" *ngIf="allUsers">
+    <div class="col s12 m6" *ngFor="let user of allUsers">
+        <div class="card light-blue lighten-1">
+            <div class="card-content white-text">
+                <span class="card-title">{{user.username}}</span>
+                <p>Email : {{user.email}}</p>
+            </div>
+            <div class="card-action white">
+                <a href="javascript:void(0)" id="{{user._id}}" class="blue-text"
+                    (click)="showDetails($event)">Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row center-align" *ngIf="allUsers?.length == 0">
+    <h3 class="blue-text">No Users</h3>
+</div>

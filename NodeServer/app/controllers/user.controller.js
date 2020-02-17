@@ -84,6 +84,37 @@ exports.addNotifications = (req, res) => {
             })
         });
 }
+//get asset token
+
+exports.getAssetToken = (req, res, next) => {
+    var assetID = req.body.assetID;
+    Asset.find({ _id: assetID })
+        .select({ tokenID: 1, _id: 0 })
+        .then(r => {
+            if (r != null || r != undefined) {
+                req.app.tokenID = r[0]["tokenID"];
+                console.log("mext")
+                next();
+                //res.send(r[0]);
+            }
+            else {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err.message)
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
+
+//end of asset token
+
 
 //get asset details
 exports.getAssetDetails = (req, res, next) => {

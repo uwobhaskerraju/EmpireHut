@@ -51,17 +51,21 @@ export class AssetdetailsComponent implements OnInit {
 
     //check whether the owner is admin or not
     //hit respective APIs based on that
-    this._http.checkAdmin(this.assetDetails[0]["address"])
+    this._http.checkAdmin(this.assetDetails[0]["ownerAdd"])
       .subscribe(r => {
+        console.log(r)
         if (r["result"]) {
           // yes owner is admin(govt), so we can directly buy 
           this._http.purchaseAsset(this.assetDetails[0],this._var.userdetails["address"])
-          .subscribe();
+          .subscribe(r=>{
+            console.log(r);
+          });
         }
         else {
           this._http.submitProposal(this.amount, this._var.userdetails["address"], this.assetDetails[0])
             .subscribe(r => {
               console.log(r);
+              M.toast({ html: "Submitted Proposal", classes: 'rounded' })
             });
         }
       });

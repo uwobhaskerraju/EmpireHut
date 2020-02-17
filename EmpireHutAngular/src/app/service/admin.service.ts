@@ -46,4 +46,23 @@ export class AdminService {
     let URL = environment.apiBaseURL + '/admin/count';
     return this._http.get(URL);
   }
+
+  getAllUsers() {
+    let URL = environment.apiBaseURL + '/admin/users';
+    return this._http.get(URL);
+  }
+
+  getAllUserDetails(id: any) {
+    let URL = environment.apiBaseURL + 'admin/userdetails/' + id;
+    return this._http.get(URL);
+  }
+
+  getUserTransactions(address:String){
+    let URL = environment.apiBaseURL+'admin/trans';
+    let jsnData={
+      address:address
+    }
+    return this._http.post(URL,jsnData);
+
+  }
 }

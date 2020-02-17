@@ -4,6 +4,7 @@ try {
     require('dotenv').config();
     const dataConfig = require('../config/data.config.js');
     const abiDecoder = require('abi-decoder');
+    const assetDecoder = abiDecoder;
 
     const rpcURL = process.env.blockURL
     const web3 = new Web3(rpcURL)
@@ -31,6 +32,7 @@ try {
 
 
     abiDecoder.addABI(abi)
+    assetDecoder.addABI(asset_abi);
     //track 10 ethereum accounts
     var usrID = [];
     /************************** */
@@ -76,6 +78,7 @@ try {
     }
 
     exports.transferTo = (req, res, next) => {
+        console.log("transfer To")
         try {
             var _from = req.body.from;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
@@ -91,6 +94,7 @@ try {
                 .then(bal => {
                     //console.log(r);
                     // balance got deducted
+                    console.log("next")
                     next();
                     //res.send({ statusCode: 200, data: { address: _to, balance: bal } });
                 })
@@ -120,7 +124,7 @@ try {
                         continue;
                     }
                     else {
-                        req.app.user="user"
+                        req.app.user = "user"
                         break;
                     }
                 }
@@ -197,7 +201,16 @@ try {
 
     exports.transferAsset = (req, res) => {
         try {
-
+            var _from = req.body.from;//(await web3.eth.getAccounts())[0];
+            var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
+            var tokenID = req.app.tokenID;
+            assetcontract.methods.transferAsset(_from, _to, tokenID).call()
+                .on('confirmation', function (confirmationNumber, receipt) {
+                    res.send(receipt);
+                })
+                .on('error', function (error, receipt) {
+                    res.send({ statusCode: 500, data: { error: error, message: receipt } });
+                });
         } catch (error) {
             res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
         }
@@ -280,6 +293,170 @@ try {
             });
 
     };
+
+    exports.getUserAssetCount = (req, res) => {
+        var resu = req.app.details[0];
+        var address = resu["address"];
+        assetcontract.methods.tokenCount(address).call()
+            .then(r => {
+                resu = resu.toObject();
+                resu.ownedTokens = r;
+                res.send({ statusCode: 200, result: resu });
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, data: { error: err } });
+            });
+
+    };
+
+
+    async function getTransactionsByAccount(myaccount, startBlockNumber, endBlockNumber) {
+        var fnlResult = [];
+        const loopTrans = (e, time) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    var jsnData = {};
+                    jsnData.description = "Property Purchase"
+                    jsnData.date = Date(time)
+                    //{from:,to:,amount:,date:,type:,description:}
+                    if (myaccount == e.to) {
+                        jsnData.from = e.from
+                        jsnData.to = e.to
+                        jsnData.amount = abiDecoder.decodeMethod(e.input)
+                        jsnData.type = "Credit"
+                    }
+                    if (myaccount == e.from) {
+                        jsnData.from = e.from
+                        jsnData.to = e.to
+                        jsnData.amount = abiDecoder.decodeMethod(e.input)
+                        jsnData.type = "Debit"
+                    }
+                    else {
+                        jsnData = {};
+                    }
+                    console.log(jsnData)
+                    resolve(jsnData);
+                } catch (error) {
+                    reject(error);
+                }
+
+            });
+        }
+        console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks " + startBlockNumber + " and " + endBlockNumber);
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+            if (i % 1000 == 0) {
+                console.log("Searching block " + i);
+            }
+            var block = await web3.eth.getBlock(i, true);
+            // console.log(block)
+            if (block != null && block.transactions != null) {
+                for (var trans of block.transactions) {
+                    //console.log(trans)
+                    var ret = await loopTrans(trans, block.timestamp);
+
+                    if (ret.length > 0) {
+                        var filtered = ret.filter(function () { return true });
+                        fnlResult.push(filtered[0]);
+                    }
+                }
+            }
+        }
+
+
+        return fnlResult;
+    }
+    exports.getTransactions = async (req, res) => {
+        var fnlResult = [];
+        const loopTrans = (e, time, myaccount) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    var jsnData = {};
+                    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    jsnData.description = "Property Purchase"
+                    jsnData.date = (new Date(time)).toLocaleDateString("en-US", options)
+                    //{from:,to:,amount:,date:,type:,description:}
+                    if (myaccount == e.to) {
+                        jsnData.from = e.from
+                        jsnData.to = e.to
+                        jsnData.amount = abiDecoder.decodeMethod(e.input)
+                        jsnData.type = "Credit"
+                    }
+                    if (myaccount == e.from) {
+                        jsnData.from = e.from
+                        jsnData.to = abiDecoder.decodeMethod(e.input)["params"][0]["value"]
+                        for (x in abiDecoder.decodeMethod(e.input)["params"][1]) {
+                            if (x == "value") {
+                                jsnData.amount = abiDecoder.decodeMethod(e.input)["params"][1][x]
+                            }
+                        }
+                        jsnData.type = "Debit"
+
+                        if (abiDecoder.decodeMethod(e.input)["name"].includes("register")) {
+                            jsnData.from = "Canada Govt"
+                            jsnData.to = e.from
+                            jsnData.amount = 1000
+                            jsnData.type = "Credit"
+                            jsnData.description = "Registration"
+                        }
+                    }
+                    else {
+                        jsnData = {};
+                    }
+                    if (jsnData.hasOwnProperty('description')) {
+                        resolve([jsnData]);
+                    }
+                    else {
+                        resolve([]);
+                    }
+
+                } catch (error) {
+                    reject(error);
+                }
+
+            });
+        }
+        const details = async () => {
+            var myaccount = req.body.address;
+            var endBlockNumber = await web3.eth.getBlockNumber();
+            var startBlockNumber = 0;
+            console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks " + startBlockNumber + " and " + endBlockNumber);
+
+            for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+                if (i % 1000 == 0) {
+                    console.log("Searching block " + i);
+                }
+                var block = await web3.eth.getBlock(i, true);
+                // console.log(block)
+                if (block != null && block.transactions != null) {
+                    for (var trans of block.transactions) {
+                        //console.log(trans)
+                        var ret = await loopTrans(trans, block.timestamp, myaccount);
+                        //console.log(ret.length)
+                        if (ret.length > 0) {
+
+                            var filtered = ret.filter(function () { return true });
+                            fnlResult.push(filtered[0]);
+
+
+                        }
+                    }
+                }
+            }
+        }
+        details().then(r => {
+            //req.app.tokenIDs = null;
+            res.send(fnlResult)
+        })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+
+    };
     /**************************/
     // end to calls to AssetToken
     /**************************/
@@ -310,19 +487,19 @@ try {
     };
 
     exports.blocks = async (req, res) => {
-        console.log(arguments.callee.name)
+        //console.log(arguments.callee.name)
         // var maxBlock = await web3.eth.getBlockNumber()
         // "transactions": [
         //     "0x49ebba10e98e89598fc4af4b11594d32720da419fb5fb71c3edec37a8cc52f5b"
         // ],
         // var a = [];
 
-        // web3.eth.getTransaction('0x484c52eb41d0071fd631df44ef975d181bae93524c7e5acc4c24a5cb6b2e5161')
-        //     .then(r => {
-        //         console.log(abiDecoder.decodeMethod(r.input))
-        //         res.send(r);
-        //     });
-        res.send("Asdsd")
+        web3.eth.getTransaction('0x4f7d93877945e5b2fdacb132e115c85fd54908912a546d69c538e4b18def1fe4')
+            .then(r => {
+                console.log(abiDecoder.decodeMethod(r.input))
+                res.send(r);
+            });
+        // res.send("Asdsd")
 
 
     };

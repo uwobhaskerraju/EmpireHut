@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { AdminService } from '../service/admin.service';
-import { Router } from '@angular/router';
-import {VariableService} from '../service/variable.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { VariableService } from '../service/variable.service';
 
 @Component({
   selector: 'app-admin',
@@ -12,8 +12,10 @@ import {VariableService} from '../service/variable.service';
 export class AdminComponent implements OnInit {
   imagePath: String
   userDetails: Object
-  tokenCount:String
-  constructor(private _http: AdminService, private router: Router,private _VariableService:VariableService) { }
+  tokenCount: String
+  constructor(private _http: AdminService,
+    private router: Router, private _VariableService: VariableService
+    , private route: ActivatedRoute) { }
 
   ngOnInit() {
     // this should be like this as we are checking token to update userdetails
@@ -25,14 +27,14 @@ export class AdminComponent implements OnInit {
             .subscribe(r => {
               if (r["statusCode"] == 200) {
                 this.userDetails = r["data"]
-                this._VariableService.userdetails=r["data"]
+                this._VariableService.userdetails = r["data"]
                 //console.log(this.userDetails)
                 this._http.getTotalCount()
-                .subscribe(r=>{
-                  //console.log(r)
-                  this._VariableService.tokenCount=r["data"]["result"];
-                  this.tokenCount=this._VariableService.tokenCount;
-                });
+                  .subscribe(r => {
+                    //console.log(r)
+                    this._VariableService.tokenCount = r["data"]["result"];
+                    this.tokenCount = this._VariableService.tokenCount;
+                  });
               }
             });
         }
@@ -48,17 +50,17 @@ export class AdminComponent implements OnInit {
     this.router.navigate([''])
   }
 
-  navigate(value:any){
+  navigate(value: any) {
 
-    switch(value){
+    switch (value) {
       case 1:
         this.router.navigate(['admin']);
         break;
       case 2:
-        this.router.navigate(['admin/create']);
+        this.router.navigate(['create'], { relativeTo: this.route });
         break;
       case 3:
-        this.router.navigate(['admin/user']);
+        this.router.navigate(['user'], { relativeTo: this.route });
         break;
     }
 
@@ -68,9 +70,9 @@ export class AdminComponent implements OnInit {
     // componentReference.anyFunction();
     //Below will subscribe to the searchItem emitter
     componentReference._tokenCount.subscribe((data) => {
-       // Will receive the data from child here 
-       this.tokenCount=data;
+      // Will receive the data from child here 
+      this.tokenCount = data;
     })
- }
+  }
 
 }

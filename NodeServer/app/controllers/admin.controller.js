@@ -18,7 +18,7 @@ try {
         next();
     };
     function randomNumber() {
-        return Math.floor(Math.random() * 9)+1;
+        return Math.floor(Math.random() * 9) + 1;
     }
     exports.insertAsset = (req, res) => {
         var tokenID = req.app.tokenID;
@@ -28,7 +28,7 @@ try {
             "name": req.body.name,
             "address": req.body.address,
             //  "owner": user,
-            "picture":randomNumber()+".jpg",
+            "picture": randomNumber() + ".jpg",
             "price": req.app.price,
             "area": req.body.area,
             "latlong": req.app.latlong
@@ -69,21 +69,21 @@ try {
                 })
             });
     };
-    exports.getUserDetails = (req,res,next)=>{
+    exports.getUserDetails = (req, res, next) => {
         var address = req.body.address;
-        User.find({address:address})
-        .select({username:1,_id:0,email:1,address:1})
-        .then(r=>{
-           // console.log(r)
-            req.app.user=r;
-            next();
-        })
-        .catch(err => {
-            res.send({
-                statusCode: 500,
-                result: dataConfig.GlobalErrMsg
+        User.find({ address: address })
+            .select({ username: 1, _id: 0, email: 1, address: 1 })
+            .then(r => {
+                // console.log(r)
+                req.app.user = r;
+                next();
             })
-        });
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
     };
     exports.getUserName = (req, res) => {
 
@@ -91,7 +91,7 @@ try {
         User.find({ address: asset["owner"] })
             .select({ username: 1, _id: 0 })
             .then(r => {
-              
+
                 req.app.assetD[0] = null;
                 //asset = asset.toObject();
                 delete asset.tokenID
@@ -148,6 +148,36 @@ try {
             });
     };
     //end of get asset details
+
+    exports.getAllUsers = (req, res) => {
+        User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }] })
+            .select({ username: 1, email: 1, _id: 1 })
+            .then(r => {
+                res.send({ statusCode: 200, result: r });
+            })
+            .catch(r => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    };
+
+    exports.getAllUserDetails = (req, res,next) => {
+        User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { _id: req.params.id }] })
+            .select({ username: 1, email: 1, _id: 1,address:1 })
+            .then(r => {
+                //res.send({ statusCode: 200, result: r });
+                req.app.details=r;
+                next();
+            })
+            .catch(r => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    };
 } catch (error) {
 
 }

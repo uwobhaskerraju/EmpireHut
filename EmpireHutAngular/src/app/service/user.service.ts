@@ -64,8 +64,11 @@ export class UserService {
     let jsnData = {
       owner:assetDetails["ownerAdd"],//_to
       amount:assetDetails["price"],
-      from:usrAdd
+      from:usrAdd,
+      assetID:assetDetails["_id"]
     }
     return this._http.post(URL, jsnData);
   }
+
+
 }
