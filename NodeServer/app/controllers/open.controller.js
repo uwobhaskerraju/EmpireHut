@@ -13,6 +13,7 @@ exports.registerUser = (req, res) => {
 
     User.findOne({ email: req.body.email })
         .then(async data => {
+            console.log('open registerUser')
             try {
                 if (data) {
                     // table has user so end the request
@@ -27,7 +28,7 @@ exports.registerUser = (req, res) => {
                         "password": hash,
                         "email": req.body.email,
                         "emailverified": false,
-                        "usertype": "user",
+                        "usertype": req.app.user,
                         "address":req.app.usrAddress,
                         "signupmethod": "registration"
                     };
@@ -42,6 +43,7 @@ exports.registerUser = (req, res) => {
                                 "userType": data["usertype"]
                             }
                             req.app.usrAddress=null;
+                            req.app.user=null;
                             let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
                             res.send({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
                         })

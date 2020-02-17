@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+asset_data.txt
+user_data.txt
+asset_data.txt
+.gitignore
+assettoken_old.sol
+asset_data.txt

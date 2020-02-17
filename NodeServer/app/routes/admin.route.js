@@ -7,10 +7,11 @@ module.exports = (app) => {
     
     app.post('/admin/create',checkrequest.CheckToken,admin.createAsset,web3.insertAssetweb3,admin.insertAsset);
     
-    app.post('/admin/count',checkrequest.CheckToken,web3.getTokenCount);
+    app.get('/admin/count',checkrequest.CheckToken,web3.getTokenCount);
 
     app.get('/admin/assets',checkrequest.CheckToken,web3.getTokensOfUser,admin.getAllAssets);
 
     app.get('/admin/asset/:id',checkrequest.CheckToken,admin.getAssetDetails,web3.getAssetDetails,admin.getUserName);
 
+    
 }

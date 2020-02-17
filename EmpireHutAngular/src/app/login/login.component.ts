@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit {
       this._http.registerUser(name, pass, email)
         .subscribe(data => {
           if (data["statusCode"] == 200) {
-
+            console.log("as")
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
             switch (data["result"]["userType"]) {
               case "user":
@@ -102,8 +102,10 @@ export class LoginComponent implements OnInit {
 
           }
           else {
+            //console.log("here")
             // throw a toast
-            M.toast({ html: data["result"], classes: 'rounded' })
+            console.log(data["data"])
+            M.toast({ html: data["data"], classes: 'rounded' })
             //clear the form
             this.ngOnInit();
           }

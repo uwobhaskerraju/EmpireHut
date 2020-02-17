@@ -62,9 +62,9 @@ export class UserService {
   purchaseAsset(assetDetails: any, usrAdd: any) {
     let URL = environment.apiBaseURL + '/user/purchase';
     let jsnData = {
-      owner:assetDetails["ownerAdd"],
+      owner:assetDetails["ownerAdd"],//_to
       amount:assetDetails["price"],
-      _to:usrAdd
+      from:usrAdd
     }
     return this._http.post(URL, jsnData);
   }

@@ -12,6 +12,7 @@ import {VariableService} from '../service/variable.service';
 export class AdminComponent implements OnInit {
   imagePath: String
   userDetails: Object
+  tokenCount:String
   constructor(private _http: AdminService, private router: Router,private _VariableService:VariableService) { }
 
   ngOnInit() {
@@ -26,6 +27,12 @@ export class AdminComponent implements OnInit {
                 this.userDetails = r["data"]
                 this._VariableService.userdetails=r["data"]
                 //console.log(this.userDetails)
+                this._http.getTotalCount()
+                .subscribe(r=>{
+                  //console.log(r)
+                  this._VariableService.tokenCount=r["data"]["result"];
+                  this.tokenCount=this._VariableService.tokenCount;
+                });
               }
             });
         }
@@ -56,5 +63,14 @@ export class AdminComponent implements OnInit {
     }
 
   }
+  updateAssetCount(componentReference) {
+    // console.log(componentReference)
+    // componentReference.anyFunction();
+    //Below will subscribe to the searchItem emitter
+    componentReference._tokenCount.subscribe((data) => {
+       // Will receive the data from child here 
+       this.tokenCount=data;
+    })
+ }
 
 }

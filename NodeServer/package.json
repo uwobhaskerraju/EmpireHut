@@ -12,6 +12,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^2.4.0",
     "@truffle/hdwallet-provider": "^1.0.28",
+    "abi-decoder": "^2.3.0",
     "argon2": "^0.25.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

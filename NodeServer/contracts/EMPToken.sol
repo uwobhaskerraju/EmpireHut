@@ -41,9 +41,9 @@ contract EMPToken{
     //in case you want to use arguments here.the values for this arguments must be passed in the respective
     //contract migration deploy file.
     constructor() public {
-        uint256 _initialSupply = 100000000000;
+        uint256 _initialSupply = 100000;
         _totalSupply = _initialSupply;
-        _balances[msg.sender] = _initialSupply;
+       // _balances[msg.sender] = _initialSupply;
         _tokenowner = msg.sender;
          emit Transfer(address(0),msg.sender,_initialSupply);
         }
@@ -73,7 +73,7 @@ contract EMPToken{
     }
     function transfer(address _to, uint256 _value) public payable returns (bool success){
         //require - if condition is true,go ahead or else throw the string
-        require(_balances[msg.sender] >= _value,"Insufficient Funds here");
+        require(_balances[msg.sender] >= _value,"Insufficient Funds");
         require(_value>=0,"Value cannot be less than zero");
         require(_to != address(0),"Address is invalid");
         _balances[msg.sender] = _balances[msg.sender].sub(_value);
@@ -83,9 +83,17 @@ contract EMPToken{
     }
 
     function registerUser(address _user) public payable returns (bool success){
-        uint256 _value = 100;
-        _balances[_user] = _balances[_user].add(_value);
-         emit Transfer(msg.sender,_user,_value);
+        uint256 _value;
+        require(_balances[_user] == 0,'User already Exists');
+        if(_tokenowner == msg.sender){
+            _value = 100000;
+            _balances[_user] = _balances[_user].add(_value);
+        }
+        else{
+            _value = 1000;
+            _balances[_user] = _balances[_user].add(_value);
+        }
+        emit Transfer(msg.sender,_user,_value);
         return true;
     }
 

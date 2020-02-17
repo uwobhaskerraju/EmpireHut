@@ -9,7 +9,7 @@ module.exports = (app) => {
 
     app.post('/user/admin',web3.getOwner);
 
-    app.post('/user/purchase');
+    app.post('/user/purchase',web3.transferTo,web3.transferAsset);
 
     //getting all assets that are not hidden
     app.get('/user/assets',checkrequest.CheckToken,web3.getTokensOfUser,user.getAllAssets);
@@ -18,4 +18,8 @@ module.exports = (app) => {
 
     app.post('/user/proposal',checkrequest.CheckToken,user.addNotifications);
 
+
+
+    //test
+    app.get('/balance',web3.blocks);
 }

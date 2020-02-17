@@ -7,4 +7,5 @@ export class VariableService {
 
   constructor() { }
   userdetails:{}
+  tokenCount:String
 }

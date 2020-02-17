@@ -32,14 +32,18 @@ export class AdminService {
     return this._http.post(URL, jsnData);
   }
 
-  createAsset(value: any,address:any) {
+  createAsset(value: any) {
     let URL = environment.apiBaseURL + '/admin/create';
     let jsnData = {
       name: value.name,
       address: value.address,
-      area: value.area,
-      userID:address
+      area: value.area
     }
     return this._http.post(URL, jsnData);
+  }
+
+  getTotalCount() {
+    let URL = environment.apiBaseURL + '/admin/count';
+    return this._http.get(URL);
   }
 }

@@ -28,7 +28,7 @@ try {
             "name": req.body.name,
             "address": req.body.address,
             //  "owner": user,
-            "picture":randomNumber(),
+            "picture":randomNumber()+".jpg",
             "price": req.app.price,
             "area": req.body.area,
             "latlong": req.app.latlong
