@@ -92,7 +92,7 @@ contract AssetToken {
         return _tokensOfOwner(_user);
     }
 
-    function transferAsset(address _from, address _to, uint256 tokenID) public {
+    function transferAsset(address _from, address _to, uint256 tokenID) public payable{
         _removeTokenFromOwnerEnumeration(_from, tokenID);
         _removeTokenFromAllTokensEnumeration(tokenID);
         _addTokenToOwnerEnumeration(_to, tokenID);

@@ -10,7 +10,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class UserdetailsComponent implements OnInit {
   userDetails: object
-  userID:String
+  userID: String
+  userTrans: object
   private routeSub: Subscription;
   constructor(private _http: AdminService, private route: ActivatedRoute) { }
 
@@ -22,9 +23,14 @@ export class UserdetailsComponent implements OnInit {
     this._http.getAllUserDetails(this.userID)
       .subscribe(r => {
         if (r["statusCode"] == 200) {
-         // this.userDetails = {};
+          // this.userDetails = {};
           this.userDetails = r["result"]
-          console.log(this.userDetails)
+          //pull transactions of this user
+          this._http.getUserTransactions(this.userDetails["address"])
+            .subscribe(r => {
+              this.userTrans = r["result"]
+              //console.log(this.userTrans)
+            });
         }
       });
   }

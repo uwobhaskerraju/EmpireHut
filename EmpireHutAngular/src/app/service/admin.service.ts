@@ -57,12 +57,12 @@ export class AdminService {
     return this._http.get(URL);
   }
 
-  getUserTransactions(address:String){
-    let URL = environment.apiBaseURL+'admin/trans';
-    let jsnData={
-      address:address
+  getUserTransactions(address: String) {
+    let URL = environment.apiBaseURL + 'admin/trans';
+    let jsnData = {
+      address: address
     }
-    return this._http.post(URL,jsnData);
+    return this._http.post(URL, jsnData);
 
   }
 }

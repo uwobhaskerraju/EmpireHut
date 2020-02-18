@@ -18,8 +18,11 @@ export class AssetsComponent implements OnInit {
     this.imagePath = environment.imagePath
     this._http.getAllAssets()
       .subscribe(data => {
-       // console.log(data);
-        this.allAssets = data;
+        // console.log(data);
+        if (data["statusCode"] == 200) {
+          this.allAssets = data["result"];
+        }
+
       });
   }
 

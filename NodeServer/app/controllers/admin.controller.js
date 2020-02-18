@@ -97,7 +97,7 @@ try {
                 delete asset.tokenID
                 asset.owner = r[0].username;
                 //console.log(asset)
-                res.send(asset);
+                res.send({statusCode:200,result:asset});
             })
             .catch(err => {
                 res.send({
@@ -138,7 +138,7 @@ try {
         }
         details().then(r => {
             req.app.tokenIDs = null;
-            res.send(result)
+            res.send({ statusCode: 200, result: result })
         })
             .catch(r => {
                 res.send({
@@ -163,12 +163,79 @@ try {
             });
     };
 
-    exports.getAllUserDetails = (req, res,next) => {
+    exports.getUserNameFrmAddress = async (req, res) => {
+        var fnlRes = [];
+        var getData = (ad) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    // console.log(ad)
+                    regex = ad.map(function (e) { return new RegExp(e, "i"); });
+                    User.find({ address: { $in: regex } })
+                        //User.find({ address: ad1 })
+                        .select({ username: 1, _id: 0, address: 1 })
+                        .then(r => {
+                            // console.log(r)
+                            resolve(r);
+                        })
+                        .catch(r => {
+                            reject(r);
+                        });
+                } catch (error) {
+                    reject(error);
+                }
+
+            });
+        }
+        var details = async () => {
+
+            var result = req.app.result;
+            //var reldup = result;
+            req.app.result = null;
+            var ret = [];
+            for (var value of result) {
+                var ad = []
+                var ad1 = value["from"]
+                var ad2 = value["to"]
+                if (String(ad1).includes('0x')) {
+                    ad.push(String(ad1).toLowerCase())
+                }
+                if (String(ad2).includes('0x')) {
+                    ad.push(String(ad2).toLowerCase())
+                }
+                //console.log(ad1 + " " + ad2)
+                var ret = await getData(ad);
+                for (var x of ret) {
+                    if (String(x["address"]).toLowerCase() == value["from"].toLowerCase()) {
+                        value["from"] = x["username"]
+                    }
+                    if (String(x["address"]).toLowerCase() == value["to"].toLowerCase()) {
+                        value["to"] = x["username"]
+                    }
+                }
+            }
+            return result.reverse();
+            //console.log(result)
+        }
+
+        details().then(r => {
+            //console.log(r)
+            res.send({ statusCode: 200, result: r })
+        })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+
+            });
+    }
+    exports.getAllUserDetails = (req, res, next) => {
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { _id: req.params.id }] })
-            .select({ username: 1, email: 1, _id: 1,address:1 })
+            .select({ username: 1, email: 1, _id: 1, address: 1 })
             .then(r => {
                 //res.send({ statusCode: 200, result: r });
-                req.app.details=r;
+                req.app.details = r;
                 next();
             })
             .catch(r => {

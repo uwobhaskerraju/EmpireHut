@@ -14,7 +14,8 @@ module.exports = (app) => {
 
 
    
-
+    //test
+    app.get('/contracts',web3.testEvents);
 
 
 }

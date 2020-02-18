@@ -29,7 +29,10 @@ export class AssetdetailsComponent implements OnInit {
     });
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
-        this.assetDetails.push(data);
+        if (data["statusCode"] == 200) {
+          this.assetDetails.push(data["result"]);
+        }
+
         //console.log(this.assetDetails)
       });
   }
@@ -56,16 +59,30 @@ export class AssetdetailsComponent implements OnInit {
         console.log(r)
         if (r["result"]) {
           // yes owner is admin(govt), so we can directly buy 
-          this._http.purchaseAsset(this.assetDetails[0],this._var.userdetails["address"])
-          .subscribe(r=>{
-            console.log(r);
-          });
+          this._http.purchaseAsset(this.assetDetails[0], this._var.userdetails["address"])
+            .subscribe(r => {
+              if (r["statusCode"] == 200) {
+                M.toast({ html: "Asset Purchased! :) ", classes: 'rounded' })
+
+                //call parent method
+              }
+              else {
+                M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
+              }
+              console.log(r);
+            });
         }
         else {
           this._http.submitProposal(this.amount, this._var.userdetails["address"], this.assetDetails[0])
             .subscribe(r => {
+              if (r["statusCode"] == 200) {
+                M.toast({ html: "Submitted Proposal", classes: 'rounded' })
+              }
+              else {
+                M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
+              }
               console.log(r);
-              M.toast({ html: "Submitted Proposal", classes: 'rounded' })
+
             });
         }
       });

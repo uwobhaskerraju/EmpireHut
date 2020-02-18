@@ -54,7 +54,7 @@ try {
                 }
             })
             .catch(err => {
-                res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
             });
     }
 
@@ -66,13 +66,13 @@ try {
             EMPContract.methods.balanceOf(usrAddress).call()
                 .then(bal => {
                     //console.log(r);
-                    res.send({ statusCode: 200, data: { address: usrAddress, balance: bal } });
+                    res.send({ statusCode: 200, result: bal });
                 })
                 .catch(err => {
-                    res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
                 });
         } catch (error) {
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
 
     }
@@ -117,6 +117,7 @@ try {
         try {
 
             var rndInt = null;
+            usrID.push(0)
             if (usrID.includes(0)) {
                 while (true) {
                     rndInt = randomNumber();
@@ -124,6 +125,7 @@ try {
                         continue;
                     }
                     else {
+                        usrID.push(rndInt)
                         req.app.user = "user"
                         break;
                     }
@@ -133,7 +135,7 @@ try {
                 rndInt = 0;
                 req.app.user = "admin"
             }
-
+            console.log(rndInt)
             var usrAddress = (await web3.eth.getAccounts())[rndInt];
             EMPContract.methods.registerUser(usrAddress).send({ from: usrAddress })
                 .then(r => {
@@ -174,11 +176,11 @@ try {
                         user = user[0].toObject();
                         user.balance = bal;
                         req.app.user = null;
-                        res.send({ statusCode: 200, data: user });
+                        res.send({ statusCode: 200, result: user });
                     })
                     .catch(err => {
                         console.log(err)
-                        res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                        res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
                     });
             }
             else {
@@ -187,7 +189,7 @@ try {
 
         } catch (error) {
             console.log(error)
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
     };
 
@@ -204,15 +206,17 @@ try {
             var _from = req.body.from;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
             var tokenID = req.app.tokenID;
-            assetcontract.methods.transferAsset(_from, _to, tokenID).call()
+            assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 1 })
                 .on('confirmation', function (confirmationNumber, receipt) {
-                    res.send(receipt);
+                    console.log(receipt)
+                    res.send({ statusCode: 200, result: receipt });
                 })
                 .on('error', function (error, receipt) {
-                    res.send({ statusCode: 500, data: { error: error, message: receipt } });
+                    console.log(error)
+                    res.send({ statusCode: 500, result: error });
                 });
         } catch (error) {
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
     };
     // end of transferAsset
@@ -255,10 +259,10 @@ try {
     exports.getTokenCount = (req, res) => {
         assetcontract.methods.tokenCount(adminAddr).call()
             .then(r => {
-                res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
+                res.send({ statusCode: 200, result: r });
             })
             .catch(err => {
-                res.send({ statusCode: 500, data: { error: err } });
+                res.send({ statusCode: 500, result: err });
             });
 
     }
@@ -304,69 +308,13 @@ try {
                 res.send({ statusCode: 200, result: resu });
             })
             .catch(err => {
-                res.send({ statusCode: 500, data: { error: err } });
+                res.send({ statusCode: 500, result: err });
             });
 
     };
 
 
-    async function getTransactionsByAccount(myaccount, startBlockNumber, endBlockNumber) {
-        var fnlResult = [];
-        const loopTrans = (e, time) => {
-            return new Promise((resolve, reject) => {
-                try {
-                    var jsnData = {};
-                    jsnData.description = "Property Purchase"
-                    jsnData.date = Date(time)
-                    //{from:,to:,amount:,date:,type:,description:}
-                    if (myaccount == e.to) {
-                        jsnData.from = e.from
-                        jsnData.to = e.to
-                        jsnData.amount = abiDecoder.decodeMethod(e.input)
-                        jsnData.type = "Credit"
-                    }
-                    if (myaccount == e.from) {
-                        jsnData.from = e.from
-                        jsnData.to = e.to
-                        jsnData.amount = abiDecoder.decodeMethod(e.input)
-                        jsnData.type = "Debit"
-                    }
-                    else {
-                        jsnData = {};
-                    }
-                    console.log(jsnData)
-                    resolve(jsnData);
-                } catch (error) {
-                    reject(error);
-                }
-
-            });
-        }
-        console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks " + startBlockNumber + " and " + endBlockNumber);
-
-        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-            if (i % 1000 == 0) {
-                console.log("Searching block " + i);
-            }
-            var block = await web3.eth.getBlock(i, true);
-            // console.log(block)
-            if (block != null && block.transactions != null) {
-                for (var trans of block.transactions) {
-                    //console.log(trans)
-                    var ret = await loopTrans(trans, block.timestamp);
-
-                    if (ret.length > 0) {
-                        var filtered = ret.filter(function () { return true });
-                        fnlResult.push(filtered[0]);
-                    }
-                }
-            }
-        }
-
-
-        return fnlResult;
-    }
-    exports.getTransactions = async (req, res) => {
+    exports.getTransactions = async (req, res, next) => {
         var fnlResult = [];
         const loopTrans = (e, time, myaccount) => {
             return new Promise((resolve, reject) => {
@@ -446,7 +394,9 @@ try {
         }
         details().then(r => {
             //req.app.tokenIDs = null;
-            res.send(fnlResult)
+            req.app.result = fnlResult;
+            next();
+            //res.send({ statusCode: 200, result: fnlResult })
         })
             .catch(r => {
                 console.log(r)
@@ -463,6 +413,23 @@ try {
     /**************/
     //test
     /******************/
+
+
+    exports.testEvents = (req, res) => {
+        try {
+
+            assetcontract.getPastEvents('Create', {
+                fromBlock: 0,
+                toBlock: 'latest'
+            })
+                .then(function (events) {
+                    console.log(events) // same results as the optional callback above
+                    res.send(events)
+                });
+        } catch (error) {
+
+        }
+    };
 
     exports.transferLogic = async (req, res) => {
         try {

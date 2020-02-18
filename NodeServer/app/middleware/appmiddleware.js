@@ -133,7 +133,7 @@ function decodetoken(req, res, next) {
     var bearerHeader = req.headers["authorization"]
     //console.log(bearerHeader)
     if (bearerHeader === undefined) {
-        return res.send({ statusCode: 500, message: errMsg })
+        return res.send({ statusCode: 500, result: errMsg })
     }
     else {
         //console.log("herer")
@@ -141,11 +141,11 @@ function decodetoken(req, res, next) {
         var reqToken = bearerHeader.split(' ')[1]
         jwt.verify(reqToken, secret, (err, decoded) => {
             //console.log(err)
-            if (err) return res.send({ statusCode: 500, message: errMsg })
+            if (err) return res.send({ statusCode: 500, result: errMsg })
             if (role.includes(decoded["userType"])) {
-                res.send({ statusCode: 200, message: decoded })
+                res.send({ statusCode: 200, result: decoded })
             }
-            else return res.send({ statusCode: 500, message: errMsg })
+            else return res.send({ statusCode: 500, result: errMsg })
 
         });
     }

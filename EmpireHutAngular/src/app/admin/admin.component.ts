@@ -23,16 +23,16 @@ export class AdminComponent implements OnInit {
     this._http.decodeToken()
       .subscribe(d => {
         if (d["statusCode"] == 200) {
-          this._http.getUserDetails(d["message"]["address"])
+          this._http.getUserDetails(d["result"]["address"])
             .subscribe(r => {
               if (r["statusCode"] == 200) {
-                this.userDetails = r["data"]
-                this._VariableService.userdetails = r["data"]
+                this.userDetails = r["result"]
+                this._VariableService.userdetails = r["result"]
                 //console.log(this.userDetails)
                 this._http.getTotalCount()
                   .subscribe(r => {
                     //console.log(r)
-                    this._VariableService.tokenCount = r["data"]["result"];
+                    this._VariableService.tokenCount = r["result"];
                     this.tokenCount = this._VariableService.tokenCount;
                   });
               }

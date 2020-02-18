@@ -10,11 +10,11 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./adminhomdetails.component.css']
 })
 export class AdminhomdetailsComponent implements OnInit {
-  assetDetails=[];
+  assetDetails = [];
   imagePath: String;
   private routeSub: Subscription;
   assetID: String;
-  constructor(private _http: AdminService, private route: ActivatedRoute,private router:Router) { }
+  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -23,12 +23,15 @@ export class AdminhomdetailsComponent implements OnInit {
     });
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
-        this.assetDetails.push(data);
+        if (data["statusCode"] == 200) {
+          this.assetDetails.push(data["result"]);
+        }
+
         //console.log(this.assetDetails)
       });
   }
 
-  goBack(){
+  goBack() {
     this.router.navigate(['admin'])
   }
 

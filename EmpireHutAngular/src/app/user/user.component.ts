@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
-import {UserService} from '../service/user.service';
+import { UserService } from '../service/user.service';
 import { Router } from '@angular/router';
-import {VariableService} from '../service/variable.service';
+import { VariableService } from '../service/variable.service';
 
 declare var M: any;
 
@@ -14,21 +14,20 @@ declare var M: any;
 export class UserComponent implements OnInit {
   imagePath: String
   //userDetails: Object
-  constructor(private _http:UserService,private router:Router,private _VariableService:VariableService) {
+  constructor(private _http: UserService, private router: Router, private _VariableService: VariableService) {
     M.AutoInit();
-   }
+    this.callTokenAndPerDetails();
+  }
 
-  ngOnInit() {
-  
-    this.imagePath = environment.imagePath
+  callTokenAndPerDetails() {
     this._http.decodeToken()
       .subscribe(d => {
         if (d["statusCode"] == 200) {
-          this._http.getUserDetails(d["message"]["address"])
+          this._http.getUserDetails(d["result"]["address"])
             .subscribe(r => {
               if (r["statusCode"] == 200) {
-               // this.userDetails = r["data"]
-                this._VariableService.userdetails=r["data"]
+                //this.userDetails = r["data"]
+                this._VariableService.userdetails = r["result"]
                 console.log(this._VariableService.userdetails)
               }
             });
@@ -39,14 +38,20 @@ export class UserComponent implements OnInit {
       });
   }
 
-  logout(){
+  ngOnInit() {
+
+    this.imagePath = environment.imagePath
+
+  }
+
+  logout() {
     localStorage.clear();
     this.router.navigate([''])
   }
 
-  navigate(value:any){
+  navigate(value: any) {
 
-    switch(value){
+    switch (value) {
       case 1:
         this.router.navigate(['user']);
         break;
@@ -54,7 +59,7 @@ export class UserComponent implements OnInit {
         //this.router.navigate(['user/create']);
         break;
       case 3:
-       // this.router.navigate(['admin/user']);
+        // this.router.navigate(['admin/user']);
         break;
     }
 

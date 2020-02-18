@@ -50,7 +50,7 @@ exports.getAllAssets = async (req, res) => {
     }
     details().then(r => {
         req.app.tokenIDs = null;
-        res.send(result)
+        res.send({ statusCode: 200, result: result })
     })
         .catch(r => {
             res.send({
@@ -76,6 +76,12 @@ exports.addNotifications = (req, res) => {
             if (r != null || r != undefined) {
                 res.send({ statusCode: 200, result: dataConfig.Proposal });
             }
+            else {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            }
         })
         .catch(r => {
             res.send({
@@ -87,7 +93,7 @@ exports.addNotifications = (req, res) => {
 //get asset token
 
 exports.getAssetToken = (req, res, next) => {
-    var assetID = req.body.assetID;
+    var assetID = req.body.assetID;//mongoID
     Asset.find({ _id: assetID })
         .select({ tokenID: 1, _id: 0 })
         .then(r => {
@@ -154,7 +160,7 @@ exports.getUserName = (req, res) => {
             asset.owner = r[0].username;
             asset.ownerAdd = r[0].address;
             //console.log(asset)
-            res.send(asset);
+            res.send({ statusCode: 200, result: asset });
         })
         .catch(err => {
             res.send({
