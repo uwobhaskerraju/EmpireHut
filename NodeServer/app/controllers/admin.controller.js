@@ -97,7 +97,7 @@ try {
                 delete asset.tokenID
                 asset.owner = r[0].username;
                 //console.log(asset)
-                res.send({statusCode:200,result:asset});
+                res.send({ statusCode: 200, result: asset });
             })
             .catch(err => {
                 res.send({

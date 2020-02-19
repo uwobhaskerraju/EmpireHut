@@ -104,8 +104,8 @@ export class LoginComponent implements OnInit {
           else {
             //console.log("here")
             // throw a toast
-            console.log(data["data"])
-            M.toast({ html: data["data"], classes: 'rounded' })
+            console.log(data["result"])
+            M.toast({ html: data["result"], classes: 'rounded' })
             //clear the form
             this.ngOnInit();
           }

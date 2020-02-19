@@ -19,6 +19,7 @@ import { AssetsComponent } from './user/assets/assets.component';
 import { AssetdetailsComponent } from './user/assetdetails/assetdetails.component';
 import { UsersComponent } from './admin/users/users.component';
 import { UserdetailsComponent } from './admin/userdetails/userdetails.component';
+import { ProposalsComponent } from './user/proposals/proposals.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { UserdetailsComponent } from './admin/userdetails/userdetails.component'
     AssetsComponent,
     AssetdetailsComponent,
     UsersComponent,
-    UserdetailsComponent
+    UserdetailsComponent,
+    ProposalsComponent
   ],
   imports: [
     BrowserModule,

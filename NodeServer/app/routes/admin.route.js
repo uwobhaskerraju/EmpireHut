@@ -9,7 +9,7 @@ module.exports = (app) => {
 
     app.get('/admin/count', checkrequest.CheckToken, web3.getTokenCount);
 
-    app.get('/admin/assets', checkrequest.CheckToken, web3.getTokensOfUser, admin.getAllAssets);
+    app.get('/admin/assets', checkrequest.CheckToken, web3.getAllTokens, admin.getAllAssets);
 
     app.get('/admin/asset/:id', checkrequest.CheckToken, admin.getAssetDetails, web3.getAssetDetails, admin.getUserName);
 

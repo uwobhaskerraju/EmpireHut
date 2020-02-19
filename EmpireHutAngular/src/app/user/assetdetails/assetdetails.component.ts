@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/service/user.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +13,9 @@ declare var M: any;
   styleUrls: ['./assetdetails.component.css']
 })
 export class AssetdetailsComponent implements OnInit {
+  @Output() _tokenCount: EventEmitter<any> = new EventEmitter();
+
+
   assetDetails = [];
   imagePath: String;
   private routeSub: Subscription;
@@ -41,6 +44,23 @@ export class AssetdetailsComponent implements OnInit {
     this.router.navigate(['user'])
   }
 
+  updateCount() {
+    // emit data to parent component
+    this._http.getBalance()
+      .subscribe(r => {
+        if (r["statusCode"] == 200) {
+          console.log(r)
+          //this._VariableService.tokenCount = r["data"]["result"];
+          this._tokenCount.emit(r["result"]);
+        }
+        else {
+          //console.log("something went wrong in getting balance")
+          M.toast({ html: "something went wrong in getting balance", classes: 'rounded' })
+        }
+
+      });
+  }
+
   submitProposal() {
 
     if (this.amount > this._var.userdetails["balance"]) {
@@ -65,6 +85,8 @@ export class AssetdetailsComponent implements OnInit {
                 M.toast({ html: "Asset Purchased! :) ", classes: 'rounded' })
 
                 //call parent method
+                this.updateCount();
+                this.router.navigate(['user']);
               }
               else {
                 M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
@@ -86,7 +108,6 @@ export class AssetdetailsComponent implements OnInit {
             });
         }
       });
-
-
   }
+
 }

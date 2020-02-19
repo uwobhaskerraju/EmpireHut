@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { VariableService } from '../service/variable.service';
 
 declare var M: any;
@@ -14,7 +14,8 @@ declare var M: any;
 export class UserComponent implements OnInit {
   imagePath: String
   //userDetails: Object
-  constructor(private _http: UserService, private router: Router, private _VariableService: VariableService) {
+  constructor(private _http: UserService, private router: Router,
+    private _VariableService: VariableService, private route: ActivatedRoute) {
     M.AutoInit();
     this.callTokenAndPerDetails();
   }
@@ -38,6 +39,16 @@ export class UserComponent implements OnInit {
       });
   }
 
+  updateBalance(componentReference) {
+    // console.log(componentReference)
+    // componentReference.anyFunction();
+    //Below will subscribe to the searchItem emitter
+    componentReference._tokenCount.subscribe((data) => {
+      // Will receive the data from child here 
+      this._VariableService.userdetails["balance"] = data;
+    })
+  }
+
   ngOnInit() {
 
     this.imagePath = environment.imagePath
@@ -56,7 +67,7 @@ export class UserComponent implements OnInit {
         this.router.navigate(['user']);
         break;
       case 2:
-        //this.router.navigate(['user/create']);
+        this.router.navigate(['proposals'], { relativeTo: this.route });
         break;
       case 3:
         // this.router.navigate(['admin/user']);

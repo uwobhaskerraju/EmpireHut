@@ -46,7 +46,7 @@ export class CreateassetComponent implements OnInit {
     .subscribe(r => {
       console.log(r)
       //this._VariableService.tokenCount = r["data"]["result"];
-      this._tokenCount.emit(r["data"]["result"]);
+      this._tokenCount.emit(r["result"]);
     });
     
   }

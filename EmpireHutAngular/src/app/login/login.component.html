@@ -1,6 +1,6 @@
 <nav class="light-blue">
     <div class="nav-wrapper">
-        <a  routerLink="/" class="brand-logo"><i class="material-icons">polymer</i>Empire Hut</a>
+        <a routerLink="/" class="brand-logo"><i class="material-icons">polymer</i>Empire Hut</a>
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
             <li><a routerLink="/">Home</a></li>
@@ -90,8 +90,7 @@
                             </div>
                             <div class="row center-align ">
                                 <a (click)="registerUser()"
-                                    class="btn-floating btn-large waves-effect waves-light red tooltipped"
-                                    data-position="bottom" data-tooltip="Sign Up"><i
+                                    class="btn-floating btn-large waves-effect waves-light red"><i
                                         class="material-icons">play_arrow</i></a>
                             </div>
                             <div class="row">
@@ -132,8 +131,8 @@
                                 <div class="row">
                                     <div class="input-field">
                                         <i class="material-icons prefix">enhanced_encryption</i>
-                                        <input name="password" #passLogin type="password"
-                                            class="validate" data-length="10">
+                                        <input name="password" #passLogin type="password" class="validate"
+                                            data-length="10">
                                         <label for="password" class="active">Password</label>
                                         <span class="helper-text" data-error="Invalid Email/Password"
                                             data-success=""></span>

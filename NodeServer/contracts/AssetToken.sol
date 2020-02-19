@@ -32,12 +32,16 @@ contract AssetToken {
     address private _contractOwner;
 
     //tokenID to its transaction history
-    mapping(uint => uint[]) private _tokenHistory;
+    mapping(uint256 => uint256[]) private _tokenHistory;
 
     using SafeMath for uint256;
 
     event Create(address indexed _from, uint256 _tokenID);
-    event AssetTransfer(address indexed _from, address indexed _to,uint256 _tokenID);
+    event AssetTransfer(
+        address indexed _from,
+        address indexed _to,
+        uint256 _tokenID
+    );
 
     constructor() public {
         _contractOwner = msg.sender;
@@ -57,6 +61,9 @@ contract AssetToken {
         return owner;
     }
 
+    function getAllTokens() public view returns (uint256[] memory) {
+        return _allTokens;
+    }
     function tokenCount(address _owner) public view returns (uint256) {
         // address _to = "0x52Ba9079f9c5b315988EaCE3b2001A8d17fBCA54";
         uint256[] memory co = _tokensOfOwner(_owner);
@@ -92,13 +99,18 @@ contract AssetToken {
         return _tokensOfOwner(_user);
     }
 
-    function transferAsset(address _from, address _to, uint256 tokenID) public payable{
+    function transferAsset(address _from, address _to, uint256 tokenID)
+        public
+        payable
+    {
+        require(_from!=_to,"Both Address cannot be same");
         _removeTokenFromOwnerEnumeration(_from, tokenID);
+        _ownedTokensIndex[tokenID] = 0;
         _removeTokenFromAllTokensEnumeration(tokenID);
         _addTokenToOwnerEnumeration(_to, tokenID);
         _addTokenToAllTokensEnumeration(tokenID);
         _tokenOwner[tokenID] = _to;
-        emit AssetTransfer(_from,_to,tokenID);
+        emit AssetTransfer(_from, _to, tokenID);
     }
     function _removeTokenFromAllTokensEnumeration(uint256 tokenId) private {
         // To prevent a gap in the tokens array, we store the last token in the index of the token to delete, and

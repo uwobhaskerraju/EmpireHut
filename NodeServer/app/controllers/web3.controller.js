@@ -77,34 +77,67 @@ try {
 
     }
 
+    exports.RegularTransfer = (req, res) => {
+        console.log("RegularTransfer")
+        try {
+            //_from =user , _to=owner. it will be opposite in next()
+            var _from = req.body.to;//(await web3.eth.getAccounts())[0];
+            var _to = adminAddr;//(await web3.eth.getAccounts())[3];
+            var value = req.body.amount;
+            var type = req.app.transferType;
+
+            if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            if (value <= 0) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
+                .then(bal => {
+                    res.send({ statusCode: 200, result: bal });
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+                });
+        } catch (error) {
+            console.log(error);
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+        }
+
+    };
+
     exports.transferTo = (req, res, next) => {
         console.log("transfer To")
         try {
-            var _from = req.body.from;//(await web3.eth.getAccounts())[0];
+            //_from =user , _to=owner. it will be opposite in next()
+            var _from = req.body.to;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
+            var type = req.app.transferType;
 
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
-                res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
             }
             if (value <= 0) {
-                res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
             }
-            EMPContract.methods.transfer(_to, value).send({ from: _from, value: 1 })
+            EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
                 .then(bal => {
                     //console.log(r);
                     // balance got deducted
                     console.log("next")
+                    console.log(req.app.tokenID)
                     next();
                     //res.send({ statusCode: 200, data: { address: _to, balance: bal } });
                 })
                 .catch(err => {
                     console.log(err);
-                    res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
                 });
         } catch (error) {
             console.log(error);
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
 
     };
@@ -117,7 +150,7 @@ try {
         try {
 
             var rndInt = null;
-            usrID.push(0)
+            //usrID.push(0)
             if (usrID.includes(0)) {
                 while (true) {
                     rndInt = randomNumber();
@@ -134,6 +167,7 @@ try {
             else {
                 rndInt = 0;
                 req.app.user = "admin"
+                usrID.push(rndInt)
             }
             console.log(rndInt)
             var usrAddress = (await web3.eth.getAccounts())[rndInt];
@@ -154,15 +188,16 @@ try {
                     if (errMsg == null) {
                         errMsg = dataConfig.GlobalErrMsg;
                     }
-                    res.send({ statusCode: 500, data: errMsg });
+                    res.send({ statusCode: 500, result: errMsg });
                 });
         } catch (error) {
             console.log(error)
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
     }
 
     exports.getUserDetails = (req, res) => {
+        console.log("web3 getUserDetails")
         try {
             var user = req.app.user;
             // console.log(user)
@@ -202,20 +237,33 @@ try {
     /**************************/
 
     exports.transferAsset = (req, res) => {
+        console.log("transfer asset")
         try {
-            var _from = req.body.from;//(await web3.eth.getAccounts())[0];
-            var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
+            var _to = req.body.to;//(await web3.eth.getAccounts())[0];
+            var _from = req.body.owner;//(await web3.eth.getAccounts())[3];
             var tokenID = req.app.tokenID;
-            assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 1 })
-                .on('confirmation', function (confirmationNumber, receipt) {
-                    console.log(receipt)
-                    res.send({ statusCode: 200, result: receipt });
-                })
-                .on('error', function (error, receipt) {
+            //console.log(req.body)
+            //console.log(req.app)
+            assetcontract.methods.transferAsset(_from, _to, tokenID).estimateGas({ from: _from, value: 50000 }, function (error, gas) {
+                if (error) {
                     console.log(error)
                     res.send({ statusCode: 500, result: error });
-                });
+                }
+                // console.log("before")
+                assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 50000, gas: gas })
+                    .on('confirmation', function (confirmationNumber, receipt) {
+                        //console.log(receipt)
+                        res.send({ statusCode: 200, result: receipt });
+                    })
+                    .on('error', function (error, receipt) {
+                        console.log(error)
+                        res.send({ statusCode: 500, result: error });
+                    });
+
+            });
+
         } catch (error) {
+            console.log(error)
             res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
     };
@@ -228,30 +276,40 @@ try {
             // var adminAddr = req.body.userID;
 
             var rndStr = web3.utils.soliditySha3(req.app.randomStr);
+            console.log(rndStr);
             assetcontract.methods.createAsset(rndStr).send({ from: adminAddr, gas: 1000000 })
                 .on('confirmation', function (confirmationNumber, receipt) {
-                    console.log("confirmation")
+                    //console.log("confirmation")
                     //console.log(receipt)
                     assetcontract.getPastEvents('Create', function (error, event) {
                         if (error) {
-                            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+                            console.log(error)
+                            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
                         }
                         else {
-                            //console.log(event);
-                            req.app.tokenID = event[0]["returnValues"]["_tokenID"];
-                            // console.log(req.app.tokenID);
-                            // update mongoDB
-                            next();
+                            console.log(event);
+                            if (event != null || event != undefined || event.length > 0) {
+                                req.app.tokenID = event[0]["returnValues"]["_tokenID"];
+                                // console.log(req.app.tokenID);
+                                // update mongoDB
+                                next();
+                            }
+                            else {
+                                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+                            }
+
                             //res.send({ statusCode: 200, data: { address: adminAddr} });
                         }
                     });
                 })
                 .on('error', function (error, receipt) {
-                    res.send({ statusCode: 500, data: { error: error, message: receipt } });
+                    console.log(error)
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
                 })
 
         } catch (error) {
-            res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+            console.log(error)
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
 
     };
@@ -283,17 +341,42 @@ try {
             })
     };
 
-    exports.getTokensOfUser = (req, res, next) => {
-        var user = adminAddr;
+    exports.getAllTokens = (req, res, next) => {
+        // var user = adminAddr;
         // var user = req.body.userID;
-        assetcontract.methods.ownedTokensOfUser(user).call()
+        console.log("getAllTokens")
+        assetcontract.methods.getAllTokens().call()
             .then(r => {
                 //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
                 req.app.tokenIDs = r;
+                console.log(r)
                 next();
             })
             .catch(err => {
                 res.send({ statusCode: 500, data: { error: err } });
+            });
+
+    };
+
+    exports.getTokensOfUser = (req, res, next) => {
+        // var user = adminAddr;
+        console.log("web3 getTokensOfUser")
+        var user = req.body.userID;
+        var tokenIDs = req.app.tokenIDs;
+        var fnlTokens = []
+        assetcontract.methods.ownedTokensOfUser(user).call()
+            .then(r => {
+                console.log("r " + r)
+                //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
+                if (r.length > 0) {
+                    fnlTokens = tokenIDs.filter(x => !r.includes(x));
+                    console.log(fnlTokens)
+                    req.app.tokenIDs = fnlTokens;
+                }
+                next();
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, result: err });
             });
 
     };
@@ -321,7 +404,7 @@ try {
                 try {
                     var jsnData = {};
                     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    jsnData.description = "Property Purchase"
+                    //jsnData.description = "Property Purchase"
                     jsnData.date = (new Date(time)).toLocaleDateString("en-US", options)
                     //{from:,to:,amount:,date:,type:,description:}
                     if (myaccount == e.to) {
@@ -331,6 +414,7 @@ try {
                         jsnData.type = "Credit"
                     }
                     if (myaccount == e.from) {
+
                         jsnData.from = e.from
                         jsnData.to = abiDecoder.decodeMethod(e.input)["params"][0]["value"]
                         for (x in abiDecoder.decodeMethod(e.input)["params"][1]) {
@@ -338,8 +422,24 @@ try {
                                 jsnData.amount = abiDecoder.decodeMethod(e.input)["params"][1][x]
                             }
                         }
+                        for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
+                            if (x == "value") {
+                                jsnData.description = abiDecoder.decodeMethod(e.input)["params"][2][x]
+                            }
+                        }
                         jsnData.type = "Debit"
-
+                        if (abiDecoder.decodeMethod(e.input)["name"].includes("transfer")) {
+                            var temp = null;
+                            for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
+                                if (x == "value") {
+                                    temp = abiDecoder.decodeMethod(e.input)["params"][2][x]
+                                }
+                            }
+                            if (temp.includes("[Approved]")) {
+                                jsnData.type = " "
+                                jsnData.amount = " "
+                            }
+                        }
                         if (abiDecoder.decodeMethod(e.input)["name"].includes("register")) {
                             jsnData.from = "Canada Govt"
                             jsnData.to = e.from
@@ -415,6 +515,17 @@ try {
     /******************/
 
 
+    exports.testGas = async (req, res) => {
+        var _from = (await web3.eth.getAccounts())[0];
+        var _to = (await web3.eth.getAccounts())[3];
+        var tokenID = '103127725420421299009027266705421683310022189863692271989244868721091361824061';
+        assetcontract.methods.transferAsset(_from, _to, tokenID).estimateGas({ gas: 5000000 }, function (error, gasAmount) {
+            if (gasAmount == 5000000)
+                console.log('Method ran out of gas');
+            console.log(gasAmount)
+            res.send("done")
+        });
+    }
     exports.testEvents = (req, res) => {
         try {
 
@@ -431,7 +542,7 @@ try {
         }
     };
 
-    exports.transferLogic = async (req, res) => {
+    exports.testtransferLogic = async (req, res) => {
         try {
             var _from = (await web3.eth.getAccounts())[6];
             var _to = (await web3.eth.getAccounts())[0];
@@ -453,7 +564,7 @@ try {
         }
     };
 
-    exports.blocks = async (req, res) => {
+    exports.testblocks = async (req, res) => {
         //console.log(arguments.callee.name)
         // var maxBlock = await web3.eth.getBlockNumber()
         // "transactions": [
@@ -461,13 +572,25 @@ try {
         // ],
         // var a = [];
 
-        web3.eth.getTransaction('0x4f7d93877945e5b2fdacb132e115c85fd54908912a546d69c538e4b18def1fe4')
+        web3.eth.getTransaction('0xe55d63b934eac18ce6bcb9dd75b3defaccafc3de4c613af6a01eb1049ae7e2c9')
             .then(r => {
                 console.log(abiDecoder.decodeMethod(r.input))
                 res.send(r);
             });
         // res.send("Asdsd")
-
+        // assetcontract.testgetPastEvents('Create', function (error, event) {
+        //     if (error) {
+        //         res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
+        //     }
+        //     else {
+        //         console.log(event);
+        //         //req.app.tokenID = event[0]["returnValues"]["_tokenID"];
+        //         // console.log(req.app.tokenID);
+        //         // update mongoDB
+        //         res.send("Asd")
+        //         //res.send({ statusCode: 200, data: { address: adminAddr} });
+        //     }
+        // });
 
     };
 

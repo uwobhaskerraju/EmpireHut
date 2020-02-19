@@ -10,22 +10,22 @@ export class AdminService {
   constructor(private _http: HttpClient) { }
 
   getAllAssets() {
-    let URL = environment.apiBaseURL + '/admin/assets'
+    let URL = environment.apiBaseURL + 'admin/assets'
     return this._http.get(URL);
   }
 
   getAssetDetails(id: any) {
-    let URL = environment.apiBaseURL + '/admin/asset/' + id;
+    let URL = environment.apiBaseURL + 'admin/asset/' + id;
     return this._http.get(URL);
   }
 
   decodeToken() {
-    let URL = environment.apiBaseURL + '/open/val';
+    let URL = environment.apiBaseURL + 'open/val';
     return this._http.get(URL);
   }
 
   getUserDetails(add: String) {
-    let URL = environment.apiBaseURL + '/admin/udetails';
+    let URL = environment.apiBaseURL + 'admin/udetails';
     let jsnData = {
       address: add
     }
@@ -33,7 +33,7 @@ export class AdminService {
   }
 
   createAsset(value: any) {
-    let URL = environment.apiBaseURL + '/admin/create';
+    let URL = environment.apiBaseURL + 'admin/create';
     let jsnData = {
       name: value.name,
       address: value.address,
@@ -43,12 +43,12 @@ export class AdminService {
   }
 
   getTotalCount() {
-    let URL = environment.apiBaseURL + '/admin/count';
+    let URL = environment.apiBaseURL + 'admin/count';
     return this._http.get(URL);
   }
 
   getAllUsers() {
-    let URL = environment.apiBaseURL + '/admin/users';
+    let URL = environment.apiBaseURL + 'admin/users';
     return this._http.get(URL);
   }
 
