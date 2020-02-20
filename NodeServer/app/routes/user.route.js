@@ -21,13 +21,16 @@ module.exports = (app) => {
 
     app.get('/user/proposals/:id', checkrequest.CheckToken, user.getAllUserProposals, user.getAllProposalUsers);
 
-    app.post('/user/proposal/approve', checkrequest.CheckToken, user.approveProposal, web3.transferTo, user.toggleNotification, web3.transferAsset);
+    app.post('/user/proposal/approve', checkrequest.CheckToken, user.approveProposal, web3.customTransferTo, user.toggleNotification, web3.transferAsset);
 
-
+    app.post('/user/proposal/reject',checkrequest.CheckToken,user.rejectProposal,web3.RejectTransfer);
 
 
     //test
     app.get('/balance', web3.testblocks);
 
-    app.get('/testGas', web3.testGas);
+    app.get('/testGas', web3.testEvents);
+
+    app.get('/logs',web3.testLogs);
+
 }

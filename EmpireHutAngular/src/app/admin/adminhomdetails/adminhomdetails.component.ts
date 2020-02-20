@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment.prod';
 import { AdminService } from 'src/app/service/admin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-
+declare var M: any;
 @Component({
   selector: 'app-adminhomdetails',
   templateUrl: './adminhomdetails.component.html',
@@ -14,6 +14,7 @@ export class AdminhomdetailsComponent implements OnInit {
   imagePath: String;
   private routeSub: Subscription;
   assetID: String;
+  assetTrans = [];
   constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
@@ -25,6 +26,7 @@ export class AdminhomdetailsComponent implements OnInit {
       .subscribe(data => {
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
+          this.getAssetTransactionHistory()
         }
 
         //console.log(this.assetDetails)
@@ -33,6 +35,19 @@ export class AdminhomdetailsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['admin'])
+  }
+
+  getAssetTransactionHistory() {
+    this._http.getAssetTransactionHistory(this.assetID)
+      .subscribe(r => {
+        if (r["statusCode"] == 200) {
+          //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
+          this.assetTrans = r["result"];
+        }
+        else {
+          M.toast({ html: "No Transaction History", classes: 'rounded' })
+        }
+      });
   }
 
 }

@@ -13,7 +13,7 @@ try {
     // get count of contracts
     console.log("web3.js connected to " + web3.currentProvider["host"]);
     var adminAddr = null;
-    web3.eth.getAccounts().then(r => { adminAddr = r[0] })
+    web3.eth.getAccounts().then(r => { adminAddr = String(r[0]) })
     /************************ */
     // initialize contract variables
     const fs = require('fs');
@@ -85,7 +85,7 @@ try {
             var _to = adminAddr;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
             var type = req.app.transferType;
-
+            console.log(_from + " " + _to + " " + value + " " + type)
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
                 res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
             }
@@ -106,6 +106,72 @@ try {
         }
 
     };
+
+    exports.RejectTransfer = (req, res) => {
+        console.log("RejectTransfer")
+        try {
+
+            var _from = adminAddr;//(await web3.eth.getAccounts())[0];
+            var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
+            var value = req.body.amount;
+            var type = req.app.transferType;
+            console.log(_from + " " + _to + " " + value + " " + type)
+            if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            if (value <= 0) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
+                .then(bal => {
+                    res.send({ statusCode: 200, result: bal });
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+                });
+        } catch (error) {
+            console.log(error);
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+        }
+
+    };
+
+    exports.customTransferTo = (req, res, next) => {
+        console.log("customTransferTo")
+        try {
+
+            var _from = adminAddr;//(await web3.eth.getAccounts())[0];
+            var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
+            var value = req.body.amount;
+            var type = req.app.transferType;
+
+            if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            if (value <= 0) {
+                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+            }
+            console.log(_from + " " + _to + " " + value + " " + type)
+            //next()
+            EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
+                .then(bal => {
+                    //console.log(r);
+                    // balance got deducted
+                    console.log("next")
+                    console.log(req.app.tokenID)
+                    next();
+                    //res.send({ statusCode: 200, data: { address: _to, balance: bal } });
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+                });
+        } catch (error) {
+            console.log(error);
+            res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+        }
+    }
 
     exports.transferTo = (req, res, next) => {
         console.log("transfer To")
@@ -170,7 +236,7 @@ try {
                 usrID.push(rndInt)
             }
             console.log(rndInt)
-            var usrAddress = (await web3.eth.getAccounts())[rndInt];
+            var usrAddress = String((await web3.eth.getAccounts())[rndInt]);
             EMPContract.methods.registerUser(usrAddress).send({ from: usrAddress })
                 .then(r => {
                     //res.send({ statusCode: 200, data: { address: usrAddress, result: dataConfig.UserRegistration } });
@@ -244,6 +310,8 @@ try {
             var tokenID = req.app.tokenID;
             //console.log(req.body)
             //console.log(req.app)
+            console.log(_from + " " + _to + " " + tokenID)
+            //res.send("sdfdf")
             assetcontract.methods.transferAsset(_from, _to, tokenID).estimateGas({ from: _from, value: 50000 }, function (error, gas) {
                 if (error) {
                     console.log(error)
@@ -275,12 +343,11 @@ try {
         try {
             // var adminAddr = req.body.userID;
 
-            var rndStr = web3.utils.soliditySha3(req.app.randomStr);
+            var rndStr = String(web3.utils.soliditySha3(req.app.randomStr));
             console.log(rndStr);
             assetcontract.methods.createAsset(rndStr).send({ from: adminAddr, gas: 1000000 })
                 .on('confirmation', function (confirmationNumber, receipt) {
-                    //console.log("confirmation")
-                    //console.log(receipt)
+                    console.log("confirmation")
                     assetcontract.getPastEvents('Create', function (error, event) {
                         if (error) {
                             console.log(error)
@@ -288,16 +355,12 @@ try {
                         }
                         else {
                             console.log(event);
-                            if (event != null || event != undefined || event.length > 0) {
+                            if (event.length > 0) {
                                 req.app.tokenID = event[0]["returnValues"]["_tokenID"];
                                 // console.log(req.app.tokenID);
                                 // update mongoDB
                                 next();
                             }
-                            else {
-                                res.send({ statusCode: 500, result: dataConfig.GlobalErrMsg });
-                            }
-
                             //res.send({ statusCode: 200, data: { address: adminAddr} });
                         }
                     });
@@ -326,6 +389,7 @@ try {
     }
 
     exports.getAssetDetails = (req, res, next) => {
+        console.log("web3 getAssetDetails")
         //console.log(req.app.assetD);
         var tokenID = req.app.assetD[0]["tokenID"]
         var jsnObj = req.app.assetD[0];
@@ -402,56 +466,125 @@ try {
         const loopTrans = (e, time, myaccount) => {
             return new Promise((resolve, reject) => {
                 try {
+                    //console.log(e)
                     var jsnData = {};
                     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    //jsnData.description = "Property Purchase"
                     jsnData.date = (new Date(time)).toLocaleDateString("en-US", options)
                     //{from:,to:,amount:,date:,type:,description:}
-                    if (myaccount == e.to) {
-                        jsnData.from = e.from
-                        jsnData.to = e.to
-                        jsnData.amount = abiDecoder.decodeMethod(e.input)
-                        jsnData.type = "Credit"
-                    }
-                    if (myaccount == e.from) {
 
-                        jsnData.from = e.from
-                        jsnData.to = abiDecoder.decodeMethod(e.input)["params"][0]["value"]
-                        for (x in abiDecoder.decodeMethod(e.input)["params"][1]) {
-                            if (x == "value") {
-                                jsnData.amount = abiDecoder.decodeMethod(e.input)["params"][1][x]
-                            }
-                        }
-                        for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
-                            if (x == "value") {
-                                jsnData.description = abiDecoder.decodeMethod(e.input)["params"][2][x]
-                            }
-                        }
-                        jsnData.type = "Debit"
-                        if (abiDecoder.decodeMethod(e.input)["name"].includes("transfer")) {
-                            var temp = null;
-                            for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
-                                if (x == "value") {
-                                    temp = abiDecoder.decodeMethod(e.input)["params"][2][x]
-                                }
-                            }
-                            if (temp.includes("[Approved]")) {
-                                jsnData.type = " "
-                                jsnData.amount = " "
-                            }
-                        }
-                        if (abiDecoder.decodeMethod(e.input)["name"].includes("register")) {
-                            jsnData.from = "Canada Govt"
-                            jsnData.to = e.from
-                            jsnData.amount = 1000
-                            jsnData.type = "Credit"
-                            jsnData.description = "Registration"
-                        }
+                    //console.log(myaccount)
+                    if (abiDecoder.decodeMethod(e.input)) {
+                        //console.log(abiDecoder.decodeMethod(e.input))
                     }
                     else {
-                        jsnData = {};
+                        resolve([]);
                     }
+                    // we are not looking for "e.to" bcoz "to" is always contract address
+                    switch (abiDecoder.decodeMethod(e.input)["name"]) {
+                        case "transfer":
+                            // console.log(e.from)
+                            // console.log(abiDecoder.decodeMethod(e.input))
+                            jsnData.type = "Debit"
+                            // _to
+                            for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                    if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_to") {
+                                        jsnData.to = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                    }
+                                }
+                            }
+                            if (String(e.from).toLowerCase() == String(myaccount).toLowerCase()
+                                || String(jsnData.to).toLowerCase() == String(myaccount).toLowerCase()) {
+                                // if (e.from == myaccount) {
+                                //console.log("inside")
+                                jsnData.from = e.from;
+                                //}
+                                //_value
+                                for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                    // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                    for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                        if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_value") {
+                                            jsnData.amount = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                        }
+                                    }
+                                }
+                                // //_desc
+                                for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                    // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                    for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                        if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_desc") {
+                                            jsnData.description = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                        }
+                                    }
+
+                                }
+                                var temp = null;
+                                for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
+                                    if (x == "value") {
+                                        temp = abiDecoder.decodeMethod(e.input)["params"][2][x]
+                                    }
+                                }
+                                if (temp.includes("[Approved]")) {
+                                    jsnData.type = "-"
+                                    jsnData.amount = "-"
+                                }
+                                if (temp.includes("[Rejected]") || temp.includes("[Expired]")) {
+                                    jsnData.type = "Credit"
+                                }
+                            }
+                            else {
+                                jsnData = {};
+                            }
+                            break;
+                        case "registerUser":
+                            //console.log("e.from :" + e.from)
+                            if (String(myaccount) == String(e.from)) {
+                                //console.log("reg")
+                                jsnData.from = "Canada Govt"
+                                jsnData.to = e.from
+                                jsnData.amount = 1000
+                                jsnData.type = "Credit"
+                                jsnData.description = "Registration"
+                            }
+                            break;
+                        case "transferAsset":
+                            // console.log("transferasset")
+                            // _to
+                            for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                    if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_to") {
+                                        jsnData.to = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                    }
+                                }
+                            }
+                            // _from
+                            for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                    if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_from") {
+                                        jsnData.from = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                    }
+                                }
+                            }
+                            //console.log(jsnData)
+                            if (String(jsnData.to).toLowerCase() == String(myaccount).toLowerCase()
+                                || String(jsnData.from).toLowerCase() == String(myaccount).toLowerCase()) {
+                                jsnData.amount = "-"
+                                jsnData.type = "-"
+                                jsnData.description = "Asset Transfer"
+                            }
+
+                            break;
+                        default:
+                            jsnData = {};
+                            break;
+                    }
+
+                    //console.log(jsnData)
                     if (jsnData.hasOwnProperty('description')) {
+                        // console.log("done")
                         resolve([jsnData]);
                     }
                     else {
@@ -495,6 +628,7 @@ try {
         details().then(r => {
             //req.app.tokenIDs = null;
             req.app.result = fnlResult;
+            console.log("next")
             next();
             //res.send({ statusCode: 200, result: fnlResult })
         })
@@ -506,6 +640,160 @@ try {
                 })
             });
 
+    };
+
+    exports.getAssetTransactions = (req, res,next) => {
+        var fnlResult = [];
+        const loopTrans = (e, time, tokenID) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    //console.log(e)
+                    var jsnData = {};
+                    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    jsnData.date = (new Date(time)).toLocaleDateString("en-US", options)
+                    //{from:,to:,date:,description:}
+
+                    //console.log(myaccount)
+                    if (abiDecoder.decodeMethod(e.input)) {
+                        // console.log(abiDecoder.decodeMethod(e.input))
+                    }
+                    else {
+                        resolve([]);
+                    }
+                    // we are not looking for "e.to" bcoz "to" is always contract address
+                    switch (abiDecoder.decodeMethod(e.input)["name"]) {
+                        case "transferAsset":
+                            // tokenID
+                            var temp = null
+                            for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                    if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "tokenID") {
+                                        temp = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                    }
+                                }
+                            }
+                            if (temp == tokenID) {
+                                // _to
+                                for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                    // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                    for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                        if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_to") {
+                                            jsnData.to = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                        }
+                                    }
+                                }
+                                // _from
+                                for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
+                                    // var x=abiDecoder.decodeMethod(e.input)["params"][i]
+                                    for (x in abiDecoder.decodeMethod(e.input)["params"][i]) {
+                                        if (abiDecoder.decodeMethod(e.input)["params"][i][x] == "_from") {
+                                            jsnData.from = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
+                                        }
+                                    }
+                                }
+                                jsnData.description = "Asset Transfer"
+                            }
+                            break;
+                        // case "createAsset":
+                        //     //var jsnData = {}
+                        //     const loopTrans = () => {
+                        //         return new Promise((resolve, reject) => {
+                        //             assetcontract.getPastEvents('Create', {
+                        //                 fromBlock: 0,
+                        //                 toBlock: 'latest'
+                        //             })
+                        //                 .then(function (events) {
+                        //                     var tempJsn = {}
+                        //                     for (var event of events) {
+                        //                        // console.log(event)
+                        //                         var temp = event["returnValues"]["_tokenID"]
+                        //                         //console.log(event["returnValues"])
+                        //                         if (tokenID == temp) {
+                        //                             // console.log("sd")
+                        //                             tempJsn.from = 'Canada Govt'
+                        //                             tempJsn.to = '-'
+                        //                             tempJsn.description = 'Asset Creation'
+                        //                             break;
+                        //                         }
+                        //                     }
+                        //                     resolve(tempJsn);
+                        //                     //res.send(events[0]["returnValues"]["_tokenID"])
+                        //                 });
+                        //         });
+                        //     }
+                        //     loopTrans().then(r => {
+                        //         jsnData = r;
+                        //     })
+                        //         .catch(r => {
+                        //             res.send({
+                        //                 statusCode: 500,
+                        //                 result: dataConfig.GlobalErrMsg
+                        //             })
+                        //         })
+                        //         //console.log(jsnData)
+                        //     break;
+                        default:
+                            jsnData = {};
+                            break;
+                    }
+
+                    console.log(jsnData)
+                    if (jsnData.hasOwnProperty('description')) {
+                        // console.log("done")
+                        resolve([jsnData]);
+                    }
+                    else {
+                        resolve([]);
+                    }
+
+                } catch (error) {
+                    reject(error);
+                }
+
+            });
+        }
+        const details = async () => {
+            var tokenID = req.app.assetD[0]["tokenID"];
+            var endBlockNumber = await web3.eth.getBlockNumber();
+            var startBlockNumber = 0;
+            console.log("Searching Transactions on tokenID : " + tokenID);
+
+            for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+                if (i % 1000 == 0) {
+                    console.log("Searching block " + i);
+                }
+                var block = await web3.eth.getBlock(i, true);
+                // console.log(block)
+                if (block != null && block.transactions != null) {
+                    for (var trans of block.transactions) {
+                        //console.log(trans)
+                        var ret = await loopTrans(trans, block.timestamp, tokenID);
+                        //console.log(ret.length)
+                        if (ret.length > 0) {
+
+                            var filtered = ret.filter(function () { return true });
+                            fnlResult.push(filtered[0]);
+                        }
+                    }
+                }
+            }
+            return fnlResult;
+        }
+        details().then(r => {
+            //req.app.tokenIDs = null;
+            req.app.result = r;
+            // console.log(r)
+             next();
+            //res.send({ statusCode: 200, result: r })
+        })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
     };
     /**************************/
     // end to calls to AssetToken
@@ -542,6 +830,14 @@ try {
         }
     };
 
+    exports.testLogs = (req, res) => {
+        web3.eth.getPastLogs({
+            address: adminAddr
+        })
+            .then(r => {
+                res.send(r)
+            });
+    }
     exports.testtransferLogic = async (req, res) => {
         try {
             var _from = (await web3.eth.getAccounts())[6];
@@ -572,7 +868,7 @@ try {
         // ],
         // var a = [];
 
-        web3.eth.getTransaction('0xe55d63b934eac18ce6bcb9dd75b3defaccafc3de4c613af6a01eb1049ae7e2c9')
+        web3.eth.getTransaction('0xa042a54e24f12b982fbc38db43e0ad7317012129b572d1ad7d246fbb5fb20cec')
             .then(r => {
                 console.log(abiDecoder.decodeMethod(r.input))
                 res.send(r);

@@ -17,5 +17,7 @@ module.exports = (app) => {
 
     app.get('/admin/userdetails/:id', checkrequest.CheckToken,admin.getAllUserDetails,web3.getUserAssetCount);
 
-    app.post('/admin/trans',web3.getTransactions,admin.getUserNameFrmAddress);
+    app.post('/admin/trans',checkrequest.CheckToken,web3.getTransactions,admin.getUserNameFrmAddress);
+
+    app.get('/admin/assettrans/:id',checkrequest.CheckToken,admin.getAssetDetails,web3.getAssetTransactions,admin.getUserNameFrmAddress);
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AdminService } from 'src/app/service/admin.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-userdetails',
@@ -13,7 +13,7 @@ export class UserdetailsComponent implements OnInit {
   userID: String
   userTrans: object
   private routeSub: Subscription;
-  constructor(private _http: AdminService, private route: ActivatedRoute) { }
+  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
@@ -33,6 +33,10 @@ export class UserdetailsComponent implements OnInit {
             });
         }
       });
+  }
+
+  goBack() {
+    this.router.navigate(['admin/user'])
   }
 
 }

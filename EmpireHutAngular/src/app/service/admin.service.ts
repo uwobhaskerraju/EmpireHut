@@ -65,4 +65,9 @@ export class AdminService {
     return this._http.post(URL, jsnData);
 
   }
+
+  getAssetTransactionHistory(assetID: any) {
+    let URL = environment.apiBaseURL + 'admin/assettrans/' + assetID;
+    return this._http.get(URL);
+  }
 }

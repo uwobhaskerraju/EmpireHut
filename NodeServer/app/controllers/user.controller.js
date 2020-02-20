@@ -143,6 +143,7 @@ exports.getAssetToken = (req, res, next) => {
 
 //get asset details
 exports.getAssetDetails = (req, res, next) => {
+    console.log("user getAssetDetails")
     //console.log(req.params.id)
     var assetID = mongoose.Types.ObjectId(req.params.id)
     // console.log(assetID)
@@ -168,7 +169,7 @@ exports.getAssetDetails = (req, res, next) => {
         });
 };
 exports.getUserName = (req, res) => {
-
+    console.log("user getUserName")
     var asset = req.app.assetD[0];
     User.find({ address: asset["owner"] })
         .select({ username: 1, _id: 0, address: 1 })
@@ -206,6 +207,7 @@ exports.getAllProposalUsers = (req, res) => {
         .then(r => {
             // console.log(r)
             for (var asset of assets) {
+                //console.log(asset)
                 for (var x of r) {
                     if (String(x["address"]).toLowerCase() == String(asset["owner"]).toLowerCase()) {
                         asset["owner_username"] = x["username"]
@@ -215,7 +217,7 @@ exports.getAllProposalUsers = (req, res) => {
                     }
                 }
             }
-            res.send({ statusCode: 200, result: asset })
+            res.send({ statusCode: 200, result: assets })
         })
         .catch(err => {
             console.log(err)
@@ -279,12 +281,29 @@ exports.getAllUserProposals = (req, res, next) => {
 
 }
 
+exports.rejectProposal = (req, res, next) => {
+    var assetID = req.body.assetID;
+    var notID = req.body.notID;
+    req.app.transferType = "[Rejected] Purchase Proposal"
+    Notification.updateOne({ _id: mongoose.Types.ObjectId(notID) }, { $set: { active: false, deal: false } })
+        .then(r => {
+            next();
+        })
+        .catch(err => {
+            console.log(err)
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
+
 exports.toggleNotification = (req, res, next) => {
     console.log("toggleNotification")
     var data = req.app.proposal;
-    Notification.update({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
+    Notification.updateMany({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
         .then(r => {
-           // console.log(r)
+            // console.log(r)
             Notification.updateOne({ _id: mongoose.Types.ObjectId(data["_id"]) }, { $set: { deal: true } })
                 .then(r => {
                     //console.log(r)
@@ -345,7 +364,7 @@ exports.approveProposal = (req, res, next) => {
         }
     ])
         .then(data => {
-             //console.log(data)
+            //console.log(data)
             if (data.length > 0) {
 
                 req.app.proposal = data[0];

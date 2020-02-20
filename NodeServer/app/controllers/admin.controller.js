@@ -52,6 +52,7 @@ try {
     //get asset details
     exports.getAssetDetails = (req, res, next) => {
         //console.log(req.params.id)
+        console.log("getAssetDetails")
         var assetID = mongoose.Types.ObjectId(req.params.id)
         //console.log(assetID)
         Asset.find({ _id: assetID })
@@ -59,6 +60,7 @@ try {
                 //console.log(r)
                 if (r != null || r != undefined) {
                     req.app.assetD = r;
+                    console.log("next")
                     next();
                 }
             })
@@ -164,6 +166,7 @@ try {
     };
 
     exports.getUserNameFrmAddress = async (req, res) => {
+        console.log("getUserNameFrmAddress")
         var fnlRes = [];
         var getData = (ad) => {
             return new Promise((resolve, reject) => {
@@ -189,6 +192,7 @@ try {
         var details = async () => {
 
             var result = req.app.result;
+            // console.log(result)
             //var reldup = result;
             req.app.result = null;
             var ret = [];
@@ -203,15 +207,18 @@ try {
                     ad.push(String(ad2).toLowerCase())
                 }
                 //console.log(ad1 + " " + ad2)
-                var ret = await getData(ad);
-                for (var x of ret) {
-                    if (String(x["address"]).toLowerCase() == value["from"].toLowerCase()) {
-                        value["from"] = x["username"]
-                    }
-                    if (String(x["address"]).toLowerCase() == value["to"].toLowerCase()) {
-                        value["to"] = x["username"]
+                if (ad.length > 0) {
+                    var ret = await getData(ad);
+                    for (var x of ret) {
+                        if (String(x["address"]).toLowerCase() == value["from"].toLowerCase()) {
+                            value["from"] = x["username"]
+                        }
+                        if (String(x["address"]).toLowerCase() == value["to"].toLowerCase()) {
+                            value["to"] = x["username"]
+                        }
                     }
                 }
+
             }
             return result.reverse();
             //console.log(result)
@@ -245,6 +252,7 @@ try {
                 })
             });
     };
+
 } catch (error) {
 
 }

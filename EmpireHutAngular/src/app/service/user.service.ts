@@ -45,7 +45,7 @@ export class UserService {
       assetId: assetDetails["_id"],
       propertyValue: assetDetails["price"],
       owner: assetDetails["ownerAdd"],
-      proposalAddr: address
+      proposalAddr: address //in the end he will be _to
     }
     //console.log(jsnData)
     return this._http.post(URL, jsnData);
@@ -78,14 +78,26 @@ export class UserService {
 
   acceptProposal(propObj: any) {
     let URL = environment.apiBaseURL + 'user/proposal/approve';
-    let jsnData={
-      notID:propObj._id,
-      assetID:propObj.assetId,
-      to:propObj.proposalAddr,
-      owner:propObj.owner,
-      amount:propObj.proposedAmount
+    let jsnData = {
+      notID: propObj._id,
+      assetID: propObj.assetId,
+      to: propObj.proposalAddr,
+      owner: propObj.owner,
+      amount: propObj.proposedAmount
     }
     //console.log
-    return this._http.post(URL,jsnData);
+    return this._http.post(URL, jsnData);
+  }
+
+  rejectProposal(propObj: any) {
+    let URL = environment.apiBaseURL + 'user/proposal/reject';
+    let jsnData = {
+      notID: propObj._id,
+      assetID: propObj.assetId,
+      amount:propObj.proposedAmount,
+      owner:propObj.proposalAddr
+    }
+    console.log(jsnData)
+    return this._http.post(URL, jsnData);
   }
 }
