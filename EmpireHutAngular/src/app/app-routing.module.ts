@@ -20,6 +20,7 @@ import { UserComponent } from '../app/user/user.component'
 import { AssetsComponent } from '../app/user/assets/assets.component'
 import { AssetdetailsComponent } from '../app/user/assetdetails/assetdetails.component'
 import { ProposalsComponent } from '../app/user/proposals/proposals.component'
+import { MyassetsComponent } from '../app/user/myassets/myassets.component'
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -37,7 +38,8 @@ const routes: Routes = [
     path: 'user', component: UserComponent, children: [
       { path: '', component: AssetsComponent },
       { path: 'asset/:id', component: AssetdetailsComponent },
-      { path: 'proposals', component: ProposalsComponent }
+      { path: 'proposals', component: ProposalsComponent },
+      { path: 'personal', component: MyassetsComponent }
     ]
   }
   // ,

@@ -14,8 +14,9 @@ export class UserService {
     return this._http.get(URL);
   }
 
-  getAllAssets() {
-    let URL = environment.apiBaseURL + 'user/assets'
+  getAllAssets(address: any) {
+    let URL = environment.apiBaseURL + 'user/assets/' + address
+    console.log(URL)
     return this._http.get(URL);
   }
 
@@ -94,10 +95,34 @@ export class UserService {
     let jsnData = {
       notID: propObj._id,
       assetID: propObj.assetId,
-      amount:propObj.proposedAmount,
-      owner:propObj.proposalAddr
+      amount: propObj.proposedAmount,
+      owner: propObj.proposalAddr
     }
     console.log(jsnData)
     return this._http.post(URL, jsnData);
+  }
+
+  getPersonalAssets(address: any) {
+    let URL = environment.apiBaseURL + 'user/personal/' + address;
+    return this._http.get(URL);
+  }
+
+
+  toggleAsset(id: any, hidden: any) {
+    let URL = environment.apiBaseURL + 'user/asset/toggle';
+    let jsnData = JSON.stringify({
+      id: id,
+      state: hidden
+    })
+    console.log(jsnData)
+    return this._http.post(URL, jsnData)
+  }
+
+  getSearchedAssets(address: any, value: any) {
+    let URL = environment.apiBaseURL + 'user/search/assets/' + address;
+    let jsnData = JSON.stringify({
+      value: value
+    });
+    return this._http.post(URL,jsnData);
   }
 }

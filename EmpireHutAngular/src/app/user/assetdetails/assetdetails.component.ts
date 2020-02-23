@@ -35,6 +35,10 @@ export class AssetdetailsComponent implements OnInit {
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
         }
+        else{
+          M.toast({ html: "something went wrong", classes: 'rounded' })
+          this.router.navigate(['user'])
+        }
 
         //console.log(this.assetDetails)
       });

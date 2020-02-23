@@ -13,7 +13,7 @@ module.exports = (app) => {
 
     //getting all assets that are not hidden
     //web3.getTokensOfUser,
-    app.get('/user/assets', checkrequest.CheckToken, web3.getAllTokens, user.getAllAssets);
+    app.get('/user/assets/:id', checkrequest.CheckToken,web3.regularOwnedTokensOfUser ,web3.getAllTokens, user.getAllAssets);
 
     app.get('/user/asset/:id', checkrequest.CheckToken, user.getAssetDetails, web3.getAssetDetails, user.getUserName);
 
@@ -25,7 +25,16 @@ module.exports = (app) => {
 
     app.post('/user/proposal/reject',checkrequest.CheckToken,user.rejectProposal,web3.RejectTransfer);
 
+    //,,user.getUserAssets
+    app.get('/user/personal/:id',checkrequest.CheckToken,web3.regularOwnedTokensOfUser,user.getUserAssets);
 
+    app.post('/user/asset/toggle',checkrequest.CheckToken,user.toggleAsset)
+
+    app.post('/user/search/assets/:id',checkrequest.CheckToken,web3.regularOwnedTokensOfUser,user.getSearchedAssets);
+   
+   
+   
+   
     //test
     app.get('/balance', web3.testblocks);
 

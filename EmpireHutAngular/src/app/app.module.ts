@@ -20,6 +20,7 @@ import { AssetdetailsComponent } from './user/assetdetails/assetdetails.componen
 import { UsersComponent } from './admin/users/users.component';
 import { UserdetailsComponent } from './admin/userdetails/userdetails.component';
 import { ProposalsComponent } from './user/proposals/proposals.component';
+import { MyassetsComponent } from './user/myassets/myassets.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { ProposalsComponent } from './user/proposals/proposals.component';
     AssetdetailsComponent,
     UsersComponent,
     UserdetailsComponent,
-    ProposalsComponent
+    ProposalsComponent,
+    MyassetsComponent
   ],
   imports: [
     BrowserModule,

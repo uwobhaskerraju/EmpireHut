@@ -1,17 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ContentChild } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { UserService } from '../service/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { VariableService } from '../service/variable.service';
+import { AssetsComponent } from './assets/assets.component';
+
 
 declare var M: any;
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.css']
+  styleUrls: ['./user.component.css']//,
+  //providers: [AssetsComponent]
 })
 export class UserComponent implements OnInit {
+ // @ContentChild(AssetsComponent, { static: true }) component: AssetsComponent;
+  
   imagePath: String
   //userDetails: Object
   constructor(private _http: UserService, private router: Router,
@@ -30,6 +35,7 @@ export class UserComponent implements OnInit {
                 //this.userDetails = r["data"]
                 this._VariableService.userdetails = r["result"]
                 console.log(this._VariableService.userdetails)
+               // this.component.getAssets();
               }
             });
         }
@@ -40,9 +46,7 @@ export class UserComponent implements OnInit {
   }
 
   updateBalance(componentReference) {
-    // console.log(componentReference)
-    // componentReference.anyFunction();
-    //Below will subscribe to the searchItem emitter
+
     componentReference._tokenCount.subscribe((data) => {
       // Will receive the data from child here 
       this._VariableService.userdetails["balance"] = data;
@@ -70,7 +74,7 @@ export class UserComponent implements OnInit {
         this.router.navigate(['proposals'], { relativeTo: this.route });
         break;
       case 3:
-        // this.router.navigate(['admin/user']);
+        this.router.navigate(['personal'], { relativeTo: this.route });
         break;
     }
 

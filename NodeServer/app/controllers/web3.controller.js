@@ -401,27 +401,39 @@ try {
                 next();
             })
             .catch(err => {
-                res.send({ statusCode: 500, data: { error: dataConfig.GlobalErrMsg } });
-            })
+                res.send({ statusCode: 500, result: err });
+            });
     };
 
     exports.getAllTokens = (req, res, next) => {
         // var user = adminAddr;
         // var user = req.body.userID;
+        var ownedTokens=req.app.tokenIDs;
         console.log("getAllTokens")
         assetcontract.methods.getAllTokens().call()
             .then(r => {
                 //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
-                req.app.tokenIDs = r;
+                let difference = r.filter(x => !ownedTokens.includes(x));
+                req.app.tokenIDs = difference;
                 console.log(r)
                 next();
             })
             .catch(err => {
-                res.send({ statusCode: 500, data: { error: err } });
+                res.send({ statusCode: 500, result: err });
             });
-
     };
-
+    exports.regularOwnedTokensOfUser = (req, res, next) => {
+        var address=req.params.id
+       // console.log(address);
+        assetcontract.methods.ownedTokensOfUser(address).call()
+        .then(r=>{
+           req.app.tokenIDs=r;
+           next()
+        })
+        .catch(err => {
+            res.send({ statusCode: 500, result: err });
+        });
+    };
     exports.getTokensOfUser = (req, res, next) => {
         // var user = adminAddr;
         console.log("web3 getTokensOfUser")
@@ -445,9 +457,9 @@ try {
 
     };
 
-    exports.getUserAssetCount = (req, res,next) => {
+    exports.getUserAssetCount = (req, res, next) => {
         console.log("Get User Asset Count")
-       // console.log(req.app.details)
+        // console.log(req.app.details)
         var resu = req.app.details[0];
         var address = resu["address"];
         assetcontract.methods.tokenCount(address).call()
@@ -458,7 +470,7 @@ try {
                 assetcontract.methods.ownedTokensOfUser(address).call()
                     .then(data => {
                         resu.tokenIds = data
-                        req.app.details=resu
+                        req.app.details = resu
                         next();
                     })
                     .catch(err => {
@@ -901,6 +913,7 @@ try {
 
     };
 
+   
 } catch (error) {
     console.log("in catch")
     process.kill(process.pid, 'SIGTERM')

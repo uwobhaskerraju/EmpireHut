@@ -45,7 +45,7 @@ export class AdminhomeComponent implements OnInit {
     this._http.toggleAsset(id, stateValue)
       .subscribe(r => {
         if (r["statusCode"] == 200) {
-          M.toast({ html: "Asset Hidden", classes: 'rounded' })
+          M.toast({ html: "Operation Succesful", classes: 'rounded' })
         }
         else {
           M.toast({ html: "Something went wrong", classes: 'rounded' })

@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const Notification = require('../models/notification.model');
 const dataConfig = require('../config/data.config.js');
 var mongoose = require('mongoose');
+var dice = require('dice-coefficient')
 
 exports.getUserDetails = (req, res, next) => {
     try {
@@ -168,6 +169,50 @@ exports.getAssetDetails = (req, res, next) => {
             })
         });
 };
+exports.toggleAsset = (req, res) => {
+    var assetID = req.body.id
+    var state = req.body.state
+    state = (state == 1) ? "true" : "false";
+    console.log(state)
+    Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
+        .then(r => {
+            res.send({ statusCode: 200, result: true });
+        })
+        .catch(r => {
+            res.send({ statusCode: 500, result: false });
+        })
+}
+exports.getUserAssets = (req, res) => {
+    var tokenIDs = req.app.tokenIDs
+    Asset.find({ tokenID: { $in: tokenIDs } })
+        .select({ picture: 1, name: 1, _id: 1 })
+        .then(r => {
+            res.send({ statusCode: 200, result: r })
+        })
+        .catch(err => {
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
+
+exports.getUserAddress = (req, res, next) => {
+    var id = req.params.id
+    User.find({ _id: mongoose.Types.ObjectId(id) })
+        .select({ address: 1, _id: 0 })
+        .then(r => {
+            req.app.address = r[0];
+            next();
+        })
+        .catch(err => {
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
+
 exports.getUserName = (req, res) => {
     console.log("user getUserName")
     var asset = req.app.assetD[0];
@@ -327,7 +372,38 @@ exports.toggleNotification = (req, res, next) => {
             })
         });
 };
-
+exports.getSearchedAssets = (req, res) => {
+    var threshold = 0.25
+    var q = req.body.value
+    var ownedTokens = req.app.tokenIDs
+    Asset.find({ hidden: false, tokenID: { $nin: ownedTokens } })
+        .select({ "name": 1, "_id": 1, "picture": 1 })
+        .then(data => {
+            var fnlJson = []
+            //console.log(data)
+            data.forEach(d => {
+                //console.log(Object.keys(d.toObject()))
+                Object.keys(d.toObject()).forEach(function (key) {
+                    // console.table('Key : ' + key + ', Value : ' + d[key])
+                    if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
+                        fnlJson.push(d)
+                    }
+                })
+                //return false
+                //console.log("next loop")
+            })
+            fnlJson = [...new Set(fnlJson)];
+            //console.log("ou loop")
+            res.send({ statusCode: 200, result: fnlJson })
+        })
+        .catch(r => {
+            console.log(r)
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
 exports.approveProposal = (req, res, next) => {
     //check whether any amount has been transferred to admin
     console.log("approveProposal")
