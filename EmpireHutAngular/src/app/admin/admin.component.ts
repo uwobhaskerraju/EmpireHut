@@ -15,8 +15,12 @@ export class AdminComponent implements OnInit {
   tokenCount: String
   constructor(private _http: AdminService,
     private router: Router, private _VariableService: VariableService
-    , private route: ActivatedRoute) { }
-
+    , private route: ActivatedRoute) {
+    // this.userDetails["balance"] = 0;
+  }
+  ngOnChanges() {
+    this.userDetails["balance"] = 0;
+  }
   ngOnInit() {
     // this should be like this as we are checking token to update userdetails
     this.imagePath = environment.imagePath

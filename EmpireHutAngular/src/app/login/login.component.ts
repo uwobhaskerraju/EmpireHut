@@ -18,14 +18,14 @@ export class LoginComponent implements OnInit {
   constructor(private _http: OpenService, private router: Router, private _valService: ValidationService) {
     M.AutoInit();
     M.updateTextFields();
-    var textNeedCount = document.querySelectorAll('input');
-    M.CharacterCounter.init(textNeedCount);
+    // var textNeedCount = document.querySelectorAll('input');
+    // M.CharacterCounter.init(textNeedCount);
   }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
-    M.AutoInit();
-    M.updateTextFields();
+     M.AutoInit();
+    // M.updateTextFields();
     var textNeedCount = document.querySelectorAll('input');
     M.CharacterCounter.init(textNeedCount);
   }
@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit {
       this._http.registerUser(name, pass, email)
         .subscribe(data => {
           if (data["statusCode"] == 200) {
-            console.log("as")
+            //console.log("as")
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
             switch (data["result"]["userType"]) {
               case "user":

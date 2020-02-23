@@ -39,4 +39,8 @@ export class UserdetailsComponent implements OnInit {
     this.router.navigate(['admin/user'])
   }
 
+  routerDetails(value: any) {
+    console.log(value.srcElement.id)
+    this.router.navigate(['admin/asset',value.srcElement.id])
+  }
 }

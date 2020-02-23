@@ -28,6 +28,10 @@ export class AdminhomdetailsComponent implements OnInit {
           this.assetDetails.push(data["result"]);
           this.getAssetTransactionHistory()
         }
+        else{
+          M.toast({ html: "Something went wrong!", classes: 'rounded' })
+          this.router.navigate(['admin'])
+        }
 
         //console.log(this.assetDetails)
       });

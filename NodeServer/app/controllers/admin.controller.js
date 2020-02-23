@@ -4,6 +4,7 @@ try {
     const Asset = require('../models/asset.model');
     const User = require('../models/user.model');
     var mongoose = require('mongoose');
+    var dice = require('dice-coefficient')
 
     //create a new Asset
     // goes to web3 controller first and comes back here(insertAsset)
@@ -129,7 +130,7 @@ try {
         const getDetails = x => {
             return new Promise((resolve, reject) => {
                 Asset.find({ tokenID: x })
-                    .select({ "name": 1, "_id": 1, "picture": 1 })
+                    .select({ "name": 1, "_id": 1, "picture": 1, hidden: 1 })
                     .then(data => {
                         resolve(data);
                     })
@@ -242,8 +243,14 @@ try {
             .select({ username: 1, email: 1, _id: 1, address: 1 })
             .then(r => {
                 //res.send({ statusCode: 200, result: r });
-                req.app.details = r;
-                next();
+                if (r.length > 0) {
+                    req.app.details = r;
+                    next();
+                }
+                else {
+                    res.send({ statusCode: 300, result: "Found Nothing" })
+                }
+
             })
             .catch(r => {
                 res.send({
@@ -253,6 +260,72 @@ try {
             });
     };
 
+    exports.getSearchedAssets = (req, res) => {
+        var threshold = 0.25
+        var q = req.params.id
+        Asset.find()
+            .select({ "name": 1, "_id": 1, "picture": 1 })
+            .then(data => {
+                var fnlJson = []
+                //console.log(data)
+                data.forEach(d => {
+                    //console.log(Object.keys(d.toObject()))
+                    Object.keys(d.toObject()).forEach(function (key) {
+                        // console.table('Key : ' + key + ', Value : ' + d[key])
+                        if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
+                            fnlJson.push(d)
+                        }
+                    })
+                    //return false
+                    //console.log("next loop")
+                })
+                fnlJson = [...new Set(fnlJson)];
+                //console.log("ou loop")
+                res.send({ statusCode: 200, result: fnlJson })
+            })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    };
+
+    exports.toggleAsset = (req, res) => {
+        var assetID = req.body.id
+        var state = req.body.state
+        state = (state == 1) ? "true" : "false";
+        console.log(state)
+        Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
+            .then(r => {
+                res.send({ statusCode: 200, result: true });
+            })
+            .catch(r => {
+                res.send({ statusCode: 500, result: false });
+            })
+    }
+
+    exports.getuserAssets = (req, res) => {
+        //res.send(req.app.details)
+        var details = req.app.details;
+        Asset.find({ tokenID: { $in: details.tokenIds } })
+            .select({ name: 1, _id: 1 })
+            .then(r => {
+                //details = details.toObject();
+                delete details.tokenIds
+                details.assets = r;
+                res.send({ statusCode: 200, result: details })
+
+            })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
 } catch (error) {
 
 }

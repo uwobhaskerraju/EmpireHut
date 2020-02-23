@@ -70,4 +70,19 @@ export class AdminService {
     let URL = environment.apiBaseURL + 'admin/assettrans/' + assetID;
     return this._http.get(URL);
   }
+
+  getSearchedAssets(value: any) {
+    let URL = environment.apiBaseURL + 'admin/search/assets/' + value;
+    return this._http.get(URL);
+  }
+
+  toggleAsset(id: any, hidden: any) {
+    let URL = environment.apiBaseURL + 'admin/asset/toggle';
+    let jsnData = JSON.stringify({
+      id: id,
+      state: hidden
+    })
+    console.log(jsnData)
+    return this._http.post(URL, jsnData)
+  }
 }

@@ -5,10 +5,10 @@ declare var M: any
 })
 export class ValidationService {
 
-  succOpMsg='Operation Succesfull'
-  OpFailedMsg='Operation Failed. Try Again!'
-  fieldsErr='fields shouldnt be empty and greater than 15 characters'
-  loggedInUser={}
+  succOpMsg = 'Operation Succesfull'
+  OpFailedMsg = 'Operation Failed. Try Again!'
+  fieldsErr = 'fields shouldnt be empty and greater than 15 characters'
+  loggedInUser = {}
   constructor() { }
 
 
@@ -154,5 +154,62 @@ export class ValidationService {
       errMsg = errMsg.concat('Username cannot be empty||')
     }
     return errMsg
+  }
+
+  validateAssetArea(area: any) {
+    //console.log(area);
+    if (String(area).length == 0) {
+      return "Area cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(area)) {
+      if (String(area).length < 0 || String(area).length > 5) {
+        //console.log("here area")
+        errMsg = errMsg.concat('Area should be max of 4 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('Area cannot be empty||')
+    }
+    return errMsg;
+  }
+
+  validateAssetAddress(address: String) {
+    //console.log(address)
+    if (String(address).length == 0) {
+      return "address cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(address)) {
+      if (String(address).length < 0 || String(address).length > 16) {
+        errMsg = errMsg.concat('Address should be max of 15 characters||')
+      }
+    }
+    else {
+      // console.log("her")
+      errMsg = errMsg.concat('Address cannot be empty||')
+    }
+    return errMsg
+  }
+
+  validateAssetName(name: String) {
+    if (String(name).length == 0) {
+      //console.log("ASd")
+      return "name cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(name)) {
+      if (String(name).length < 0 || String(name).length > 11) {
+        errMsg = errMsg.concat('name should be max of 10 characters||')
+      }
+      var letter = /^([a-zA-Z]+\s)*[a-zA-Z]+$/
+      if (!name.match(letter)) {
+        errMsg = errMsg.concat('Name should be alphabets only||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('Name cannot be empty||')
+    }
+    return errMsg;
   }
 }

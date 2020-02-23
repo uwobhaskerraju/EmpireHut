@@ -7,19 +7,19 @@
     <div class="row">
         <div class="input-field col s6">
             <i class="material-icons prefix">chrome_reader_mode</i>
-            <input id="title" type="text" class="validate" required [(ngModel)]="asset.name">
+            <input id="title" type="text" class="validate" required [(ngModel)]="asset.name" data-length="10">
             <label for="title" class="active">Name</label>
         </div>
         <div class="input-field col s6">
             <i class="material-icons prefix">place</i>
-            <input id="artist" type="text" class="validate" required [(ngModel)]="asset.address">
+            <input id="artist" type="text" class="validate" required [(ngModel)]="asset.address" data-length="15">
             <label for="artist" class="active">Address</label>
         </div>
     </div>
     <div class="row">
         <div class="input-field col s6">
             <i class="material-icons prefix">photo_size_select_small</i>
-            <input id="album" type="number" class="validate" required [(ngModel)]="asset.area">
+            <input id="album" type="number" class="validate" required [(ngModel)]="asset.area" data-length="4">
             <label for="album" class="active">Area</label>
         </div>
     </div>

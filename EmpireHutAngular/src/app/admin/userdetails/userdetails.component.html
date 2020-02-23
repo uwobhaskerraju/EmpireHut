@@ -23,34 +23,53 @@
 <br><br>
 <div class="divider"></div>
 <div class="section center">
+    <h5>Owned Assets</h5>
+</div>
+<div *ngIf="userDetails['assets']">
+    <table class="striped">
+        <tbody>
+            <tr *ngFor="let asset of userDetails['assets']">
+                <td><a href="javascript:void(0)" id="{{asset._id}}" (click)="routerDetails($event)">{{asset.name}}</a>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+<div class="row center-align" *ngIf="userDetails['assets']?.length == 0">
+    <h3 class="blue-text">No Owned Assets</h3>
+</div>
+<br><br>
+<div class="divider"></div>
+<div class="section center">
     <h5>Transactions</h5>
 </div>
-<div class="row" *ngIf="userTrans"></div>
-<table class="striped">
-    <thead>
-        <tr>
-            <th>From</th>
-            <th>To</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Description</th>
-        </tr>
-    </thead>
+<div class="row" *ngIf="userTrans">
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Description</th>
+            </tr>
+        </thead>
 
-    <tbody>
-        <tr *ngFor="let tran of userTrans">
-            <td>{{tran["from"]}}</td>
-            <td>{{tran["to"]}}</td>
-            <td>{{tran["amount"]}}</td>
-            <td>{{tran["type"]}}</td>
-            <td>{{tran["date"]}}</td>
-            <td>{{tran["description"]}}</td>
-        </tr>
+        <tbody>
+            <tr *ngFor="let tran of userTrans">
+                <td>{{tran["from"]}}</td>
+                <td>{{tran["to"]}}</td>
+                <td>{{tran["amount"]}}</td>
+                <td>{{tran["type"]}}</td>
+                <td>{{tran["date"]}}</td>
+                <td>{{tran["description"]}}</td>
+            </tr>
 
-    </tbody>
-</table>
-
+        </tbody>
+    </table>
+</div>
 <div class="row center-align" *ngIf="userTrans?.length == 0">
     <h3 class="blue-text">No Transactions</h3>
 </div>

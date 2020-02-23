@@ -20,6 +20,7 @@
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-sanitizer": "^1.0.5",
+    "dice-coefficient": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.13",
     "nodemon": "^2.0.2",

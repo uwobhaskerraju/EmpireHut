@@ -445,14 +445,25 @@ try {
 
     };
 
-    exports.getUserAssetCount = (req, res) => {
+    exports.getUserAssetCount = (req, res,next) => {
+        console.log("Get User Asset Count")
+       // console.log(req.app.details)
         var resu = req.app.details[0];
         var address = resu["address"];
         assetcontract.methods.tokenCount(address).call()
             .then(r => {
                 resu = resu.toObject();
                 resu.ownedTokens = r;
-                res.send({ statusCode: 200, result: resu });
+                // res.send({ statusCode: 200, result: resu });
+                assetcontract.methods.ownedTokensOfUser(address).call()
+                    .then(data => {
+                        resu.tokenIds = data
+                        req.app.details=resu
+                        next();
+                    })
+                    .catch(err => {
+                        res.send({ statusCode: 500, result: err });
+                    });
             })
             .catch(err => {
                 res.send({ statusCode: 500, result: err });
@@ -642,7 +653,7 @@ try {
 
     };
 
-    exports.getAssetTransactions = (req, res,next) => {
+    exports.getAssetTransactions = (req, res, next) => {
         var fnlResult = [];
         const loopTrans = (e, time, tokenID) => {
             return new Promise((resolve, reject) => {
@@ -784,7 +795,7 @@ try {
             //req.app.tokenIDs = null;
             req.app.result = r;
             // console.log(r)
-             next();
+            next();
             //res.send({ statusCode: 200, result: r })
         })
             .catch(r => {
