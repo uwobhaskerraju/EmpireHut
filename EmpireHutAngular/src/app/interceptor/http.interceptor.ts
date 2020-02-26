@@ -1,8 +1,10 @@
 import { Injectable, Injector } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 //https://www.techiediaries.com/angular-interceptors-mock-http-requests-example/
+//https://scotch.io/@vigneshsithirai/angular-6-7-http-client-interceptor-with-error-handling
+//https://github.com/vigneshsithirai/Angular-Interceptor/blob/master/src/app/interceptor/httpconfig.interceptor.ts
 @Injectable()
 export class MockHttpCalIInterceptor implements HttpInterceptor {
     constructor(private injector: Injector) { }
@@ -18,7 +20,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'Access-Control-Allow-Headers': 'Content-Type',
-                            'authorization': 'Bearer '+localStorage.getItem('ACCESS_TOKEN')
+                            'authorization': 'Bearer ' + localStorage.getItem('ACCESS_TOKEN')
                         }
                     )
                 });
@@ -44,13 +46,34 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'Access-Control-Allow-Headers': 'Content-Type',
-                        'authorization': 'Bearer '+localStorage.getItem('ACCESS_TOKEN')
+                        'authorization': 'Bearer ' + localStorage.getItem('ACCESS_TOKEN')
                     }
                 )
             });
         }
 
         //console.log(req);
-        return next.handle(req);
+        return next.handle(req).pipe(
+            map((event: HttpEvent<any>) => {
+                if (event instanceof HttpResponse) {
+                    console.log('event--->>>', event);
+                    if (event["body"]["statusCode"] == 200) {
+                        console.log(event["url"])
+                        console.log(event["body"]["result"])
+                    }
+                }
+                return event;
+            }),
+            catchError((error: HttpErrorResponse) => {
+                let data = {};
+                data = {
+                    reason: error && error.error && error.error.reason ? error.error.reason : '',
+                    status: error.status
+                };
+                console.log(data)
+                return throwError(error);//url,message
+            })
+            
+            );
     }
 }

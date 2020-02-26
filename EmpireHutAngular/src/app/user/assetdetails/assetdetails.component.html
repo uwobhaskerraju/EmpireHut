@@ -42,25 +42,62 @@
         </div>
     </div>
     <div class="divider"></div>
-    <div class="section center">
-        <h5>Buy Property</h5>
-        <p>Enter an amount for which you wish to purchase this property. A Notification will be sent to
-            the owner for approval.
-        </p>
-        <div class="row">
-            <div class="col s12">
-                Amount:
-                <div class="input-field inline">
-                    <input id="propertyamount" type="number" class="validate" [(ngModel)]="amount">
-                    <span class="helper-text" data-error="wrong" data-success="right"></span>
-                </div>
-            </div>
-            <div class="row">
-                <a class="btn-floating btn-large waves-effect waves-light red" (click)="submitProposal()"><i
-                        class="material-icons">play_arrow</i></a>
-            </div>
+
+    <div *ngIf="self; else notSelf">
+
+        <div class="section center">
+            <h2>Transaction History</h2>
+        </div>
+
+        <div *ngIf="assetTrans">
+            <table class="centered responsive-table">
+                <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let trans of assetTrans">
+                        <td>
+                            {{trans.from}}
+                        </td>
+                        <td>
+                            {{trans.to}}
+                        </td>
+                        <td>
+                            {{trans.date}}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <ng-template #notSelf>
+        <div class="section center">
+            <h5>Buy Property</h5>
+            <p>Enter an amount for which you wish to purchase this property. A Notification will be sent to
+                the owner for approval.
+            </p>
+            <div class="row">
+                <div class="col s12">
+                    Amount:
+                    <div class="input-field inline">
+                        <input id="propertyamount" type="number" class="validate" [(ngModel)]="amount">
+                        <span class="helper-text" data-error="wrong" data-success="right"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <a class="btn-floating btn-large waves-effect waves-light red" (click)="submitProposal()"><i
+                            class="material-icons">play_arrow</i></a>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
 </div>
 
 <div class="row center-align" *ngIf="assetDetails?.length == 0">

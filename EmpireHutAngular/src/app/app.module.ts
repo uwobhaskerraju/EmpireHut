@@ -21,6 +21,7 @@ import { UsersComponent } from './admin/users/users.component';
 import { UserdetailsComponent } from './admin/userdetails/userdetails.component';
 import { ProposalsComponent } from './user/proposals/proposals.component';
 import { MyassetsComponent } from './user/myassets/myassets.component';
+import { TransactionsComponent } from './user/transactions/transactions.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { MyassetsComponent } from './user/myassets/myassets.component';
     UsersComponent,
     UserdetailsComponent,
     ProposalsComponent,
-    MyassetsComponent
+    MyassetsComponent,
+    TransactionsComponent
   ],
   imports: [
     BrowserModule,

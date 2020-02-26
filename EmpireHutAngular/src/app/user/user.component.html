@@ -4,6 +4,7 @@
       <a href="javascript:void(0)" data-target="mobile-demo" class="sidenav-trigger"><i
           class="material-icons">menu</i></a>
       <ul class="right hide-on-med-and-down">
+        <li><a href="javascript:void(0)"><i class="material-icons left">account_balance</i>{{tokenCount}}</a></li>
         <li><a href="javascript:void(0)"><i class="material-icons left">attach_money</i>{{_VariableService.userdetails["balance"]}} EMP</a></li>
         <li><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
       </ul>
@@ -35,17 +36,17 @@
         </li>
          <li>
           <a class="waves-effect" (click)="navigate(2)">
-            <i class="material-icons">memory</i>Purchase Proposal</a>
+            <i class="material-icons">shopping_cart</i>Purchase Proposal</a>
         </li>
         <li>
           <a class="waves-effect" href="javascript:void(0)" (click)="navigate(3)">
-            <i class="material-icons">school</i>My Assets</a>
+            <i class="material-icons">home</i>My Assets</a>
         </li>
-        <!--<li>
+       <li>
           <a class="waves-effect" href="javascript:void(0)" (click)="navigate(4)">
-            <i class="material-icons">school</i>My Playlist</a>
+            <i class="material-icons">monetization_on</i>My Transactions</a>
         </li>
-        <li>
+        <!-- <li>
           <a class="waves-effect" href="javascript:void(0)" (click)="navigate(5)">
             <i class="material-icons">school</i>All Playlist</a>
         </li> -->

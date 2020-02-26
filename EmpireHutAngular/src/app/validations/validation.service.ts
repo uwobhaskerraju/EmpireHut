@@ -163,9 +163,9 @@ export class ValidationService {
     }
     let errMsg = '';
     if (Boolean(area)) {
-      if (String(area).length < 0 || String(area).length > 5) {
+      if (String(area).length < 0 || String(area).length > 3) {
         //console.log("here area")
-        errMsg = errMsg.concat('Area should be max of 4 characters||')
+        errMsg = errMsg.concat('Area should be max of 3 characters||')
       }
     }
     else {
@@ -181,8 +181,8 @@ export class ValidationService {
     }
     let errMsg = '';
     if (Boolean(address)) {
-      if (String(address).length < 0 || String(address).length > 16) {
-        errMsg = errMsg.concat('Address should be max of 15 characters||')
+      if (String(address).length < 0 || String(address).length > 25) {
+        errMsg = errMsg.concat('Address should be max of 25 characters||')
       }
     }
     else {
@@ -199,8 +199,8 @@ export class ValidationService {
     }
     let errMsg = '';
     if (Boolean(name)) {
-      if (String(name).length < 0 || String(name).length > 11) {
-        errMsg = errMsg.concat('name should be max of 10 characters||')
+      if (String(name).length < 0 || String(name).length > 15) {
+        errMsg = errMsg.concat('name should be max of 15 characters||')
       }
       var letter = /^([a-zA-Z]+\s)*[a-zA-Z]+$/
       if (!name.match(letter)) {

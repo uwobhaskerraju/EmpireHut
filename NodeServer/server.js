@@ -46,6 +46,8 @@ router.use(function (req, res, next) {
     next()// make sure we go to the next routes and don't stop here
 });
 
+
+
 function sanitizeRequest(req) {
     var body = req.body
     const entries = Object.keys(body)
@@ -69,6 +71,8 @@ require('./app/routes/open.route.js')(router);
 require('./app/routes/admin.route.js')(router);
 require('./app/routes/user.route.js')(router);
 // listen for requests
+
+
 
 app.listen(port, () => {
     console.log("Server is listening on port " + port);

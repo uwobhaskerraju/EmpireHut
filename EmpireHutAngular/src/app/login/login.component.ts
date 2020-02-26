@@ -116,4 +116,13 @@ export class LoginComponent implements OnInit {
     }
 
   }
+
+
+  // test(){
+  //   console.log("here")
+  //   this._http.test()
+  //   .subscribe(r=>{
+  //     console.log(r)
+  //   })
+  // }
 }

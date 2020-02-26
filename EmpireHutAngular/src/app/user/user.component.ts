@@ -15,9 +15,10 @@ declare var M: any;
   //providers: [AssetsComponent]
 })
 export class UserComponent implements OnInit {
- // @ContentChild(AssetsComponent, { static: true }) component: AssetsComponent;
-  
+  // @ContentChild(AssetsComponent, { static: true }) component: AssetsComponent;
+
   imagePath: String
+  tokenCount: any
   //userDetails: Object
   constructor(private _http: UserService, private router: Router,
     private _VariableService: VariableService, private route: ActivatedRoute) {
@@ -34,8 +35,17 @@ export class UserComponent implements OnInit {
               if (r["statusCode"] == 200) {
                 //this.userDetails = r["data"]
                 this._VariableService.userdetails = r["result"]
-                console.log(this._VariableService.userdetails)
-               // this.component.getAssets();
+                //console.log(this._VariableService.userdetails)
+                // this.component.getAssets();
+                this._http.getOwnedAssets(this._VariableService.userdetails["address"])
+                  .subscribe(r => {
+                    if (r["statusCode"] == 200) {
+                      this.tokenCount =r["result"];
+                    }
+                    else {
+                      this.tokenCount = 0;
+                    }
+                  });
               }
             });
         }
@@ -75,6 +85,9 @@ export class UserComponent implements OnInit {
         break;
       case 3:
         this.router.navigate(['personal'], { relativeTo: this.route });
+        break;
+      case 4:
+        this.router.navigate(['transactions'], { relativeTo: this.route })
         break;
     }
 

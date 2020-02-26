@@ -20,9 +20,17 @@ export class UserService {
     return this._http.get(URL);
   }
 
-  getBalance() {
+  getOwnedAssets(address:any) {
+    let URL = environment.apiBaseURL + 'user/count/' + address
+    return this._http.get(URL);
+  }
+
+  getBalance(address: any) {
     let url = environment.apiBaseURL + 'user/balance';
-    return this._http.get(url);
+    let jsnData = {
+      userID: address
+    }
+    return this._http.post(url, jsnData);
   }
 
   getUserDetails(add: String) {
@@ -50,6 +58,11 @@ export class UserService {
     }
     //console.log(jsnData)
     return this._http.post(URL, jsnData);
+  }
+
+  getAssetTransactionHistory(assetID: any) {
+    let URL = environment.apiBaseURL + 'user/assettrans/' + assetID;
+    return this._http.get(URL);
   }
 
   checkAdmin(admin: any) {
@@ -123,6 +136,15 @@ export class UserService {
     let jsnData = JSON.stringify({
       value: value
     });
-    return this._http.post(URL,jsnData);
+    return this._http.post(URL, jsnData);
+  }
+
+  getUserTransactions(address: String) {
+    let URL = environment.apiBaseURL + 'user/trans';
+    let jsnData = {
+      address: address
+    }
+    return this._http.post(URL, jsnData);
+
   }
 }

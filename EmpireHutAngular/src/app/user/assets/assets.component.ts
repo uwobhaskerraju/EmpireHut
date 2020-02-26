@@ -11,10 +11,15 @@ import { VariableService } from 'src/app/service/variable.service';
 })
 export class AssetsComponent implements OnInit {
   @Output() _tokenCount: EventEmitter<any> = new EventEmitter();
+
   allAssets: Object
   imagePath: String
+  self: boolean
+
   constructor(private _http: UserService, private router: Router,
-    private route: ActivatedRoute, private _var: VariableService) { }
+    private route: ActivatedRoute, private _var: VariableService) {
+      this.self=true;
+     }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -24,6 +29,7 @@ export class AssetsComponent implements OnInit {
         if (d["statusCode"] == 200) {
           this._http.getAllAssets(d["result"]["address"])
             .subscribe(data => {
+              this.self = false;
               // console.log(data);
               if (data["statusCode"] == 200) {
                 this.allAssets = data["result"];
@@ -46,7 +52,7 @@ export class AssetsComponent implements OnInit {
 
   onSearchChange(value: any) {
     if (value) {
-      this._http.getSearchedAssets(this._var.userdetails["address"],value).subscribe(data => {
+      this._http.getSearchedAssets(this._var.userdetails["address"], value).subscribe(data => {
         if (data["statusCode"] == 200) {
           this.allAssets = data["result"]
           //console.log(this.orgSongs)

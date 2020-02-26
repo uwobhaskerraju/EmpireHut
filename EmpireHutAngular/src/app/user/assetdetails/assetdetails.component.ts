@@ -21,6 +21,8 @@ export class AssetdetailsComponent implements OnInit {
   private routeSub: Subscription;
   assetID: String;
   amount: String;
+  self: boolean;
+  assetTrans = [];
 
   constructor(private _http: UserService, private route: ActivatedRoute, private router: Router,
     private _var: VariableService) { }
@@ -34,8 +36,12 @@ export class AssetdetailsComponent implements OnInit {
       .subscribe(data => {
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
+          if (data["result"]["ownerAdd"] == this._var.userdetails["address"]) {
+            this.self = true
+            this.getAssetTransactionHistory()
+          }
         }
-        else{
+        else {
           M.toast({ html: "something went wrong", classes: 'rounded' })
           this.router.navigate(['user'])
         }
@@ -48,14 +54,28 @@ export class AssetdetailsComponent implements OnInit {
     this.router.navigate(['user'])
   }
 
+  getAssetTransactionHistory() {
+    this._http.getAssetTransactionHistory(this.assetID)
+      .subscribe(r => {
+        if (r["statusCode"] == 200) {
+          //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
+          this.assetTrans = r["result"];
+        }
+        else {
+          M.toast({ html: "No Transaction History", classes: 'rounded' })
+        }
+      });
+  }
+
   updateCount() {
     // emit data to parent component
-    this._http.getBalance()
+    this._http.getBalance(this._var.userdetails["address"])
       .subscribe(r => {
         if (r["statusCode"] == 200) {
           console.log(r)
           //this._VariableService.tokenCount = r["data"]["result"];
           this._tokenCount.emit(r["result"]);
+          this.router.navigate(['user'])
         }
         else {
           //console.log("something went wrong in getting balance")
@@ -75,7 +95,10 @@ export class AssetdetailsComponent implements OnInit {
       M.toast({ html: "The proposed amount cannot be less than zero", classes: 'rounded' })
       return false;
     }
-
+    if (Number(this.amount) < Number(this.assetDetails[0]["price"])) {
+      M.toast({ html: "The proposed amount cannot be less than Current Asset Value", classes: 'rounded' })
+      return false;
+    }
     //check whether the owner is admin or not
     //hit respective APIs based on that
     this._http.checkAdmin(this.assetDetails[0]["ownerAdd"])
@@ -90,7 +113,7 @@ export class AssetdetailsComponent implements OnInit {
 
                 //call parent method
                 this.updateCount();
-                this.router.navigate(['user']);
+                //;
               }
               else {
                 M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })

@@ -1,4 +1,9 @@
 var mongoose = require('mongoose');
+var moment = require('moment');
+var hourFromNow = function(){
+    return moment().add(1, 'hour');
+};
+
 
 var NotificationSchema = mongoose.Schema({
     _id: { type: mongoose.Schema.ObjectId, auto: true },
@@ -9,7 +14,7 @@ var NotificationSchema = mongoose.Schema({
     proposalAddr: { type: String, required: true },
     deal: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
-    datetime: { type: Date, default: Date.now }
+    datetime: { type: Date, default:hourFromNow}
 }, {
     versionKey: false
 });

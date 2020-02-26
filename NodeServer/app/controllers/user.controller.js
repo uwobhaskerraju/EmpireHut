@@ -140,7 +140,78 @@ exports.getAssetToken = (req, res, next) => {
 };
 
 //end of asset token
+exports.getUserNameFrmAddress = async (req, res) => {
+    console.log("getUserNameFrmAddress")
+    var fnlRes = [];
+    var getData = (ad) => {
+        return new Promise((resolve, reject) => {
+            try {
+                // console.log(ad)
+                regex = ad.map(function (e) { return new RegExp(e, "i"); });
+                User.find({ address: { $in: regex } })
+                    //User.find({ address: ad1 })
+                    .select({ username: 1, _id: 0, address: 1 })
+                    .then(r => {
+                        // console.log(r)
+                        resolve(r);
+                    })
+                    .catch(r => {
+                        reject(r);
+                    });
+            } catch (error) {
+                reject(error);
+            }
 
+        });
+    }
+    var details = async () => {
+
+        var result = req.app.result;
+        // console.log(result)
+        //var reldup = result;
+        req.app.result = null;
+        var ret = [];
+        for (var value of result) {
+            var ad = []
+            var ad1 = value["from"]
+            var ad2 = value["to"]
+            if (String(ad1).includes('0x')) {
+                ad.push(String(ad1).toLowerCase())
+            }
+            if (String(ad2).includes('0x')) {
+                ad.push(String(ad2).toLowerCase())
+            }
+            //console.log(ad1 + " " + ad2)
+            if (ad.length > 0) {
+                var ret = await getData(ad);
+                for (var x of ret) {
+                    if (String(x["address"]).toLowerCase() == value["from"].toLowerCase()) {
+                        value["from"] = x["username"]
+                    }
+                    if (String(x["address"]).toLowerCase() == value["to"].toLowerCase()) {
+                        value["to"] = x["username"]
+                    }
+                }
+            }
+
+        }
+        return result.reverse();
+        //console.log(result)
+    }
+
+    details().then(r => {
+        //console.log(r)
+        res.send({ statusCode: 200, result: r })
+    })
+        .catch(r => {
+            console.log(r)
+            res.send({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+
+        });
+}
 
 //get asset details
 exports.getAssetDetails = (req, res, next) => {

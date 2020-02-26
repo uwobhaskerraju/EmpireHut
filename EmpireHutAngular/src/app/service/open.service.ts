@@ -19,7 +19,7 @@ export class OpenService {
       email: email,
       password: pass
     })
- 
+
     return this.http.post(URL, JsnData);
   }
 
@@ -41,6 +41,11 @@ export class OpenService {
 
   validateToken() {
     let URL = environment.apiBaseURL + 'open/val'
+    return this.http.get(URL);
+  }
+
+  test() {
+    let URL = environment.apiBaseURL + 'open/testmeafter';
     return this.http.get(URL);
   }
 }

@@ -5,6 +5,68 @@ try {
     const User = require('../models/user.model');
     var mongoose = require('mongoose');
     var dice = require('dice-coefficient')
+    const Notification = require('../models/notification.model');
+
+    exports.revertTransactions = (req, res, next) => {
+        Notification.find({ deal: false, active: true })
+            .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
+            .then(nots => {
+                var fnlRes = [];
+                for (var not of nots) {
+                    // To calculate the time difference of two dates 
+                    var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
+
+                    // To calculate the no. of days between two dates 
+                    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                    if (Math.floor(Difference_In_Days) > 1) {
+                        fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
+                    }
+                }
+                req.app.result = fnlRes;
+                next();
+                //res.send(fnlRes);
+            })
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
+
+    exports.revertTransUpdate = (req, res) => {
+        const updateNotification = (not) => {
+            return new Promise((resolve, reject) => {
+                Notification.updateOne({ _id: mongoose.Types.ObjectId(not["_id"]) }, { $set: { active: false, deal: false } })
+                    .then(r => {
+                        resolve(true);
+                    })
+                    .catch(err => {
+                        reject(err)
+                    });
+            });
+        }
+        const noti = async () => {
+            for (var not of req.app.result) {
+                if (not["done"]) {
+                    await updateNotification(not);
+                }
+            }
+            return true;
+        }
+
+        noti().then(r=>{
+            if(r){
+                res.send({statusCode:200,result:"done"})
+            }
+        })
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
 
     //create a new Asset
     // goes to web3 controller first and comes back here(insertAsset)

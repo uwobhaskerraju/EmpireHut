@@ -7,11 +7,19 @@ try {
     const assetDecoder = abiDecoder;
 
     const rpcURL = process.env.blockURL
-    const web3 = new Web3(rpcURL)
+    const web3 = new Web3(new Web3.providers.HttpProvider(rpcURL))
 
     //console.log(web3.version) //1.2.4
     // get count of contracts
-    console.log("web3.js connected to " + web3.currentProvider["host"]);
+    web3.eth.net.isListening().then((s) => {
+        console.log("web3.js connected to " + web3.currentProvider["host"]);
+    }).catch((e) => {
+        console.log('Lost connection to the node, reconnecting');
+        //web3.setProvider(your_provider_here);
+        process.kill(process.pid, 'SIGTERM')
+        //throw "Blockchain failed to connect. Exiting"
+    })
+
     var adminAddr = null;
     web3.eth.getAccounts().then(r => { adminAddr = String(r[0]) })
     /************************ */
@@ -377,6 +385,18 @@ try {
 
     };
 
+    exports.getUserTokenCount = (req, res) => {
+        var adr = req.params.id;
+        assetcontract.methods.tokenCount(adr).call()
+            .then(r => {
+                res.send({ statusCode: 200, result: r });
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, result: err });
+            });
+
+    }
+
     exports.getTokenCount = (req, res) => {
         assetcontract.methods.tokenCount(adminAddr).call()
             .then(r => {
@@ -404,18 +424,34 @@ try {
                 res.send({ statusCode: 500, result: err });
             });
     };
-
-    exports.getAllTokens = (req, res, next) => {
+    exports.getAllUserTokens = (req, res, next) => {
         // var user = adminAddr;
         // var user = req.body.userID;
-        var ownedTokens=req.app.tokenIDs;
+        var ownedTokens = req.app.tokenIDs;
         console.log("getAllTokens")
         assetcontract.methods.getAllTokens().call()
             .then(r => {
                 //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
                 let difference = r.filter(x => !ownedTokens.includes(x));
                 req.app.tokenIDs = difference;
-                console.log(r)
+                // console.log(r)
+                next();
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, result: err });
+            });
+    };
+    exports.getAllTokens = (req, res, next) => {
+        // var user = adminAddr;
+        // var user = req.body.userID;
+        // var ownedTokens=req.app.tokenIDs;
+        console.log("getAllTokens")
+        assetcontract.methods.getAllTokens().call()
+            .then(r => {
+                //res.send({ statusCode: 200, data: { address: adminAddr, result: r } });
+                //let difference = r.filter(x => !ownedTokens.includes(x));
+                req.app.tokenIDs = r;
+                // console.log(r)
                 next();
             })
             .catch(err => {
@@ -423,16 +459,16 @@ try {
             });
     };
     exports.regularOwnedTokensOfUser = (req, res, next) => {
-        var address=req.params.id
-       // console.log(address);
+        var address = req.params.id
+        // console.log(address);
         assetcontract.methods.ownedTokensOfUser(address).call()
-        .then(r=>{
-           req.app.tokenIDs=r;
-           next()
-        })
-        .catch(err => {
-            res.send({ statusCode: 500, result: err });
-        });
+            .then(r => {
+                req.app.tokenIDs = r;
+                next()
+            })
+            .catch(err => {
+                res.send({ statusCode: 500, result: err });
+            });
     };
     exports.getTokensOfUser = (req, res, next) => {
         // var user = adminAddr;
@@ -664,6 +700,51 @@ try {
             });
 
     };
+
+    exports.revertTransactions = (req, res, next) => {
+        const revert = (tran) => {
+            return new Promise((resolve, reject) => {
+                var fnlRes = [];
+                EMPContract.methods.transfer(tran["_to"], tran["_value"], "[Expired] Purchase Proposal")
+                    .send({ from: adminAddr, value: 1, gas: 1000000 })
+                    .on('confirmation', function (confirmationNumber, receipt) {
+                        //console.log(receipt)
+                        tran["done"] = true;
+                        fnlRes.push(tran);
+                        resolve(fnlRes)
+                    })
+                    .on('error', function (error, receipt) {
+                        console.log(error)
+                        tran["done"] = false;
+                        fnlRes.push(tran);
+                        reject(fnlRes);
+                    })
+            });
+
+        }
+        const details = async () => {
+            var fnlRes = [];
+            for (var tran of req.app.result) {
+                var r = await revert(tran)
+                fnlRes.push(r[0])
+            }
+            return fnlRes;
+        }
+        details()
+            .then(r => {
+                req.app.result = r;
+                next();
+            })
+            .catch(r => {
+                console.log(r)
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+
+
+    }
 
     exports.getAssetTransactions = (req, res, next) => {
         var fnlResult = [];
@@ -913,7 +994,7 @@ try {
 
     };
 
-   
+
 } catch (error) {
     console.log("in catch")
     process.kill(process.pid, 'SIGTERM')

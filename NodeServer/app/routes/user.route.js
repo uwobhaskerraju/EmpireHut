@@ -13,7 +13,7 @@ module.exports = (app) => {
 
     //getting all assets that are not hidden
     //web3.getTokensOfUser,
-    app.get('/user/assets/:id', checkrequest.CheckToken,web3.regularOwnedTokensOfUser ,web3.getAllTokens, user.getAllAssets);
+    app.get('/user/assets/:id', checkrequest.CheckToken, web3.regularOwnedTokensOfUser, web3.getAllUserTokens, user.getAllAssets);
 
     app.get('/user/asset/:id', checkrequest.CheckToken, user.getAssetDetails, web3.getAssetDetails, user.getUserName);
 
@@ -23,23 +23,26 @@ module.exports = (app) => {
 
     app.post('/user/proposal/approve', checkrequest.CheckToken, user.approveProposal, web3.customTransferTo, user.toggleNotification, web3.transferAsset);
 
-    app.post('/user/proposal/reject',checkrequest.CheckToken,user.rejectProposal,web3.RejectTransfer);
+    app.post('/user/proposal/reject', checkrequest.CheckToken, user.rejectProposal, web3.RejectTransfer);
 
     //,,user.getUserAssets
-    app.get('/user/personal/:id',checkrequest.CheckToken,web3.regularOwnedTokensOfUser,user.getUserAssets);
+    app.get('/user/personal/:id', checkrequest.CheckToken, web3.regularOwnedTokensOfUser, user.getUserAssets);
 
-    app.post('/user/asset/toggle',checkrequest.CheckToken,user.toggleAsset)
+    app.post('/user/asset/toggle', checkrequest.CheckToken, user.toggleAsset)
 
-    app.post('/user/search/assets/:id',checkrequest.CheckToken,web3.regularOwnedTokensOfUser,user.getSearchedAssets);
-   
-   
-   
-   
+    app.post('/user/search/assets/:id', checkrequest.CheckToken, web3.regularOwnedTokensOfUser, user.getSearchedAssets);
+
+    app.post('/user/trans', checkrequest.CheckToken, web3.getTransactions, user.getUserNameFrmAddress);
+
+    app.get('/user/assettrans/:id',checkrequest.CheckToken,user.getAssetDetails,web3.getAssetTransactions,user.getUserNameFrmAddress);
+
+    app.get('/user/count/:id',checkrequest.CheckToken,web3.getUserTokenCount)
+    
     //test
     app.get('/balance', web3.testblocks);
 
     app.get('/testGas', web3.testEvents);
 
-    app.get('/logs',web3.testLogs);
+    app.get('/logs', web3.testLogs);
 
 }
