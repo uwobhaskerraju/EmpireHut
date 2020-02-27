@@ -11,9 +11,13 @@ declare var M: any;
 export class AdminhomeComponent implements OnInit {
   allAssets: Object
   imagePath: String
+  noassets: boolean
   @Output() _tokenCount: EventEmitter<any> = new EventEmitter();
 
-  constructor(private _http: AdminService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private _http: AdminService, private router: Router, private route: ActivatedRoute) {
+    this.noassets = true;
+  }
+
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -21,7 +25,11 @@ export class AdminhomeComponent implements OnInit {
       .subscribe(data => {
         // console.log(data);
         if (data["statusCode"] == 200) {
+          this.noassets = false;
           this.allAssets = data["result"];
+        }
+        else{
+          M.toast({ html: "Something went wrong", classes: 'rounded' })
         }
 
       });
@@ -54,10 +62,11 @@ export class AdminhomeComponent implements OnInit {
   }
   onSearchChange(value: any) {
     if (value) {
+      this.noassets=true;
       this._http.getSearchedAssets(value).subscribe(data => {
         if (data["statusCode"] == 200) {
+          this.noassets=false;
           this.allAssets = data["result"]
-          //console.log(this.orgSongs)
         }
         else {
           this.ngOnInit();

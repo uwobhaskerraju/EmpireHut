@@ -2,60 +2,77 @@
     <h3>Purchase Proposals</h3>
 </blockquote>
 
-<div class="row" *ngIf="allProposals">
-    <div class="col s12 m6" *ngFor="let asset of allProposals">
-        <div class="card blue-grey darken-1">
-            <div class="card-content white-text">
-                <span class="card-title">{{asset["name"]}}</span>
-                <!-- <p> -->
-                <table>
-                    <tr>
-                        <td>
-                            Property Address:
-                        </td>
-                        <td>
-                            {{asset["propertyAddr"]}}
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>
-                            Proposed By:
-                        </td>
-                        <td>
-                            {{asset["proposalAddr_username"]}}
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>
-                            Property Value:
-                        </td>
-                        <td>
-                            {{asset["propertyValue"]}} EMP
-                        </td>
-
-                    </tr>
-                    <tr>
-                        <td>
-                            Proposed Value:
-                        </td>
-                        <td>
-                            {{asset["proposedAmount"]}} EMP
-                        </td>
-
-                    </tr>
-                </table>
-                <!-- </p> -->
+<div *ngIf="hasProp; else noProp" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
             </div>
-            <div class="card-action">
-                <a href="javascript:void(0)" id="{{asset['_id']}}_1" (click)="approvereject($event)">Accept</a>
-                <a href="javascript:void(0)" id="{{asset['_id']}}_2" (click)="approvereject($event)">Reject</a>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
             </div>
         </div>
     </div>
 </div>
+<ng-template #noProp>
+    <div class="row" *ngIf="allProposals">
+        <div class="col s12 m6" *ngFor="let asset of allProposals">
+            <div class="card blue-grey darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">{{asset["name"]}}</span>
+                    <!-- <p> -->
+                    <table>
+                        <tr>
+                            <td>
+                                Property Address:
+                            </td>
+                            <td>
+                                {{asset["propertyAddr"]}}
+                            </td>
 
-<div class="row center-align" *ngIf="allProposals?.length == 0">
-    <h3 class="blue-text">No Purchase Proposals</h3>
-</div>
+                        </tr>
+                        <tr>
+                            <td>
+                                Proposed By:
+                            </td>
+                            <td>
+                                {{asset["proposalAddr_username"]}}
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                Property Value:
+                            </td>
+                            <td>
+                                {{asset["propertyValue"]}} EMP
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                Proposed Value:
+                            </td>
+                            <td>
+                                {{asset["proposedAmount"]}} EMP
+                            </td>
+
+                        </tr>
+                    </table>
+                    <!-- </p> -->
+                </div>
+                <div class="card-action">
+                    <a href="javascript:void(0)" id="{{asset['_id']}}_1" (click)="approvereject($event)">Accept</a>
+                    <a href="javascript:void(0)" id="{{asset['_id']}}_2" (click)="approvereject($event)">Reject</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row center-align" *ngIf="allProposals?.length == 0">
+        <h3 class="blue-text">No Purchase Proposals</h3>
+    </div>
+</ng-template>

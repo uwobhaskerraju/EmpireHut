@@ -2,24 +2,41 @@
     <h3>{{userDetails["username"]}}</h3>
 </blockquote>
 <h4><a href="javascript:void(0)" (click)="goBack()"><i class="material-icons">arrow_back</i></a></h4>
-<table class="striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Total Assets</th>
-        </tr>
-    </thead>
+<div *ngIf="nodetails; else fulldetails" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #fulldetails>
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Total Assets</th>
+            </tr>
+        </thead>
 
-    <tbody>
-        <tr>
-            <td>{{userDetails["username"]}}</td>
-            <td>{{userDetails["email"]}}</td>
-            <td>{{userDetails["ownedTokens"]}}</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>{{userDetails["username"]}}</td>
+                <td>{{userDetails["email"]}}</td>
+                <td>{{userDetails["ownedTokens"]}}</td>
+            </tr>
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</ng-template>
 <br><br>
 <div class="divider"></div>
 <div class="section center">
@@ -44,32 +61,49 @@
 <div class="section center">
     <h5>Transactions</h5>
 </div>
-<div class="row" *ngIf="userTrans">
-    <table class="striped">
-        <thead>
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr *ngFor="let tran of userTrans">
-                <td>{{tran["from"]}}</td>
-                <td>{{tran["to"]}}</td>
-                <td>{{tran["amount"]}}</td>
-                <td>{{tran["type"]}}</td>
-                <td>{{tran["date"]}}</td>
-                <td>{{tran["description"]}}</td>
-            </tr>
-
-        </tbody>
-    </table>
+<div *ngIf="notrans; else fulltrans" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="row center-align" *ngIf="userTrans?.length == 0">
-    <h3 class="blue-text">No Transactions</h3>
-</div>
+<ng-template #fulltrans>
+    <div class="row" *ngIf="userTrans">
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let tran of userTrans">
+                    <td>{{tran["from"]}}</td>
+                    <td>{{tran["to"]}}</td>
+                    <td>{{tran["amount"]}}</td>
+                    <td>{{tran["type"]}}</td>
+                    <td>{{tran["date"]}}</td>
+                    <td>{{tran["description"]}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="row center-align" *ngIf="userTrans?.length == 0">
+        <h3 class="blue-text">No Transactions</h3>
+    </div>
+</ng-template>

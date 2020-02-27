@@ -15,36 +15,52 @@
         <h3>Assets in your Region</h3>
     </blockquote>
 </div>
-<div class="row" *ngIf="allAssets">
-    <div class="col s3" *ngFor="let asset of allAssets">
-        <div class="card small hoverable z-depth-4">
-            <div class="card-image">
-                <img src="{{imagePath}}{{asset.picture}}">
-                <!-- <span class="card-title">{{song.Name}}</span> -->
+<div *ngIf="noassets; else fullassets" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
             </div>
-            <div class="card-content center-align">
-                <p class="blue-text"> {{asset.name}}
-                </p>
-                Hide:
-                <div class="switch">
-
-                    <label>
-                        Off
-                        <input type="checkbox" id="{{asset._id}}" [(ngModel)]="asset.hidden" ng-true-value="true"
-                        (change)="checkAll($event)" ng-false-value="false">
-                        <span class="lever"></span>
-                        On
-                    </label>
-                </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
             </div>
-            <div class="card-action ">
-                <a href="javascript:void(0)" id="{{asset._id}}" class="blue-text"
-                    (click)="showDetails($event)">Details</a>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
             </div>
         </div>
     </div>
 </div>
+<ng-template #fullassets>
+    <div class="row" *ngIf="allAssets">
+        <div class="col s3" *ngFor="let asset of allAssets">
+            <div class="card small hoverable z-depth-4">
+                <div class="card-image">
+                    <img src="{{imagePath}}{{asset.picture}}">
+                    <!-- <span class="card-title">{{song.Name}}</span> -->
+                </div>
+                <div class="card-content center-align">
+                    <p class="blue-text"> {{asset.name}}
+                    </p>
+                    Hide:
+                    <div class="switch">
 
-<div class="row center-align" *ngIf="allAssets?.length == 0">
-    <h3 class="blue-text">No Assets</h3>
-</div>
+                        <label>
+                            Off
+                            <input type="checkbox" id="{{asset._id}}" [(ngModel)]="asset.hidden" ng-true-value="true"
+                                (change)="checkAll($event)" ng-false-value="false">
+                            <span class="lever"></span>
+                            On
+                        </label>
+                    </div>
+                </div>
+                <div class="card-action ">
+                    <a href="javascript:void(0)" id="{{asset._id}}" class="blue-text"
+                        (click)="showDetails($event)">Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row center-align" *ngIf="allAssets?.length == 0">
+        <h3 class="blue-text">No Assets</h3>
+    </div>
+</ng-template>

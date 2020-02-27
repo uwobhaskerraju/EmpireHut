@@ -10,12 +10,12 @@ module.exports = (app) => {
     app.post('/open/login', checkrequest.CheckLogin, open.validateLogin);
 
     // validate Token
-    app.get('/open/val',checkrequest.DecodeToken);
+    app.get('/open/val', checkrequest.DecodeToken);
 
+    app.get('/open/token', checkrequest.returnToken);
 
-   
     //test
-    app.get('/contracts',web3.testEvents);
+    app.get('/contracts', web3.testEvents);
 
 
 }

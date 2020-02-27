@@ -27,32 +27,24 @@ export class UserComponent implements OnInit {
   }
 
   callTokenAndPerDetails() {
-    this._http.decodeToken()
-      .subscribe(d => {
-        if (d["statusCode"] == 200) {
-          this._http.getUserDetails(d["result"]["address"])
+
+    this._http.getUserDetails(this._VariableService.userdetails["address"])
+      .subscribe(r => {
+        if (r["statusCode"] == 200) {
+          this._VariableService.userdetails = r["result"]
+          this._http.getOwnedAssets(this._VariableService.userdetails["address"])
             .subscribe(r => {
               if (r["statusCode"] == 200) {
-                //this.userDetails = r["data"]
-                this._VariableService.userdetails = r["result"]
-                //console.log(this._VariableService.userdetails)
-                // this.component.getAssets();
-                this._http.getOwnedAssets(this._VariableService.userdetails["address"])
-                  .subscribe(r => {
-                    if (r["statusCode"] == 200) {
-                      this.tokenCount =r["result"];
-                    }
-                    else {
-                      this.tokenCount = 0;
-                    }
-                  });
+                this.tokenCount = r["result"];
+              }
+              else {
+                this.tokenCount = 0;
               }
             });
-        }
-        else {
-          this.router.navigate(['']);
+
         }
       });
+
   }
 
   updateBalance(componentReference) {
@@ -71,6 +63,7 @@ export class UserComponent implements OnInit {
 
   logout() {
     localStorage.clear();
+    this._VariableService.userdetails=null;
     this.router.navigate([''])
   }
 

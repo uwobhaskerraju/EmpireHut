@@ -3,48 +3,35 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Rout
 import { Observable } from 'rxjs';
 import { OpenService } from '../service/open.service';
 import { VariableService } from '../service/variable.service'
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
+//https://codeburst.io/using-angular-route-guard-for-securing-routes-eabf5b86b4d1
 export class AuthGuard implements CanActivate {
-  dState: Object;
+  
   constructor(private router: Router, private _http: OpenService, private _VariableService: VariableService) {
-    this._http.validateToken()
-      .subscribe(d => {
-        console.log("inside auth")
-        if (d["statusCode"] == 200) {
-          this._VariableService.userdetails = d["message"]
-          this.dState = d["message"];
-          console.log("end2")
-          // return true;
-
-        }
-        else {
-          this.router.navigate(['/'])
-          // return false;
-        }
-
-      });
+ 
   }
   canActivate(
     next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): boolean {
+    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
-    if (localStorage.getItem('ACCESS_TOKEN') != null) {
+    return this._http.validateToken().pipe(
+      map((r: Response) => {
+        //console.log(r)
+        if ((r["statusCode"] == 200) && (r["result"]["userType"] == next.data.role)) {
+          this._VariableService.userdetails = r["result"]
+          return true;
+        }
+        else {
+          this._VariableService.userdetails = null;
+          this.router.navigate([''])
+          return false;
+        }
+      }));
 
-      if (this.dState == null) {
-        console.log("inside null")
-        this.router.navigate(['/'])
-        return false;
-      }
-      console.log("end")
-      return true;
-    }
-    else {
-      this.router.navigate(['/'])
-      return false;
-    }
   }
 
 }

@@ -1,45 +1,64 @@
 <h4><a href="javascript:void(0)" (click)="goBack()"><i class="material-icons">arrow_back</i></a></h4>
-<div class="row" *ngIf="assetDetails">
-    <div class="col s12" *ngFor="let asset of assetDetails">
-        <div class="card large">
-            <div class="card-image">
-                <img src="{{imagePath}}{{asset.picture}}">
-                <span class="card-title"> {{asset.name}}</span>
+
+
+<div *ngIf="nodetails; else fulldetails" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
             </div>
-            <div class="card-content">
-                <table class="centered responsive-table">
-                    <tbody>
-                        <tr>
-                            <td>
-                                Property Name : {{asset.name}}
-                            </td>
-                            <td>
-                                Owner: {{asset.owner}}
-                            </td>
-                            <td>
-                                Area : {{asset.area}} Sq.Ft
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Address : {{asset.address}}
-                            </td>
-
-                            <td>
-                                Value: <i class="material-icons">attach_money</i> {{asset.price}} EMP
-                            </td>
-                            <td>
-                                Lat/Long : {{asset.latlong}}
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
+            <div class="gap-patch">
+                <div class="circle"></div>
             </div>
-
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
         </div>
     </div>
 </div>
+<ng-template #fulldetails>
+    <div class="row" *ngIf="assetDetails">
+        <div class="col s12" *ngFor="let asset of assetDetails">
+            <div class="card large">
+                <div class="card-image">
+                    <img src="{{imagePath}}{{asset.picture}}">
+                    <span class="card-title"> {{asset.name}}</span>
+                </div>
+                <div class="card-content">
+                    <table class="centered responsive-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Property Name : {{asset.name}}
+                                </td>
+                                <td>
+                                    Owner: {{asset.owner}}
+                                </td>
+                                <td>
+                                    Area : {{asset.area}} Sq.Ft
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Address : {{asset.address}}
+                                </td>
+
+                                <td>
+                                    Value: <i class="material-icons">attach_money</i> {{asset.price}} EMP
+                                </td>
+                                <td>
+                                    Lat/Long : {{asset.latlong}}
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</ng-template>
 <br>
 <br>
 <div class="divider"></div>
@@ -48,32 +67,49 @@
     <h2>Transaction History</h2>
 </div>
 
-<div *ngIf="assetTrans">
-    <table class="centered responsive-table">
-        <thead>
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let trans of assetTrans">
-                <td>
-                    {{trans.from}}
-                </td>
-                <td>
-                    {{trans.to}}
-                </td>
-                <td>
-                    {{trans.date}}
-                </td>
-            </tr>
-
-        </tbody>
-    </table>
+<div *ngIf="notrans; else fulltrans" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
 </div>
+<ng-template #fulltrans>
+    <div *ngIf="assetTrans">
+        <table class="centered responsive-table">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let trans of assetTrans">
+                    <td>
+                        {{trans.from}}
+                    </td>
+                    <td>
+                        {{trans.to}}
+                    </td>
+                    <td>
+                        {{trans.date}}
+                    </td>
+                </tr>
 
-<div class="row center-align" *ngIf="assetTrans?.length == 0">
-    <h3 class="blue-text">No Transactions</h3>
-</div>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row center-align" *ngIf="assetTrans?.length == 0">
+        <h3 class="blue-text">No Transactions</h3>
+    </div>
+</ng-template>

@@ -13,7 +13,13 @@ export class UserdetailsComponent implements OnInit {
   userID: String
   userTrans: object
   private routeSub: Subscription;
-  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { }
+  nodetails:boolean;
+  notrans:boolean
+
+  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { 
+    this.nodetails=true;
+    this.notrans=true;
+  }
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
@@ -22,13 +28,18 @@ export class UserdetailsComponent implements OnInit {
 
     this._http.getAllUserDetails(this.userID)
       .subscribe(r => {
+        this.nodetails=false;
         if (r["statusCode"] == 200) {
+          
           // this.userDetails = {};
           this.userDetails = r["result"]
           //pull transactions of this user
           this._http.getUserTransactions(this.userDetails["address"])
             .subscribe(r => {
-              this.userTrans = r["result"]
+              if(r["statusCode"]==200){
+                this.notrans=false
+                this.userTrans = r["result"]
+              }             
               //console.log(this.userTrans)
             });
         }

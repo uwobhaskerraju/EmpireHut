@@ -15,9 +15,11 @@ export class CreateassetComponent implements OnInit {
 
   imagePath: String
   asset: any = {};
+  loader:boolean
   constructor(private _http: AdminService, private _val: ValidationService) {
     M.AutoInit();
     M.updateTextFields();
+    this.loader=false;
   }
 
   ngOnInit() {
@@ -29,6 +31,7 @@ export class CreateassetComponent implements OnInit {
   }
 
   addasset() {
+    this.loader=true;
     let errMsg = ''
     let area = this.asset["area"]
     let address = this.asset["address"]
@@ -51,6 +54,7 @@ export class CreateassetComponent implements OnInit {
       //  console.log("true")
         this._http.createAsset(this.asset)
           .subscribe(r => {
+            this.loader=false;
             if (r["statusCode"] == 200) {
               M.toast({ html: r["result"], classes: 'rounded' });
              // this.ngOnInit();

@@ -33,7 +33,7 @@ const routes: Routes = [
       { path: 'create', component: CreateassetComponent },
       { path: 'user', component: UsersComponent },
       { path: 'user/view/:id', component: UserdetailsComponent }
-    ]
+    ], canActivate: [AuthGuard], data: { role: 'admin' }
   },
   {
     path: 'user', component: UserComponent, children: [
@@ -42,11 +42,11 @@ const routes: Routes = [
       { path: 'proposals', component: ProposalsComponent },
       { path: 'personal', component: MyassetsComponent },
       { path: 'transactions', component: TransactionsComponent }
-    ]
+    ], canActivate: [AuthGuard], data: { role: 'user' }
   }
-  // ,
-  // { path: '404', component: NotfoundComponent },
-  // { path: '**', redirectTo: '/404' },
+  ,
+  { path: '404', component: NotfoundComponent },
+  { path: '**', redirectTo: '/404' },
 ];
 
 

@@ -8,14 +8,21 @@ import { VariableService } from 'src/app/service/variable.service';
   styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
-  userTrans:Object
-  constructor(private _http:UserService,private _var:VariableService) { }
+  userTrans=[]
+  notrans:boolean;
+  constructor(private _http:UserService,private _var:VariableService) {
+    this.notrans=true;
+   }
 
   ngOnInit() {
     this._http.getUserTransactions(this._var.userdetails["address"])
     .subscribe(r => {
-      this.userTrans = r["result"]
-      //console.log(this.userTrans)
+      this.notrans=false;
+      if(r["statusCode"]==200){
+        this.userTrans = r["result"]
+        //console.log(this.userTrans)
+      }
+   
     });
   }
 

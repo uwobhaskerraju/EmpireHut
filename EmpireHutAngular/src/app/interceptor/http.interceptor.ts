@@ -52,12 +52,12 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
             });
         }
 
-        //console.log(req);
+       // console.log(req);
         return next.handle(req).pipe(
             map((event: HttpEvent<any>) => {
                 if (event instanceof HttpResponse) {
-                    console.log('event--->>>', event);
-                    if (event["body"]["statusCode"] == 200) {
+                    //console.log('event--->>>', event);
+                    if (event["body"]["statusCode"] != 200) {
                         console.log(event["url"])
                         console.log(event["body"]["result"])
                     }

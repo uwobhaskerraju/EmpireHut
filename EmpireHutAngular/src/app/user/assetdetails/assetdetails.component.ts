@@ -23,9 +23,14 @@ export class AssetdetailsComponent implements OnInit {
   amount: String;
   self: boolean;
   assetTrans = [];
+  nodetails:boolean
+  notrans:boolean
 
   constructor(private _http: UserService, private route: ActivatedRoute, private router: Router,
-    private _var: VariableService) { }
+    private _var: VariableService) {
+      this.nodetails=true;
+      this.notrans=true;
+     }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -34,6 +39,7 @@ export class AssetdetailsComponent implements OnInit {
     });
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
+        this.nodetails=false;
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
           if (data["result"]["ownerAdd"] == this._var.userdetails["address"]) {
@@ -57,6 +63,7 @@ export class AssetdetailsComponent implements OnInit {
   getAssetTransactionHistory() {
     this._http.getAssetTransactionHistory(this.assetID)
       .subscribe(r => {
+        this.notrans=false
         if (r["statusCode"] == 200) {
           //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
           this.assetTrans = r["result"];

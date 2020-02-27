@@ -9,11 +9,15 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class UsersComponent implements OnInit {
   allUsers: Object;
-  constructor(private _http: AdminService, private router: Router, private route: ActivatedRoute) { }
+  nousers:boolean
+  constructor(private _http: AdminService, private router: Router, private route: ActivatedRoute) { 
+    this.nousers=true
+  }
 
   ngOnInit() {
     this._http.getAllUsers()
       .subscribe(r => {
+        this.nousers=false;
         if (r["statusCode"] == 200) {
           this.allUsers = r["result"]
         }

@@ -44,6 +44,13 @@ export class OpenService {
     return this.http.get(URL);
   }
 
+  // returnToken():any{
+  //   let URL = environment.apiBaseURL + 'open/token'
+  //   this.http.get(URL).subscribe(r=>{
+  //     return r;
+  //   });
+  // }
+
   test() {
     let URL = environment.apiBaseURL + 'open/testmeafter';
     return this.http.get(URL);

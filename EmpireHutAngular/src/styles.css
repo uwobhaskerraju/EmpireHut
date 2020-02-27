@@ -21,3 +21,7 @@ blockquote {
 nav {
   background-color: #03a9f4 !important;
 }
+
+.progress .indeterminate {
+  background-color: #03a9f4 !important;
+}

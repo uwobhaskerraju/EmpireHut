@@ -151,6 +151,28 @@ function decodetoken(req, res, next) {
     }
 }
 
+function returndecodetoken(req, res, next) {
+    var bearerHeader = req.headers["authorization"]
+    //console.log(bearerHeader)
+    if (bearerHeader === undefined) {
+        return res.send(false)
+    }
+    else {
+        //console.log("herer")
+        var role = ['user', 'admin']
+        var reqToken = bearerHeader.split(' ')[1]
+        jwt.verify(reqToken, secret, (err, decoded) => {
+            //console.log(err)
+            if (err) return res.send(false)
+            if (role.includes(decoded["userType"])) {
+                res.send(true)
+            }
+            else return res.send(false)
+
+        });
+    }
+}
+
 function checkRole(req, res, next) {
     //console.log("inside checkRole")
     var bearerHeader = req.headers["authorization"]
@@ -189,5 +211,6 @@ module.exports = {
     CheckLogin: userLoginCheck,
     CheckToken: checkToken,
     CheckRole: checkRole,
-    DecodeToken: decodetoken
+    DecodeToken: decodetoken,
+    returnToken: returndecodetoken
 };

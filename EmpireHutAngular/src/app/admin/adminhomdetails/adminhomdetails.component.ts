@@ -15,7 +15,15 @@ export class AdminhomdetailsComponent implements OnInit {
   private routeSub: Subscription;
   assetID: String;
   assetTrans = [];
-  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { }
+  nodetails:boolean;
+  notrans:boolean;
+
+
+
+  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) {
+    this.nodetails=true;
+    this.notrans=true;
+   }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -24,6 +32,7 @@ export class AdminhomdetailsComponent implements OnInit {
     });
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
+        this.nodetails=false;
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
           this.getAssetTransactionHistory()
@@ -44,6 +53,7 @@ export class AdminhomdetailsComponent implements OnInit {
   getAssetTransactionHistory() {
     this._http.getAssetTransactionHistory(this.assetID)
       .subscribe(r => {
+        this.notrans=false;
         if (r["statusCode"] == 200) {
           //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
           this.assetTrans = r["result"];

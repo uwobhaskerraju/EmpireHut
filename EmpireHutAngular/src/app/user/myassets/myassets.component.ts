@@ -13,13 +13,17 @@ export class MyassetsComponent implements OnInit {
 
   allAssets: Object
   imagePath: any
+  nomyassets:boolean;
+
   constructor(private _http: UserService, private _var: VariableService, private route: ActivatedRoute, private router: Router) {
     this.imagePath = environment.imagePath
+    this.nomyassets=true;
   }
 
   ngOnInit() {
     this._http.getPersonalAssets(this._var.userdetails["address"])
       .subscribe(r => {
+        this.nomyassets=false;
         if (r["statusCode"] == 200) {
           console.log(r)
           this.allAssets = r["result"]

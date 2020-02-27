@@ -1,9 +1,20 @@
+//https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb
+//https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
+
 //import libraries
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 var cors = require('cors')
 const expressSanitizer = require('express-sanitizer');
+
+// const https = require('https');
+// const fs = require('fs');
+
+// const options = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.pem')
+// };
 // create express app
 const app = express();
 
@@ -73,6 +84,12 @@ require('./app/routes/user.route.js')(router);
 // listen for requests
 
 
+// https.createServer(options, function (req, res) {
+//     res.writeHead(200);
+//     res.end("hello world\n");
+//   }).listen(port, () => {
+//     console.log("Server is listening on port " + port);
+// });
 
 app.listen(port, () => {
     console.log("Server is listening on port " + port);

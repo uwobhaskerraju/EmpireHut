@@ -22,6 +22,7 @@ import { UserdetailsComponent } from './admin/userdetails/userdetails.component'
 import { ProposalsComponent } from './user/proposals/proposals.component';
 import { MyassetsComponent } from './user/myassets/myassets.component';
 import { TransactionsComponent } from './user/transactions/transactions.component';
+import { AuthGuard } from './auth/auth.guard';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,7 @@ import { TransactionsComponent } from './user/transactions/transactions.componen
     provide: HTTP_INTERCEPTORS,
     useClass: MockHttpCalIInterceptor,
     multi: true
-  }],
+  },AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
