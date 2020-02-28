@@ -19,7 +19,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'Access-Control-Allow-Headers': 'Content-Type',
+                           // 'Access-Control-Allow-Headers': 'Content-Type',
                             'authorization': 'Bearer ' + localStorage.getItem('ACCESS_TOKEN')
                         }
                     )
@@ -31,7 +31,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'Access-Control-Allow-Headers': 'Content-Type'
+                            //'Access-Control-Allow-Headers': 'Content-Type'
                         }
                     )
                 });
@@ -45,7 +45,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                     {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Access-Control-Allow-Headers': 'Content-Type',
+                        //'Access-Control-Allow-Headers': 'Content-Type',
                         'authorization': 'Bearer ' + localStorage.getItem('ACCESS_TOKEN')
                     }
                 )

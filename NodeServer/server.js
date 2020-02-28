@@ -1,5 +1,7 @@
 //https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb
 //https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
+//https://medium.com/@rubenvermeulen/running-angular-cli-over-https-with-a-trusted-certificate-4a0d5f92747a
+//https://www.freecodecamp.org/news/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec/
 
 //import libraries
 require('dotenv').config();
@@ -8,13 +10,16 @@ const bodyParser = require('body-parser');
 var cors = require('cors')
 const expressSanitizer = require('express-sanitizer');
 
-// const https = require('https');
-// const fs = require('fs');
 
-// const options = {
-//   key: fs.readFileSync('key.pem'),
-//   cert: fs.readFileSync('cert.pem')
-// };
+
+
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt')
+};
 // create express app
 const app = express();
 
@@ -84,13 +89,10 @@ require('./app/routes/user.route.js')(router);
 // listen for requests
 
 
-// https.createServer(options, function (req, res) {
-//     res.writeHead(200);
-//     res.end("hello world\n");
-//   }).listen(port, () => {
-//     console.log("Server is listening on port " + port);
-// });
-
-app.listen(port, () => {
+https.createServer(options,app).listen(port, () => {
     console.log("Server is listening on port " + port);
 });
+
+// app.listen(port, () => {
+//     console.log("Server is listening on port " + port);
+// });
