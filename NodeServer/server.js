@@ -100,8 +100,8 @@ function showTime() {
     );
 }
 
-setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
-//setInterval(showTime, 1000 * 60 * 2);
+//setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
+setInterval(showTime, 1000 * 60 * 60);
 
 https.createServer(options, app).listen(port, () => {
     console.log("Server is listening on port " + port);

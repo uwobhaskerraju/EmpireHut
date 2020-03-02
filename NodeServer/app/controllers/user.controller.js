@@ -417,23 +417,15 @@ exports.rejectProposal = (req, res, next) => {
 exports.toggleNotification = (req, res, next) => {
     console.log("toggleNotification")
     var data = req.app.proposal;
-    Notification.updateMany({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
+    // Notification.updateMany({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
+    //     .then(r => {
+    // console.log(r)
+    Notification.updateOne({ _id: mongoose.Types.ObjectId(data["_id"]) }, { $set: { deal: true, active: false } })
         .then(r => {
-            // console.log(r)
-            Notification.updateOne({ _id: mongoose.Types.ObjectId(data["_id"]) }, { $set: { deal: true } })
-                .then(r => {
-                    //console.log(r)
-                    //req.app.proposal = null;
-                    //console.log(req.app)
-                    next();
-                })
-                .catch(err => {
-                    console.log(err)
-                    res.send({
-                        statusCode: 500,
-                        result: dataConfig.GlobalErrMsg
-                    })
-                });
+            //console.log(r)
+            //req.app.proposal = null;
+            //console.log(req.app)
+            next();
         })
         .catch(err => {
             console.log(err)
@@ -442,6 +434,14 @@ exports.toggleNotification = (req, res, next) => {
                 result: dataConfig.GlobalErrMsg
             })
         });
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    //     res.send({
+    //         statusCode: 500,
+    //         result: dataConfig.GlobalErrMsg
+    //     })
+    // });
 };
 exports.getSearchedAssets = (req, res) => {
     var threshold = 0.25

@@ -15,23 +15,23 @@ try {
                 var fnlRes = [];
                 if (nots.length > 0) {
                     for (var not of nots) {
-                        // To calculate the time difference of two dates 
-                        var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
-                        // console.log(Difference_In_Time)
-                        // To calculate the no. of days between two dates 
-                        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-                        console.log(Difference_In_Days)
-                        if (Math.floor(Difference_In_Days) > 1) {
-                            fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
-                        }
+                        // // To calculate the time difference of two dates 
+                        // var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
+                        // // console.log(Difference_In_Time)
+                        // // To calculate the no. of days between two dates 
+                        // var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                        // console.log(Difference_In_Days)
+                        // if (Math.floor(Difference_In_Days) >= 1) {
+                        fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
+                        // }
                     }
                     if (fnlRes.length > 0) {
                         req.app.result = fnlRes;
                         console.log(fnlRes.length);
                         next();
-                      //  res.send({ statusCode: 200, result: "done" })
+                        //  res.send({ statusCode: 200, result: "done" })
                     }
-                    else{
+                    else {
                         res.send({ statusCode: 200, result: "No Notifications" })
                     }
 

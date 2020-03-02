@@ -585,8 +585,8 @@ try {
                                     }
                                 }
                                 if (temp.includes("[Approved]")) {
-                                    jsnData.type = "-"
-                                    jsnData.amount = "-"
+                                    jsnData.type = "Credit"
+                                    //jsnData.amount = "-"
                                 }
                                 if (temp.includes("[Rejected]") || temp.includes("[Expired]")) {
                                     jsnData.type = "Credit"
