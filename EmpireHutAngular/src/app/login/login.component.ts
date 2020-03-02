@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
     // M.updateTextFields();
     var textNeedCount = document.querySelectorAll('input');
     M.CharacterCounter.init(textNeedCount);
+   // console.log(environment.port)
   }
 
   ValidateLogin(email: String, pass: String) {
@@ -43,12 +44,13 @@ export class LoginComponent implements OnInit {
 
       this._http.ValidateLogin(email, pass)
         .subscribe(data => {
-          //console.log(data)
+          console.log(data)
           if (data["statusCode"] == 200) {
 
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
             switch (data["result"]["userType"]) {
               case "user":
+                console.log("this")
                 this.router.navigate(['user']);
                 break;
 
@@ -118,11 +120,11 @@ export class LoginComponent implements OnInit {
   }
 
 
-  // test(){
-  //   console.log("here")
-  //   this._http.test()
-  //   .subscribe(r=>{
-  //     console.log(r)
-  //   })
-  // }
+  test(){
+    //console.log("here")
+    this._http.test()
+    .subscribe(r=>{
+      //console.log(r)
+    })
+  }
 }

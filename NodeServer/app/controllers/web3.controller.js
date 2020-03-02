@@ -702,6 +702,7 @@ try {
     };
 
     exports.revertTransactions = (req, res, next) => {
+        console.log("revert transactions")
         const revert = (tran) => {
             return new Promise((resolve, reject) => {
                 var fnlRes = [];
@@ -725,7 +726,10 @@ try {
         const details = async () => {
             var fnlRes = [];
             for (var tran of req.app.result) {
+                console.log("inside")
+                console.log(tran)
                 var r = await revert(tran)
+                console.log(r)
                 fnlRes.push(r[0])
             }
             return fnlRes;
@@ -733,7 +737,9 @@ try {
         details()
             .then(r => {
                 req.app.result = r;
+                //console.log(r)
                 next();
+              // res.send({ statusCode: 200, result: req.app.result })
             })
             .catch(r => {
                 console.log(r)

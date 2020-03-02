@@ -15,10 +15,10 @@ export class OpenService {
     let URL = environment.apiBaseURL + 'open/login'
     //console.log(URL)
 
-    var JsnData = JSON.stringify({
+    var JsnData = {
       email: email,
       password: pass
-    })
+    }
 
     return this.http.post(URL, JsnData);
   }
@@ -29,19 +29,26 @@ export class OpenService {
     let URL = environment.apiBaseURL + 'open/register'
     //console.log(URL)
 
-    var JsnData = JSON.stringify({
+    var JsnData = {
       username: name,
       email: email,
       password: pass
-    })
+    }
     //console.log(JsnData)
 
     return this.http.post(URL, JsnData);
   }
 
   validateToken() {
-    let URL = environment.apiBaseURL + 'open/val'
-    return this.http.get(URL);
+    console.log("validate")
+    try {
+      let URL = environment.apiBaseURL + 'open/val'
+      console.log(URL)
+      return this.http.get(URL);
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   // returnToken():any{
@@ -52,7 +59,10 @@ export class OpenService {
   // }
 
   test() {
-    let URL = environment.apiBaseURL + 'open/testmeafter';
-    return this.http.get(URL);
+    let URL = environment.apiBaseURL + 'open/test';
+    let JsnData = {
+      we: "rt"
+    }
+    return this.http.post(URL, JsnData);
   }
 }

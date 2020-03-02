@@ -73,11 +73,11 @@ export class UserService {
     return this._http.post(URL, jsnData);
   }
 
-  purchaseAsset(assetDetails: any, usrAdd: any) {
+  purchaseAsset(assetDetails: any, usrAdd: any,_amount:any) {
     let URL = environment.apiBaseURL + 'user/purchase';
     let jsnData = {
       owner: assetDetails["ownerAdd"],
-      amount: assetDetails["price"],
+      amount: _amount,
       to: usrAdd,
       assetID: assetDetails["_id"]
     }
@@ -123,19 +123,19 @@ export class UserService {
 
   toggleAsset(id: any, hidden: any) {
     let URL = environment.apiBaseURL + 'user/asset/toggle';
-    let jsnData = JSON.stringify({
+    let jsnData ={
       id: id,
       state: hidden
-    })
+    }
     console.log(jsnData)
     return this._http.post(URL, jsnData)
   }
 
   getSearchedAssets(address: any, value: any) {
     let URL = environment.apiBaseURL + 'user/search/assets/' + address;
-    let jsnData = JSON.stringify({
+    let jsnData ={
       value: value
-    });
+    };
     return this._http.post(URL, jsnData);
   }
 

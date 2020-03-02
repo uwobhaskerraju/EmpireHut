@@ -91,8 +91,9 @@ function userRegistrationCheck(req, res, next) {
 
 function userLoginCheck(req, res, next) {
     gblErrMsg = '';
+    //console.log("userlogin check")
     //var inputs = sanitizeInputs(req);
-    // console.log(exports)
+    //console.log(req.body)
     if (!req.body.email) return res.send({ message: errMsg })
     if (!req.body.password) return res.send({ message: errMsg })
 
@@ -101,6 +102,7 @@ function userLoginCheck(req, res, next) {
 
     }
     if (Boolean(gblErrMsg)) {
+        console.log(gblErrMsg)
         return res.send({ statusCode: 500, result: gblErrMsg })
     }
     else {

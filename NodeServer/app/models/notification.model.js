@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
-var moment = require('moment');
-var hourFromNow = function(){
-    return moment().add(1, 'hour');
-};
+
+const moment = require('moment-timezone');
+const dateToronto = moment().startOf('day').tz('UTC')
 
 
 var NotificationSchema = mongoose.Schema({
@@ -14,7 +13,7 @@ var NotificationSchema = mongoose.Schema({
     proposalAddr: { type: String, required: true },
     deal: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
-    datetime: { type: Date, default:hourFromNow}
+    datetime: { type: Date, default:dateToronto}
 }, {
     versionKey: false
 });

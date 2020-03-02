@@ -23,8 +23,9 @@ module.exports = (app) => {
 
     app.get('/admin/search/assets/:id', checkrequest.CheckToken, admin.getSearchedAssets);
 
-    app.post('/admin/asset/toggle',checkrequest.CheckToken, admin.toggleAsset);
+    app.post('/admin/asset/toggle', checkrequest.CheckToken, admin.toggleAsset);
 
-    app.get('/admin/expire',checkrequest.CheckToken, admin.revertTransactions,web3.revertTransactions,admin.revertTransUpdate);
+    app.get('/admin/expire', admin.revertTransactions, web3.revertTransactions, admin.revertTransUpdate);
 
+   // app.get('/admin/test', admin.someTest);
 }

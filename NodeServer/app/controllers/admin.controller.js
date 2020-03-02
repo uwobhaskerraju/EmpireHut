@@ -11,19 +11,34 @@ try {
         Notification.find({ deal: false, active: true })
             .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
             .then(nots => {
+                console.log(nots.length)
                 var fnlRes = [];
-                for (var not of nots) {
-                    // To calculate the time difference of two dates 
-                    var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
-
-                    // To calculate the no. of days between two dates 
-                    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-                    if (Math.floor(Difference_In_Days) > 1) {
-                        fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
+                if (nots.length > 0) {
+                    for (var not of nots) {
+                        // To calculate the time difference of two dates 
+                        var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
+                        // console.log(Difference_In_Time)
+                        // To calculate the no. of days between two dates 
+                        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+                        console.log(Difference_In_Days)
+                        if (Math.floor(Difference_In_Days) > 1) {
+                            fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
+                        }
                     }
+                    if (fnlRes.length > 0) {
+                        req.app.result = fnlRes;
+                        console.log(fnlRes.length);
+                        next();
+                      //  res.send({ statusCode: 200, result: "done" })
+                    }
+                    else{
+                        res.send({ statusCode: 200, result: "No Notifications" })
+                    }
+
                 }
-                req.app.result = fnlRes;
-                next();
+                else {
+                    res.send({ statusCode: 200, result: "No Notifications" })
+                }
                 //res.send(fnlRes);
             })
             .catch(err => {
@@ -35,6 +50,7 @@ try {
     }
 
     exports.revertTransUpdate = (req, res) => {
+        console.log("revert ")
         const updateNotification = (not) => {
             return new Promise((resolve, reject) => {
                 Notification.updateOne({ _id: mongoose.Types.ObjectId(not["_id"]) }, { $set: { active: false, deal: false } })
@@ -48,6 +64,7 @@ try {
         }
         const noti = async () => {
             for (var not of req.app.result) {
+                console.log(not)
                 if (not["done"]) {
                     await updateNotification(not);
                 }
@@ -55,9 +72,9 @@ try {
             return true;
         }
 
-        noti().then(r=>{
-            if(r){
-                res.send({statusCode:200,result:"done"})
+        noti().then(r => {
+            if (r) {
+                res.send({ statusCode: 200, result: "done" })
             }
         })
             .catch(err => {
@@ -74,11 +91,28 @@ try {
         //generate a random string
         // blockchain has owner and tokenID
         //we store tokenID in mongo as well to link with the metadata
-        var rndStr = shortid.generate();
-        req.app.randomStr = rndStr;
-        req.app.price = req.body.area * dataConfig.pricesqft;
-        req.app.latlong = Math.floor(Math.random() * (90 - (-90) + 1) + (-90)) + "/" + Math.floor(Math.random() * (180 - (-180) + 1) + (-180))
-        next();
+
+        Asset.find({ address: req.body.address })
+            .then(r => {
+                console.log(r)
+                if (r.length == 0) {
+                    var rndStr = shortid.generate();
+                    req.app.randomStr = rndStr;
+                    req.app.price = req.body.area * dataConfig.pricesqft;
+                    req.app.latlong = Math.floor(Math.random() * (90 - (-90) + 1) + (-90)) + "/" + Math.floor(Math.random() * (180 - (-180) + 1) + (-180))
+                    next();
+                }
+                else {
+                    res.send({ statusCode: 500, result: "Address already exists" })
+                }
+            })
+            .catch(err => {
+                res.send({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+
     };
     function randomNumber() {
         return Math.floor(Math.random() * 9) + 1;
@@ -387,6 +421,11 @@ try {
                     result: dataConfig.GlobalErrMsg
                 })
             });
+    }
+
+    exports.someTest = (req, res) => {
+        //console.log(Date.now())
+        res.send(Date.now())
     }
 } catch (error) {
 

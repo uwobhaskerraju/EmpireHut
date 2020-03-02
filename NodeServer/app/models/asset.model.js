@@ -4,7 +4,7 @@ var AssetSchema = mongoose.Schema({
     _id: { type: mongoose.Schema.ObjectId, auto: true },
     tokenID: { type: String, required: true, unique: true },
     name: { type: String, required: true, minlength: 1, maxlength: 15 },
-    address: { type: String, required: true, minlength: 1, maxlength: 25 },
+    address: { type: String, required: true, minlength: 1, maxlength: 25, unique: true },
     //owner: { type: String,  required: true },
     area: { type: Number, default: 0, min: 1, max: 999 },
     price: { type: Number, default: 0 },

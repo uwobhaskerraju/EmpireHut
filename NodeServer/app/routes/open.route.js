@@ -12,10 +12,10 @@ module.exports = (app) => {
     // validate Token
     app.get('/open/val', checkrequest.DecodeToken);
 
-    app.get('/open/token', checkrequest.returnToken);
+   // app.get('/open/token', checkrequest.returnToken);
 
     //test
-    app.get('/contracts', web3.testEvents);
+    app.post('/open/test', open.testme);
 
 
 }

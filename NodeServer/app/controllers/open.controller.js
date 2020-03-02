@@ -29,7 +29,7 @@ exports.registerUser = (req, res) => {
                         "email": req.body.email,
                         "emailverified": false,
                         "usertype": req.app.user,
-                        "address":req.app.usrAddress,
+                        "address": req.app.usrAddress,
                         "signupmethod": "registration"
                     };
                     const user = new User(userObj);
@@ -42,8 +42,8 @@ exports.registerUser = (req, res) => {
                                 //"emailverified": data["emailverified"],
                                 "userType": data["usertype"]
                             }
-                            req.app.usrAddress=null;
-                            req.app.user=null;
+                            req.app.usrAddress = null;
+                            req.app.user = null;
                             let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
                             res.send({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
                         })
@@ -107,4 +107,10 @@ exports.validateLogin = (req, res) => {
                 statusCode: 500, result: err.message || errMsg
             })
         });
+};
+
+
+exports.testme = (req, res) => {
+   // console.log(req.body);
+    res.send(JSON.stringify({ statusCode: 200, s: "trt" }))
 };

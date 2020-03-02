@@ -78,10 +78,10 @@ export class AdminService {
 
   toggleAsset(id: any, hidden: any) {
     let URL = environment.apiBaseURL + 'admin/asset/toggle';
-    let jsnData = JSON.stringify({
+    let jsnData ={
       id: id,
       state: hidden
-    })
+    }
     console.log(jsnData)
     return this._http.post(URL, jsnData)
   }

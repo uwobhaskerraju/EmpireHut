@@ -9,7 +9,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 var cors = require('cors')
 const expressSanitizer = require('express-sanitizer');
-
+const CryptoJS = require('crypto-js')
+const runMiddleware = require('run-middleware');
 
 
 
@@ -17,8 +18,8 @@ const https = require('https');
 const fs = require('fs');
 
 const options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt')
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt')
 };
 // create express app
 const app = express();
@@ -31,6 +32,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json())
+
+
 
 // Configuring the database
 
@@ -58,18 +61,17 @@ var router = express.Router();
 router.use(function (req, res, next) {
     // do logging
     console.log("This route was requested: " + req.url);
-    sanitizeRequest(req); 
+    sanitizeRequest(req);
     next()// make sure we go to the next routes and don't stop here
 });
-
-
 
 function sanitizeRequest(req) {
     var body = req.body
     const entries = Object.keys(body)
     const inserts = {}
     for (let i = 0; i < entries.length; i++) {
-        req.body[entries[i]] = req.sanitize(Object.values(body)[i])
+        req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
+        //req.body[entries[i]] = req.sanitize(Object.values(body)[i])
     }
 }
 
@@ -82,14 +84,26 @@ router.get('/', (req, res) => {
 // all our APIs will have default name '/api' in route
 app.use('/api', router);
 
+runMiddleware(app);
 // import other routes from 'app' folder.
 require('./app/routes/open.route.js')(router);
 require('./app/routes/admin.route.js')(router);
 require('./app/routes/user.route.js')(router);
 // listen for requests
 
+function showTime() {
+    app.runMiddleware(
+        "/api/admin/expire",
+        function (code, data, headers) {
+            //console.log(data); // it will be show 'this-is-the-cookie'
+        }
+    );
+}
 
-https.createServer(options,app).listen(port, () => {
+setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
+//setInterval(showTime, 1000 * 60 * 2);
+
+https.createServer(options, app).listen(port, () => {
     console.log("Server is listening on port " + port);
 });
 

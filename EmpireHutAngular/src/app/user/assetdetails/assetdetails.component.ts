@@ -13,8 +13,9 @@ declare var M: any;
   styleUrls: ['./assetdetails.component.css']
 })
 export class AssetdetailsComponent implements OnInit {
-  @Output() _tokenCount: EventEmitter<any> = new EventEmitter();
-
+  @Output() _userBal: EventEmitter<any> = new EventEmitter();
+  @Output() _UsertokenCount: EventEmitter<any> = new EventEmitter();
+  
 
   assetDetails = [];
   imagePath: String;
@@ -23,14 +24,14 @@ export class AssetdetailsComponent implements OnInit {
   amount: String;
   self: boolean;
   assetTrans = [];
-  nodetails:boolean
-  notrans:boolean
+  nodetails: boolean
+  notrans: boolean
 
   constructor(private _http: UserService, private route: ActivatedRoute, private router: Router,
     private _var: VariableService) {
-      this.nodetails=true;
-      this.notrans=true;
-     }
+    this.nodetails = true;
+    this.notrans = true;
+  }
 
   ngOnInit() {
     this.imagePath = environment.imagePath
@@ -39,7 +40,7 @@ export class AssetdetailsComponent implements OnInit {
     });
     this._http.getAssetDetails(this.assetID)
       .subscribe(data => {
-        this.nodetails=false;
+        this.nodetails = false;
         if (data["statusCode"] == 200) {
           this.assetDetails.push(data["result"]);
           if (data["result"]["ownerAdd"] == this._var.userdetails["address"]) {
@@ -63,7 +64,7 @@ export class AssetdetailsComponent implements OnInit {
   getAssetTransactionHistory() {
     this._http.getAssetTransactionHistory(this.assetID)
       .subscribe(r => {
-        this.notrans=false
+        this.notrans = false
         if (r["statusCode"] == 200) {
           //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
           this.assetTrans = r["result"];
@@ -81,8 +82,13 @@ export class AssetdetailsComponent implements OnInit {
         if (r["statusCode"] == 200) {
           console.log(r)
           //this._VariableService.tokenCount = r["data"]["result"];
-          this._tokenCount.emit(r["result"]);
-          this.router.navigate(['user'])
+          this._userBal.emit(r["result"]);
+          this._http.getOwnedAssets(this._var.userdetails["address"])
+          .subscribe(r=>{
+            this._UsertokenCount.emit(r["result"])
+            this.router.navigate(['user'])
+          });
+         
         }
         else {
           //console.log("something went wrong in getting balance")
@@ -113,7 +119,7 @@ export class AssetdetailsComponent implements OnInit {
         console.log(r)
         if (r["result"]) {
           // yes owner is admin(govt), so we can directly buy 
-          this._http.purchaseAsset(this.assetDetails[0], this._var.userdetails["address"])
+          this._http.purchaseAsset(this.assetDetails[0], this._var.userdetails["address"], this.amount)
             .subscribe(r => {
               if (r["statusCode"] == 200) {
                 M.toast({ html: "Asset Purchased! :) ", classes: 'rounded' })
@@ -133,11 +139,14 @@ export class AssetdetailsComponent implements OnInit {
             .subscribe(r => {
               if (r["statusCode"] == 200) {
                 M.toast({ html: "Submitted Proposal", classes: 'rounded' })
+                 //call parent method
+                 this.updateCount();
+                 //;
               }
               else {
                 M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
               }
-              console.log(r);
+             // console.log(r);
 
             });
         }

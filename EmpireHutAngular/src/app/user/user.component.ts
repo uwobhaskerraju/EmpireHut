@@ -47,11 +47,16 @@ export class UserComponent implements OnInit {
 
   }
 
-  updateBalance(componentReference) {
+  updateUserBalance(componentReference) {
 
-    componentReference._tokenCount.subscribe((data) => {
+    componentReference._userBal.subscribe((data) => {
       // Will receive the data from child here 
       this._VariableService.userdetails["balance"] = data;
+    })
+
+    componentReference._UsertokenCount.subscribe((data) => {
+      // Will receive the data from child here 
+      this.tokenCount = data;
     })
   }
 

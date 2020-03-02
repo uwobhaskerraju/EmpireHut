@@ -67,6 +67,7 @@ export class CreateassetComponent implements OnInit {
       }
       else {
         // console.log(errMsg)
+        this.loader=false;
         this._val.generateToast(errMsg)
       }
     }
