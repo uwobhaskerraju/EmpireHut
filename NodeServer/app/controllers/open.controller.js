@@ -17,7 +17,7 @@ exports.registerUser = (req, res) => {
             try {
                 if (data) {
                     // table has user so end the request
-                    return res.send({ statusCode: 300, result: "Username already exists. Try Logging in" })
+                    return res.json({ statusCode: 300, result: "Username already exists. Try Logging in" })
                 }
                 else {
                     //register user
@@ -45,24 +45,24 @@ exports.registerUser = (req, res) => {
                             req.app.usrAddress = null;
                             req.app.user = null;
                             let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
-                            res.send({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
+                            res.json({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
                         })
                         .catch(err => {
-                            res.send({
+                            res.json({
                                 statusCode: 500,
                                 result: err.message || errMsg
                             })
                         });
                 }
             } catch (err) {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: err.message || errMsg
                 })
             }
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: err.message || errMsg
             })
@@ -75,8 +75,8 @@ exports.validateLogin = (req, res) => {
     User.findOne({ email: req.body.email })
         .then(async data => {
             try {
-                if (!data) return res.send({ statusCode: 400, result: "Invalid Username / Password" })
-                if (!data["active"]) return res.send({ statusCode: 400, result: "Contact Admin to re-activate your account" })
+                if (!data) return res.json({ statusCode: 400, result: "Invalid Username / Password" })
+                if (!data["active"]) return res.json({ statusCode: 400, result: "Contact Admin to re-activate your account" })
 
                 if (await argon2.verify(data.password, req.body.password)) {
 
@@ -88,22 +88,22 @@ exports.validateLogin = (req, res) => {
                         "userType": data["usertype"]
                     }
                     let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
-                    res.send({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
+                    res.json({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
 
                 } else {
                     // password did not match
-                    return res.send({ statusCode: 400, result: "Invalid Username / Password" })
+                    return res.json({ statusCode: 400, result: "Invalid Username / Password" })
                 }
             } catch (err) {
                 // internal failure
-                res.send({
+                res.json({
                     statusCode: 500, result: err.message || errMsg
                 })
             }
 
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500, result: err.message || errMsg
             })
         });
@@ -112,5 +112,6 @@ exports.validateLogin = (req, res) => {
 
 exports.testme = (req, res) => {
    // console.log(req.body);
-    res.send(JSON.stringify({ statusCode: 200, s: "trt" }))
+   
+   res.json({ statusCode: 200, s: "trt" })
 };

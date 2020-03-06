@@ -15,7 +15,7 @@ module.exports = (app) => {
    // app.get('/open/token', checkrequest.returnToken);
 
     //test
-    app.post('/open/test', open.testme);
+    app.get('/open/test', open.testme);
 
 
 }

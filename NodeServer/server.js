@@ -33,10 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // parse requests of content-type - application/json
 app.use(bodyParser.json())
 
-
-
 // Configuring the database
-
 const mongoose = require('mongoose');
 
 var port = process.env.port
@@ -63,6 +60,43 @@ router.use(function (req, res, next) {
     console.log("This route was requested: " + req.url);
     sanitizeRequest(req);
     next()// make sure we go to the next routes and don't stop here
+});
+
+function logResponse(obj) {
+    var body = JSON.parse(obj);
+    const entries = Object.keys(body)
+    //console.log(entries)
+    for (let i = 0; i < entries.length; i++) {
+        if (entries[i].toString() != 'statusCode') {
+            if (typeof (body[entries[i]]) == "object") {
+                //console.log(body[entries[i]])
+                var res = body[entries[i]]
+                var keys = Object.keys(res)
+                //console.log(keys)
+                for (let j = 0; j < keys.length; j++) {
+                    //console.log(keys[j])
+                    //console.log(res[keys[j]])//value
+                    body[entries[i]][keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+                }
+            }
+            else {
+                console.log(Object.values(body)[i])
+                body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
+            }
+        }
+    }
+    // console.log(JSON.stringify(body))
+    return JSON.stringify(body);
+}
+
+app.use(function (req, res, next) {
+    // console.log("INTERCEPT-REQUEST");
+    const orig_send = res.send;
+    res.send = function (arg) {
+        var a = logResponse(arg);
+        orig_send.call(res, a);
+    };
+    next();
 });
 
 function sanitizeRequest(req) {

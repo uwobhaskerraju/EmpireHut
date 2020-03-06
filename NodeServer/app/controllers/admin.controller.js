@@ -425,7 +425,7 @@ try {
 
     exports.someTest = (req, res) => {
         //console.log(Date.now())
-        res.send(Date.now())
+        res.json(Date.now())
     }
 } catch (error) {
 

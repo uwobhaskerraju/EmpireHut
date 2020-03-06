@@ -63,6 +63,6 @@ export class OpenService {
     let JsnData = {
       we: "rt"
     }
-    return this.http.post(URL, JsnData);
+    return this.http.get(URL);
   }
 }
