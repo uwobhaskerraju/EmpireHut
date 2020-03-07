@@ -67,9 +67,9 @@ function validateUserName(uName) {
 function userRegistrationCheck(req, res, next) {
     gblErrMsg = '';
     // var inputs = sanitizeInputs(req);
-    if (!req.body.email) return res.send({ statusCode: 500, result: errMsg })
-    if (!req.body.username) return res.send({ statusCode: 500, result: errMsg })
-    if (!req.body.password) return res.send({ statusCode: 500, result: errMsg })
+    if (!req.body.email) return res.json({ statusCode: 500, result: errMsg })
+    if (!req.body.username) return res.json({ statusCode: 500, result: errMsg })
+    if (!req.body.password) return res.json({ statusCode: 500, result: errMsg })
     //write validation 
     //console.log(req.body)
     if (validateEmail(req.body.email)) {
@@ -81,7 +81,7 @@ function userRegistrationCheck(req, res, next) {
     }
 
     if (Boolean(gblErrMsg)) {
-        return res.send({ statusCode: 500, result: gblErrMsg })
+        return res.json({ statusCode: 500, result: gblErrMsg })
     }
     else {
         req.secret = secret
@@ -94,8 +94,8 @@ function userLoginCheck(req, res, next) {
     //console.log("userlogin check")
     //var inputs = sanitizeInputs(req);
     //console.log(req.body)
-    if (!req.body.email) return res.send({ message: errMsg })
-    if (!req.body.password) return res.send({ message: errMsg })
+    if (!req.body.email) return res.json({ message: errMsg })
+    if (!req.body.password) return res.json({ message: errMsg })
 
     //write validations & sanitize here
     if (validateEmail(req.body.email)) {
@@ -103,7 +103,7 @@ function userLoginCheck(req, res, next) {
     }
     if (Boolean(gblErrMsg)) {
         console.log(gblErrMsg)
-        return res.send({ statusCode: 500, result: gblErrMsg })
+        return res.json({ statusCode: 500, result: gblErrMsg })
     }
     else {
         req.secret = secret
@@ -117,7 +117,7 @@ function checkToken(req, res, next) {
     // console.log("inside checktoken")
     var bearerHeader = req.headers["authorization"]
     if (bearerHeader === undefined) {
-        return res.send({ statusCode: 500, message: errMsg })
+        return res.json({ statusCode: 500, message: errMsg })
     }
     else {
 
@@ -135,19 +135,20 @@ function decodetoken(req, res, next) {
     var bearerHeader = req.headers["authorization"]
     //console.log(bearerHeader)
     if (bearerHeader === undefined) {
-        return res.send({ statusCode: 500, result: errMsg })
+        return res.json({ statusCode: 500, result: errMsg })
     }
     else {
-        //console.log("herer")
+        
         var role = ['user', 'admin']
         var reqToken = bearerHeader.split(' ')[1]
+        //console.log(reqToken)
         jwt.verify(reqToken, secret, (err, decoded) => {
             //console.log(err)
-            if (err) return res.send({ statusCode: 500, result: errMsg })
+            if (err) return res.json({ statusCode: 500, result: errMsg })
             if (role.includes(decoded["userType"])) {
-                res.send({ statusCode: 200, result: decoded })
+                res.json({ statusCode: 200, result: decoded })
             }
-            else return res.send({ statusCode: 500, result: errMsg })
+            else return res.json({ statusCode: 500, result: errMsg })
 
         });
     }
@@ -157,19 +158,19 @@ function returndecodetoken(req, res, next) {
     var bearerHeader = req.headers["authorization"]
     //console.log(bearerHeader)
     if (bearerHeader === undefined) {
-        return res.send(false)
+        return res.json(false)
     }
     else {
         //console.log("herer")
         var role = ['user', 'admin']
         var reqToken = bearerHeader.split(' ')[1]
         jwt.verify(reqToken, secret, (err, decoded) => {
-            //console.log(err)
-            if (err) return res.send(false)
+            console.log(err)
+            if (err) return res.json(false)
             if (role.includes(decoded["userType"])) {
-                res.send(true)
+                res.json(true)
             }
-            else return res.send(false)
+            else return res.json(false)
 
         });
     }
@@ -179,7 +180,7 @@ function checkRole(req, res, next) {
     //console.log("inside checkRole")
     var bearerHeader = req.headers["authorization"]
     if (bearerHeader === undefined) {
-        return res.send({ statusCode: 500, message: errMsg })
+        return res.json({ statusCode: 500, message: errMsg })
     }
     else {
         var role = ['user', 'admin']

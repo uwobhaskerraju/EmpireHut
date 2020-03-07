@@ -63,30 +63,42 @@ router.use(function (req, res, next) {
 });
 
 function logResponse(obj) {
-    var body = JSON.parse(obj);
-    const entries = Object.keys(body)
-    //console.log(entries)
-    for (let i = 0; i < entries.length; i++) {
-        if (entries[i].toString() != 'statusCode') {
-            if (typeof (body[entries[i]]) == "object") {
-                //console.log(body[entries[i]])
-                var res = body[entries[i]]
-                var keys = Object.keys(res)
-                //console.log(keys)
-                for (let j = 0; j < keys.length; j++) {
-                    //console.log(keys[j])
-                    //console.log(res[keys[j]])//value
-                    body[entries[i]][keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+    try {
+        console.log("inside logresponse")
+        var body = JSON.parse(obj);
+        const entries = Object.keys(body)
+        //console.log(entries)
+        for (let i = 0; i < entries.length; i++) {
+            if (entries[i].toString().toLowerCase() != 'statuscode') {
+                if (typeof (body[entries[i]]) == "object") {
+                    //console.log(body[entries[i]])
+                    var res = body[entries[i]]
+                    var keys = Object.keys(res)
+                    console.log(keys.length)
+                    for (let j = 0; j < keys.length; j++) {
+                        //console.log(j)
+                        //console.log(keys[j])
+                       // console.log(res[keys[j]])//value
+                        if (typeof (res[keys[j]]) != "string") {
+                            res[keys[j]] = String(res[keys[j]])
+                        }
+                        body[entries[i]][keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+                    }
+                    //console.log(body[entries[i]][keys[j]])
+                }
+                else {
+                    console.log(Object.values(body)[i])
+                    body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
                 }
             }
-            else {
-                console.log(Object.values(body)[i])
-                body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
-            }
         }
+        // console.log(JSON.stringify(body))
+        return JSON.stringify(body);
     }
-    // console.log(JSON.stringify(body))
-    return JSON.stringify(body);
+    catch (r) {
+        console.log(r)
+    }
+
 }
 
 app.use(function (req, res, next) {
@@ -101,12 +113,15 @@ app.use(function (req, res, next) {
 
 function sanitizeRequest(req) {
     var body = req.body
-    const entries = Object.keys(body)
-    const inserts = {}
-    for (let i = 0; i < entries.length; i++) {
-        req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
-        //req.body[entries[i]] = req.sanitize(Object.values(body)[i])
+    if (body != null || body != undefined) {
+        const entries = Object.keys(body)
+        const inserts = {}
+        for (let i = 0; i < entries.length; i++) {
+            req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
+            //req.body[entries[i]] = req.sanitize(Object.values(body)[i])
+        }
     }
+
 }
 
 // define a default route
