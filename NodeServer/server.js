@@ -61,33 +61,65 @@ router.use(function (req, res, next) {
     sanitizeRequest(req);
     next()// make sure we go to the next routes and don't stop here
 });
+function encruptObject(body, entries, i) {
+    console.log("inside encrypt object")
+    for (var entry of body[entries[i]]) {
+        var res = entry
+       // console.log(res)
+        var keys = Object.keys(res)
+       // console.log(keys)
+        for (let j = 0; j < keys.length; j++) {
+            if (typeof (entry[j]) == "object") {
+                if (entry[j].length > 0) {
+                    encruptObject(entry, keys, j);
+                }
+                //we are ignoring if length is zero
+            }
+            // console.log(j)
+            // console.log(keys[j])
+            // console.log(res[keys[j]])//value
+            //console.log(entry)
+            if (typeof (res[keys[j]]) != "string") {
+                res[keys[j]] = String(res[keys[j]])
+            }
+            res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+        }
+    }
+
+}
+
 
 function logResponse(obj) {
     try {
         console.log("inside logresponse")
+        //console.log(obj)
         var body = JSON.parse(obj);
         const entries = Object.keys(body)
         //console.log(entries)
         for (let i = 0; i < entries.length; i++) {
             if (entries[i].toString().toLowerCase() != 'statuscode') {
                 if (typeof (body[entries[i]]) == "object") {
-                    //console.log(body[entries[i]])
-                    var res = body[entries[i]]
-                    var keys = Object.keys(res)
-                    console.log(keys.length)
-                    for (let j = 0; j < keys.length; j++) {
-                        //console.log(j)
-                        //console.log(keys[j])
-                       // console.log(res[keys[j]])//value
-                        if (typeof (res[keys[j]]) != "string") {
-                            res[keys[j]] = String(res[keys[j]])
-                        }
-                        body[entries[i]][keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+                    //console.log(Object.keys(body[entries[i]]))
+
+                    if (body[entries[i]].length > 0) {
+                        encruptObject(body, entries, i);
                     }
-                    //console.log(body[entries[i]][keys[j]])
+                    //we are ignoring if length is zero
+                    if (body[entries[i]].length == 0) {
+
+                    }
+                    if (body[entries[i]].length === undefined) {
+                       // console.log(body[entries[i]])
+                        var temp=[];
+                        temp.push(body[entries[i]])
+                        //encruptObject(body, entries, i)
+                        body[entries[i]]=temp
+                       // console.log(body[entries[i]].length)
+                        encruptObject(body, entries, i)
+                    }
                 }
                 else {
-                    console.log(Object.values(body)[i])
+                    // console.log(Object.values(body)[i])
                     body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
                 }
             }
@@ -106,6 +138,7 @@ app.use(function (req, res, next) {
     const orig_send = res.send;
     res.send = function (arg) {
         var a = logResponse(arg);
+        console.log(a)
         orig_send.call(res, a);
     };
     next();
@@ -127,7 +160,7 @@ function sanitizeRequest(req) {
 // define a default route
 router.get('/', (req, res) => {
     //console.log('default works')
-    res.send({ success: "true" })
+    res.json({ success: "true" })
 });
 
 // all our APIs will have default name '/api' in route

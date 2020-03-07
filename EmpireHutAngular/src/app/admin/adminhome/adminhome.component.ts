@@ -23,7 +23,7 @@ export class AdminhomeComponent implements OnInit {
     this.imagePath = environment.imagePath
     this._http.getAllAssets()
       .subscribe(data => {
-        // console.log(data);
+        console.log(data);
         if (data["statusCode"] == 200) {
           this.noassets = false;
           this.allAssets = data["result"];

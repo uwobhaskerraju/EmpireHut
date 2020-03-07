@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const argon2 = require('argon2');
-const tokenExpiry = "1h"
+const tokenExpiry = "6h"
 const errMsg = "something went wrong! try again"
 const User = require('../models/user.model.js');
 

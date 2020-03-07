@@ -29,20 +29,20 @@ try {
                         req.app.result = fnlRes;
                         console.log(fnlRes.length);
                         next();
-                        //  res.send({ statusCode: 200, result: "done" })
+                        //  res.json({ statusCode: 200, result: "done" })
                     }
                     else {
-                        res.send({ statusCode: 200, result: "No Notifications" })
+                        res.json({ statusCode: 200, result: "No Notifications" })
                     }
 
                 }
                 else {
-                    res.send({ statusCode: 200, result: "No Notifications" })
+                    res.json({ statusCode: 200, result: "No Notifications" })
                 }
-                //res.send(fnlRes);
+                //res.json(fnlRes);
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -74,11 +74,11 @@ try {
 
         noti().then(r => {
             if (r) {
-                res.send({ statusCode: 200, result: "done" })
+                res.json({ statusCode: 200, result: "done" })
             }
         })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -103,11 +103,11 @@ try {
                     next();
                 }
                 else {
-                    res.send({ statusCode: 500, result: "Address already exists" })
+                    res.json({ statusCode: 500, result: "Address already exists" })
                 }
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -135,10 +135,10 @@ try {
         asset.save()
             .then(data => {
                 //console.log(data)
-                res.send({ statusCode: 200, result: dataConfig.AssetRegistration });
+                res.json({ statusCode: 200, result: dataConfig.AssetRegistration });
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -162,7 +162,7 @@ try {
                 }
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -178,7 +178,7 @@ try {
                 next();
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -196,10 +196,10 @@ try {
                 delete asset.tokenID
                 asset.owner = r[0].username;
                 //console.log(asset)
-                res.send({ statusCode: 200, result: asset });
+                res.json({ statusCode: 200, result: asset });
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -237,10 +237,10 @@ try {
         }
         details().then(r => {
             req.app.tokenIDs = null;
-            res.send({ statusCode: 200, result: result })
+            res.json({ statusCode: 200, result: result })
         })
             .catch(r => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -252,10 +252,10 @@ try {
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }] })
             .select({ username: 1, email: 1, _id: 1 })
             .then(r => {
-                res.send({ statusCode: 200, result: r });
+                res.json({ statusCode: 200, result: r });
             })
             .catch(r => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -323,11 +323,11 @@ try {
 
         details().then(r => {
             //console.log(r)
-            res.send({ statusCode: 200, result: r })
+            res.json({ statusCode: 200, result: r })
         })
             .catch(r => {
                 console.log(r)
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -338,18 +338,18 @@ try {
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { _id: req.params.id }] })
             .select({ username: 1, email: 1, _id: 1, address: 1 })
             .then(r => {
-                //res.send({ statusCode: 200, result: r });
+                //res.json({ statusCode: 200, result: r });
                 if (r.length > 0) {
                     req.app.details = r;
                     next();
                 }
                 else {
-                    res.send({ statusCode: 300, result: "Found Nothing" })
+                    res.json({ statusCode: 300, result: "Found Nothing" })
                 }
 
             })
             .catch(r => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -377,11 +377,11 @@ try {
                 })
                 fnlJson = [...new Set(fnlJson)];
                 //console.log("ou loop")
-                res.send({ statusCode: 200, result: fnlJson })
+                res.json({ statusCode: 200, result: fnlJson })
             })
             .catch(r => {
                 console.log(r)
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -395,15 +395,15 @@ try {
         console.log(state)
         Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
             .then(r => {
-                res.send({ statusCode: 200, result: true });
+                res.json({ statusCode: 200, result: true });
             })
             .catch(r => {
-                res.send({ statusCode: 500, result: false });
+                res.json({ statusCode: 500, result: false });
             })
     }
 
     exports.getuserAssets = (req, res) => {
-        //res.send(req.app.details)
+        //res.json(req.app.details)
         var details = req.app.details;
         Asset.find({ tokenID: { $in: details.tokenIds } })
             .select({ name: 1, _id: 1 })
@@ -411,12 +411,12 @@ try {
                 //details = details.toObject();
                 delete details.tokenIds
                 details.assets = r;
-                res.send({ statusCode: 200, result: details })
+                res.json({ statusCode: 200, result: details })
 
             })
             .catch(r => {
                 console.log(r)
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })

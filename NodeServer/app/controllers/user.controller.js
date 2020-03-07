@@ -19,14 +19,14 @@ exports.getUserDetails = (req, res, next) => {
                 next();
             })
             .catch(err => {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
             });
     } catch (error) {
         console.log(error)
-        res.send({
+        res.json({
             statusCode: 500,
             result: dataConfig.GlobalErrMsg
         })
@@ -62,10 +62,10 @@ exports.getAllAssets = async (req, res) => {
     }
     details().then(r => {
         req.app.tokenIDs = null;
-        res.send({ statusCode: 200, result: result })
+        res.json({ statusCode: 200, result: result })
     })
         .catch(r => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -93,17 +93,17 @@ exports.addNotifications = (req, res, next) => {
                 req.body.amount = req.body.proposedAmount
                 req.body.proposedAmount = null;
                 next();
-                //res.send({ statusCode: 200, result: dataConfig.Proposal });
+                //res.json({ statusCode: 200, result: dataConfig.Proposal });
             }
             else {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
             }
         })
         .catch(r => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -121,10 +121,10 @@ exports.getAssetToken = (req, res, next) => {
                 req.app.transferType = "Property Purchase"
                 console.log("next")
                 next();
-                //res.send(r[0]);
+                //res.json(r[0]);
             }
             else {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
@@ -132,7 +132,7 @@ exports.getAssetToken = (req, res, next) => {
         })
         .catch(err => {
             console.log(err.message)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -201,11 +201,11 @@ exports.getUserNameFrmAddress = async (req, res) => {
 
     details().then(r => {
         //console.log(r)
-        res.send({ statusCode: 200, result: r })
+        res.json({ statusCode: 200, result: r })
     })
         .catch(r => {
             console.log(r)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -227,14 +227,14 @@ exports.getAssetDetails = (req, res, next) => {
                 next();
             }
             else {
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
             }
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -247,10 +247,10 @@ exports.toggleAsset = (req, res) => {
     console.log(state)
     Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
         .then(r => {
-            res.send({ statusCode: 200, result: true });
+            res.json({ statusCode: 200, result: true });
         })
         .catch(r => {
-            res.send({ statusCode: 500, result: false });
+            res.json({ statusCode: 500, result: false });
         })
 }
 exports.getUserAssets = (req, res) => {
@@ -258,10 +258,10 @@ exports.getUserAssets = (req, res) => {
     Asset.find({ tokenID: { $in: tokenIDs } })
         .select({ picture: 1, name: 1, _id: 1 })
         .then(r => {
-            res.send({ statusCode: 200, result: r })
+            res.json({ statusCode: 200, result: r })
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -277,7 +277,7 @@ exports.getUserAddress = (req, res, next) => {
             next();
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -296,10 +296,10 @@ exports.getUserName = (req, res) => {
             asset.owner = r[0].username;
             asset.ownerAdd = r[0].address;
             //console.log(asset)
-            res.send({ statusCode: 200, result: asset });
+            res.json({ statusCode: 200, result: asset });
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -333,11 +333,11 @@ exports.getAllProposalUsers = (req, res) => {
                     }
                 }
             }
-            res.send({ statusCode: 200, result: assets })
+            res.json({ statusCode: 200, result: assets })
         })
         .catch(err => {
             console.log(err)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -384,12 +384,12 @@ exports.getAllUserProposals = (req, res, next) => {
                 next();
             }
             else {
-                res.send({ statusCode: 300, result: "no records" })
+                res.json({ statusCode: 300, result: "no records" })
             }
 
         })
         .catch(err => {
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -407,7 +407,7 @@ exports.rejectProposal = (req, res, next) => {
         })
         .catch(err => {
             console.log(err)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -429,7 +429,7 @@ exports.toggleNotification = (req, res, next) => {
         })
         .catch(err => {
             console.log(err)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -437,7 +437,7 @@ exports.toggleNotification = (req, res, next) => {
     // })
     // .catch(err => {
     //     console.log(err)
-    //     res.send({
+    //     res.json({
     //         statusCode: 500,
     //         result: dataConfig.GlobalErrMsg
     //     })
@@ -465,11 +465,11 @@ exports.getSearchedAssets = (req, res) => {
             })
             fnlJson = [...new Set(fnlJson)];
             //console.log("ou loop")
-            res.send({ statusCode: 200, result: fnlJson })
+            res.json({ statusCode: 200, result: fnlJson })
         })
         .catch(r => {
             console.log(r)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
@@ -521,25 +521,25 @@ exports.approveProposal = (req, res, next) => {
                 req.app.transferType = "[Approved] Purchase Proposal"
                 req.app.tokenID = data[0]["tokenID"]
                 //console.log(req.app.tokenID)
-                //res.send(data);
+                //res.json(data);
                 next()
             }
             else {
 
-                res.send({
+                res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
 
             }
-            //res.send(data)
+            //res.json(data)
         })
         .catch(err => {
             console.log(err)
-            res.send({
+            res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
             })
         });
-    //res.send("Asd");
+    //res.json("Asd");
 };

@@ -79,9 +79,9 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
             return next.handle(req).pipe(
                 map((event: HttpEvent<any>) => {
                     if (event instanceof HttpResponse) {
-                        // console.log('event--->>>', event);
+                        //console.log('event--->>>', event);
                         var body = event["body"]
-                        //console.log(event["body"]["result"])
+                        console.log(event["body"])
                         if (body != null || body != undefined) {
                             const entries = Object.keys(body)
                             for (let i = 0; i < entries.length; i++) {
@@ -89,13 +89,32 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                                 if (entries[i] != "statusCode") {
                                     if (typeof (body[entries[i]]) == "object") {
                                         var resp = body[entries[i]]
-                                        var keys = Object.keys(resp)
-                                        //console.log(keys)
-                                        for (let j = 0; j < keys.length; j++) {
-                                            console.log(keys[j])
-                                            //console.log(body[entries[i]][keys[j]])//value
-                                            body[entries[i]][keys[j]] =CryptoJS.AES.decrypt(body[entries[i]][keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
-                                            //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
+                                        if (resp.length == 1) {
+                                            resp = body[entries[i]][0]
+                                            console.log(resp)
+                                            var keys = Object.keys(resp)
+                                            console.log(keys)
+                                            for (let j = 0; j < keys.length; j++) {
+                                                //console.log(keys[j])
+                                                //console.log(resp[u][keys[j]])//value
+                                                resp[keys[j]] = CryptoJS.AES.decrypt(resp[keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
+                                                //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
+                                            }
+                                            body[entries[i]]=resp
+                                        }
+                                        else {
+                                            //console.log(resp)
+                                            for (var u = 0; u < resp.length; u++) {
+                                                //console.log(resp[u])
+                                                var keys = Object.keys(resp[u])
+                                                //console.log(keys)
+                                                for (let j = 0; j < keys.length; j++) {
+                                                    //console.log(keys[j])
+                                                    //console.log(resp[u][keys[j]])//value
+                                                    resp[u][keys[j]] = CryptoJS.AES.decrypt(resp[u][keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
+                                                    //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
+                                                }
+                                            }
                                         }
                                     }
                                     else {
@@ -105,8 +124,10 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                                 }
                                 //console.log(body)
                             }
-                           // console.log(body)
+                            // console.log(body)
+
                         }
+                        //console.log(body)
                     }
                     event["body"] = body
                     return event;
