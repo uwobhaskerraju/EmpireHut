@@ -32,7 +32,7 @@ export class AdminComponent implements OnInit {
               if (r["statusCode"] == 200) {
                 this.userDetails = r["result"]
                 this._VariableService.userdetails = r["result"]
-                //console.log(this.userDetails)
+                console.log(r)
                 this._http.getTotalCount()
                   .subscribe(r => {
                     //console.log(r)

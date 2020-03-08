@@ -67,22 +67,26 @@ function encruptObject(body, entries, i) {
         var res = entry
        // console.log(res)
         var keys = Object.keys(res)
-       // console.log(keys)
+        //console.log(keys)
         for (let j = 0; j < keys.length; j++) {
-            if (typeof (entry[j]) == "object") {
-                if (entry[j].length > 0) {
+            //console.log(typeof(res[keys[j]]))
+            if (typeof(res[keys[j]]) == "object") {
+                if (res[keys[j]].length > 0) {
                     encruptObject(entry, keys, j);
                 }
                 //we are ignoring if length is zero
             }
-            // console.log(j)
-            // console.log(keys[j])
-            // console.log(res[keys[j]])//value
-            //console.log(entry)
-            if (typeof (res[keys[j]]) != "string") {
-                res[keys[j]] = String(res[keys[j]])
+            else{
+                // console.log(j)
+                // console.log(keys[j])
+                // console.log(res[keys[j]])//value
+                //console.log(entry)
+                if (typeof (res[keys[j]]) != "string") {
+                    res[keys[j]] = String(res[keys[j]])
+                }
+                res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
             }
-            res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+           
         }
     }
 
@@ -92,7 +96,7 @@ function encruptObject(body, entries, i) {
 function logResponse(obj) {
     try {
         console.log("inside logresponse")
-        //console.log(obj)
+        console.log(obj)
         var body = JSON.parse(obj);
         const entries = Object.keys(body)
         //console.log(entries)
@@ -119,7 +123,11 @@ function logResponse(obj) {
                     }
                 }
                 else {
-                    // console.log(Object.values(body)[i])
+                    console.log(body[entries[i]])
+                    console.log("not an object")
+                    if (typeof (body[entries[i]]) != "string") {
+                        body[entries[i]] = String(body[entries[i]])
+                    }
                     body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
                 }
             }
@@ -138,7 +146,8 @@ app.use(function (req, res, next) {
     const orig_send = res.send;
     res.send = function (arg) {
         var a = logResponse(arg);
-        console.log(a)
+       // console.log("final response")
+        //console.log(a)
         orig_send.call(res, a);
     };
     next();

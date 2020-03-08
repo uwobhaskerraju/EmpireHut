@@ -13,12 +13,12 @@ export class UserdetailsComponent implements OnInit {
   userID: String
   userTrans: object
   private routeSub: Subscription;
-  nodetails:boolean;
-  notrans:boolean
+  nodetails: boolean;
+  notrans: boolean
 
-  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) { 
-    this.nodetails=true;
-    this.notrans=true;
+  constructor(private _http: AdminService, private route: ActivatedRoute, private router: Router) {
+    this.nodetails = true;
+    this.notrans = true;
   }
 
   ngOnInit() {
@@ -28,18 +28,36 @@ export class UserdetailsComponent implements OnInit {
 
     this._http.getAllUserDetails(this.userID)
       .subscribe(r => {
-        this.nodetails=false;
+        this.nodetails = false;
         if (r["statusCode"] == 200) {
-          
-          // this.userDetails = {};
+
+          //  // console.log(r)
+
+          //   if (r["result"].length == undefined) {
+          //     var temp = [];
+          //     temp.push(r["result"])
+          //     this.userDetails = temp;
+          //   }
+          //   else{
           this.userDetails = r["result"]
+          //}
+          console.log(r["result"].length)
           //pull transactions of this user
           this._http.getUserTransactions(this.userDetails["address"])
             .subscribe(r => {
-              if(r["statusCode"]==200){
-                this.notrans=false
-                this.userTrans = r["result"]
-              }             
+              if (r["statusCode"] == 200) {
+                this.notrans = false
+
+                if (r["result"].length == undefined) {
+                  var temp = [];
+                  temp.push(r["result"])
+                  this.userTrans = temp;
+                }
+                else {
+                  this.userTrans = r["result"]
+                }
+
+              }
               //console.log(this.userTrans)
             });
         }
@@ -52,6 +70,6 @@ export class UserdetailsComponent implements OnInit {
 
   routerDetails(value: any) {
     console.log(value.srcElement.id)
-    this.router.navigate(['admin/asset',value.srcElement.id])
+    this.router.navigate(['admin/asset', value.srcElement.id])
   }
 }

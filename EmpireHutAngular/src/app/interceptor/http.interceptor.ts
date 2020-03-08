@@ -75,6 +75,31 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                 });
             }
 
+            function singleObjectDecrypt(resp) {
+                var keys = Object.keys(resp)
+                //console.log(keys)
+                for (let j = 0; j < keys.length; j++) {
+                    //console.log(keys[j])
+                    //console.log(resp[u][keys[j]])//value
+                    if (typeof (resp[keys[j]]) == "object") {
+                        if (resp[keys[j]].length == 1) {
+                            singleObjectDecrypt(resp[keys[j]][0])
+                        }
+
+                    }
+                    else {
+                        resp[keys[j]] = CryptoJS.AES.decrypt(resp[keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
+                        if (resp[keys[j]] == "true" || resp[keys[j]] == "false") {
+                            resp[keys[j]] = JSON.parse(resp[keys[j]].toString())
+                        }
+                    }
+
+                }
+                return resp
+            }
+            function multiObjectDecrypt() {
+
+            }
             // console.log(req);
             return next.handle(req).pipe(
                 map((event: HttpEvent<any>) => {
@@ -91,29 +116,37 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                                         var resp = body[entries[i]]
                                         if (resp.length == 1) {
                                             resp = body[entries[i]][0]
-                                            console.log(resp)
-                                            var keys = Object.keys(resp)
-                                            console.log(keys)
-                                            for (let j = 0; j < keys.length; j++) {
-                                                //console.log(keys[j])
-                                                //console.log(resp[u][keys[j]])//value
-                                                resp[keys[j]] = CryptoJS.AES.decrypt(resp[keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
-                                                //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
-                                            }
-                                            body[entries[i]]=resp
+                                            //console.log(resp)
+
+                                            // var keys = Object.keys(resp)
+                                            // //console.log(keys)
+                                            // for (let j = 0; j < keys.length; j++) {
+                                            //     //console.log(keys[j])
+                                            //     //console.log(resp[u][keys[j]])//value
+                                            //     resp[keys[j]] = CryptoJS.AES.decrypt(resp[keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
+                                            //     if (resp[keys[j]] == "true" || resp[keys[j]] == "false") {
+                                            //         resp[keys[j]] = JSON.parse(resp[keys[j]].toString())
+                                            //     }
+                                            // }
+                                            body[entries[i]] = singleObjectDecrypt(resp)
                                         }
                                         else {
-                                            //console.log(resp)
+                                            console.log(resp)
                                             for (var u = 0; u < resp.length; u++) {
                                                 //console.log(resp[u])
-                                                var keys = Object.keys(resp[u])
-                                                //console.log(keys)
-                                                for (let j = 0; j < keys.length; j++) {
-                                                    //console.log(keys[j])
-                                                    //console.log(resp[u][keys[j]])//value
-                                                    resp[u][keys[j]] = CryptoJS.AES.decrypt(resp[u][keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
-                                                    //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
-                                                }
+                                                // var keys = Object.keys(resp[u])
+                                                // //console.log(keys)
+                                                // for (let j = 0; j < keys.length; j++) {
+                                                //     //console.log(keys[j])
+                                                //     //console.log(resp[u][keys[j]])//value
+                                                //     resp[u][keys[j]] = CryptoJS.AES.decrypt(resp[u][keys[j]], environment.key).toString(CryptoJS.enc.Utf8)
+                                                //     if (resp[u][keys[j]] == "true" || resp[u][keys[j]] == "false") {
+                                                //         //console.log("boolean")
+                                                //         resp[u][keys[j]] = JSON.parse(resp[u][keys[j]].toString())
+                                                //     }
+                                                //     //console.log(CryptoJS.AES.decrypt(body[entries[i]][keys[j]].toString(), environment.key).toString(CryptoJS.enc.Utf8))
+                                                // }
+                                                resp[u]=singleObjectDecrypt(resp[u]);
                                             }
                                         }
                                     }

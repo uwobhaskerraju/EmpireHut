@@ -26,9 +26,17 @@ export class AdminhomeComponent implements OnInit {
         console.log(data);
         if (data["statusCode"] == 200) {
           this.noassets = false;
-          this.allAssets = data["result"];
+          if (data["result"].length == undefined) {
+            var temp = [];
+            temp.push(data["result"])
+            this.allAssets = temp;
+          }
+          else{
+            this.allAssets = data["result"];
+          }
+          //this.allAssets = data["result"];
         }
-        else{
+        else {
           M.toast({ html: "Something went wrong", classes: 'rounded' })
         }
 
@@ -62,11 +70,18 @@ export class AdminhomeComponent implements OnInit {
   }
   onSearchChange(value: any) {
     if (value) {
-      this.noassets=true;
+      this.noassets = true;
       this._http.getSearchedAssets(value).subscribe(data => {
         if (data["statusCode"] == 200) {
-          this.noassets=false;
-          this.allAssets = data["result"]
+          this.noassets = false;
+          if (data["result"].length == undefined) {
+            var temp = [];
+            temp.push(data["result"])
+            this.allAssets = temp;
+          }
+          else{
+            this.allAssets = data["result"];
+          }
         }
         else {
           this.ngOnInit();

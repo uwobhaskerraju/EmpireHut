@@ -17,11 +17,14 @@ export class AuthGuard implements CanActivate {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-     console.log("first")
+    // console.log("first")
     try {
       return this._http.validateToken().pipe(
         map((r: Response) => {
-           console.log(r)
+          //console.log(r)
+          // if (r["result"].length == 1) {
+          //   r["result"] = r["result"][0];
+          // }
           if ((r["statusCode"] == 200) && (r["result"]["userType"] == next.data.role)) {
             this._VariableService.userdetails = r["result"]
             return true;

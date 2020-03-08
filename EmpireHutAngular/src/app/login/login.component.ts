@@ -24,11 +24,11 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.imagePath = environment.imagePath
-     M.AutoInit();
+    M.AutoInit();
     // M.updateTextFields();
     var textNeedCount = document.querySelectorAll('input');
     M.CharacterCounter.init(textNeedCount);
-   // console.log(environment.port)
+    // console.log(environment.port)
   }
 
   ValidateLogin(email: String, pass: String) {
@@ -44,9 +44,11 @@ export class LoginComponent implements OnInit {
 
       this._http.ValidateLogin(email, pass)
         .subscribe(data => {
-          console.log(data)
+         // console.log(data["result"].length)
           if (data["statusCode"] == 200) {
-
+            // if (data["result"].length == 1) {
+            //   data["result"] = data["result"][0];
+            // }
             localStorage.setItem("ACCESS_TOKEN", data["WWW-Authenticate"]);
             switch (data["result"]["userType"]) {
               case "user":
@@ -120,11 +122,11 @@ export class LoginComponent implements OnInit {
   }
 
 
-  test(){
+  test() {
     //console.log("here")
     this._http.test()
-    .subscribe(r=>{
-      //console.log(r)
-    })
+      .subscribe(r => {
+        //console.log(r)
+      })
   }
 }
