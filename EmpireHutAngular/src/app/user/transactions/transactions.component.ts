@@ -19,7 +19,15 @@ export class TransactionsComponent implements OnInit {
     .subscribe(r => {
       this.notrans=false;
       if(r["statusCode"]==200){
-        this.userTrans = r["result"]
+        if (r["result"].length == undefined) {
+          var temp = [];
+          temp.push(r["result"])
+          this.userTrans = temp;
+        }
+        else{
+          this.userTrans = r["result"]
+        }
+        //this.userTrans = r["result"]
         //console.log(this.userTrans)
       }
    

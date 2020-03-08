@@ -4,7 +4,7 @@ module.exports = (app) => {
     const web3 = require('../controllers/web3.controller.js');
 
     //register user
-    app.post('/open/register', checkrequest.CheckRegistration, web3.registerUser, open.registerUser);
+    app.post('/open/register', checkrequest.CheckRegistration,open.checkUser,web3.registerUser, open.registerUser);
 
     //validate user login
     app.post('/open/login', checkrequest.CheckLogin, open.validateLogin);

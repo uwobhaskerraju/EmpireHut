@@ -9,6 +9,26 @@ https://github.com/ranisalt/node-argon2/wiki/Options
 
 */
 
+exports.checkUser=(req,res,next)=>{
+    User.findOne({ email: req.body.email })
+    .then(data=>{
+        if (data) {
+            // table has user so end the request
+            return res.json({ statusCode: 300, result: "Username already exists. Try Logging in" })
+        }
+        else{
+            next();
+        }
+    })
+    .catch(err => {
+        res.json({
+            statusCode: 500,
+            result: err.message || errMsg
+        })
+    });
+}
+
+
 exports.registerUser = (req, res) => {
 
     User.findOne({ email: req.body.email })
