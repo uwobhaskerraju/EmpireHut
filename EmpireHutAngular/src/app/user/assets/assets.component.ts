@@ -30,9 +30,16 @@ export class AssetsComponent implements OnInit {
           this._http.getAllAssets(d["result"]["address"])
             .subscribe(data => {
               this.self = false;
-              // console.log(data);
+               console.log(data);
               if (data["statusCode"] == 200) {
-                this.allAssets = data["result"];
+                if (data["result"].length == undefined) {
+                  var temp = [];
+                  temp.push(data["result"])
+                  this.allAssets = temp;
+                }
+                else{
+                  this.allAssets = data["result"];
+                }
                 // console.log(this.allAssets);
               }
 
@@ -54,7 +61,14 @@ export class AssetsComponent implements OnInit {
     if (value) {
       this._http.getSearchedAssets(this._var.userdetails["address"], value).subscribe(data => {
         if (data["statusCode"] == 200) {
-          this.allAssets = data["result"]
+          if (data["result"].length == undefined) {
+            var temp = [];
+            temp.push(data["result"])
+            this.allAssets = temp;
+          }
+          else{
+            this.allAssets = data["result"];
+          }
           //console.log(this.orgSongs)
         }
         else {

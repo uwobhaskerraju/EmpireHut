@@ -26,7 +26,14 @@ export class MyassetsComponent implements OnInit {
         this.nomyassets=false;
         if (r["statusCode"] == 200) {
           console.log(r)
-          this.allAssets = r["result"]
+          if (r["result"].length == undefined) {
+            var temp = [];
+            temp.push(r["result"])
+            this.allAssets = temp;
+          }
+          else{
+            this.allAssets = r["result"];
+          }
         }
       });
   }
