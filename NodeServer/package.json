@@ -23,11 +23,13 @@
     "express": "^4.17.1",
     "express-sanitizer": "^1.0.5",
     "jsonwebtoken": "^8.5.1",
+    "logat": "^1.0.11",
     "moment-timezone": "^0.5.28",
     "mongoose": "^5.7.13",
     "nodemon": "^2.0.2",
     "run-middleware": "^0.9.10",
     "shortid": "^2.2.15",
-    "web3": "^1.2.4"
+    "web3": "^1.2.4",
+    "winston": "^3.2.1"
   }
 }

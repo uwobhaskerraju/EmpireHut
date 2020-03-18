@@ -108,3 +108,7 @@ asset_data.txt
 .gitignore
 assettoken_old.sol
 asset_data.txt
+server.crt
+server.key
+.gitignore
+EmpireHutAngular/.gitignore

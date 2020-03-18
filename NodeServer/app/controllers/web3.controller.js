@@ -5,6 +5,7 @@ try {
     const dataConfig = require('../config/data.config.js');
     const abiDecoder = require('abi-decoder');
     const assetDecoder = abiDecoder;
+    const logger = require('../../logger');
 
     const rpcURL = process.env.blockURL
     const web3 = new Web3(new Web3.providers.HttpProvider(rpcURL))
@@ -12,9 +13,9 @@ try {
     //console.log(web3.version) //1.2.4
     // get count of contracts
     web3.eth.net.isListening().then((s) => {
-        console.log("web3.js connected to " + web3.currentProvider["host"]);
+        logger.info("web3.js connected to " + web3.currentProvider["host"]);
     }).catch((e) => {
-        console.log('Lost connection to the node, reconnecting');
+        logger.error('Lost connection to the node, reconnecting');
         //web3.setProvider(your_provider_here);
         process.kill(process.pid, 'SIGTERM')
         //throw "Blockchain failed to connect. Exiting"

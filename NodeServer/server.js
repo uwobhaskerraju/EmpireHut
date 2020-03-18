@@ -11,7 +11,7 @@ var cors = require('cors')
 const expressSanitizer = require('express-sanitizer');
 const CryptoJS = require('crypto-js')
 const runMiddleware = require('run-middleware');
-
+const logger = require('./logger');
 
 
 const https = require('https');
@@ -44,9 +44,10 @@ mongoose.connect(process.env.mongoURL, {
     useUnifiedTopology: true,
     useCreateIndex: true
 }).then(() => {
-    console.log("Successfully connected to the database");
+    logger.info("Successfully connected to the database");
 }).catch(err => {
-    console.log('Could not connect to the database. Ending the Process', err);
+    //console.log('Could not connect to the database. Ending the Process', err);
+    logger.error('Could not connect to the database. Ending the Process', err);
     process.exit();
 });
 
@@ -57,26 +58,27 @@ var router = express.Router();
 // middleware to use for all requests
 router.use(function (req, res, next) {
     // do logging
-    console.log("This route was requested: " + req.url);
+    logger.info("This route was requested: " + req.url);
+    //console.log("This route was requested: " + req.url);
     sanitizeRequest(req);
     next()// make sure we go to the next routes and don't stop here
 });
 function encruptObject(body, entries, i) {
-    console.log("inside encrypt object")
+    logger.info("inside encruptObject");
     for (var entry of body[entries[i]]) {
         var res = entry
-       // console.log(res)
+        // console.log(res)
         var keys = Object.keys(res)
         //console.log(keys)
         for (let j = 0; j < keys.length; j++) {
             //console.log(typeof(res[keys[j]]))
-            if (typeof(res[keys[j]]) == "object") {
+            if (typeof (res[keys[j]]) == "object") {
                 if (res[keys[j]].length > 0) {
                     encruptObject(entry, keys, j);
                 }
                 //we are ignoring if length is zero
             }
-            else{
+            else {
                 // console.log(j)
                 // console.log(keys[j])
                 // console.log(res[keys[j]])//value
@@ -86,7 +88,7 @@ function encruptObject(body, entries, i) {
                 }
                 res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
             }
-           
+
         }
     }
 
@@ -95,8 +97,8 @@ function encruptObject(body, entries, i) {
 
 function logResponse(obj) {
     try {
-        console.log("inside logresponse")
-        console.log(obj)
+        logger.info("inside Logresponse");
+        //console.log(obj)
         var body = JSON.parse(obj);
         const entries = Object.keys(body)
         //console.log(entries)
@@ -113,12 +115,12 @@ function logResponse(obj) {
 
                     }
                     if (body[entries[i]].length === undefined) {
-                       // console.log(body[entries[i]])
-                        var temp=[];
+                        // console.log(body[entries[i]])
+                        var temp = [];
                         temp.push(body[entries[i]])
                         //encruptObject(body, entries, i)
-                        body[entries[i]]=temp
-                       // console.log(body[entries[i]].length)
+                        body[entries[i]] = temp
+                        // console.log(body[entries[i]].length)
                         encruptObject(body, entries, i)
                     }
                 }
@@ -136,7 +138,7 @@ function logResponse(obj) {
         return JSON.stringify(body);
     }
     catch (r) {
-        console.log(r)
+        logger.error(r);
     }
 
 }
@@ -146,7 +148,7 @@ app.use(function (req, res, next) {
     const orig_send = res.send;
     res.send = function (arg) {
         var a = logResponse(arg);
-       // console.log("final response")
+        // console.log("final response")
         //console.log(a)
         orig_send.call(res, a);
     };
@@ -194,8 +196,12 @@ function showTime() {
 //setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
 setInterval(showTime, 1000 * 60 * 60);
 
+
+//logger.debug('Debugging info');
+
 https.createServer(options, app).listen(port, () => {
-    console.log("Server is listening on port " + port);
+    logger.info("Server is listening on port " + port);
+    //console.log("Server is listening on port " + port);
 });
 
 // app.listen(port, () => {
