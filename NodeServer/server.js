@@ -57,9 +57,9 @@ var router = express.Router();
 
 // middleware to use for all requests
 router.use(function (req, res, next) {
-    // do logging
+
     logger.info("This route was requested: " + req.url);
-    //console.log("This route was requested: " + req.url);
+
     sanitizeRequest(req);
     next()// make sure we go to the next routes and don't stop here
 });
@@ -170,7 +170,6 @@ function sanitizeRequest(req) {
 
 // define a default route
 router.get('/', (req, res) => {
-    //console.log('default works')
     res.json({ success: "true" })
 });
 
@@ -193,15 +192,26 @@ function showTime() {
     );
 }
 
+// function debugLine(message) {
+//     let e = new Error();
+//     let frame = e.stack.split("\n")[2];
+//     let fileName = frame.split(":")[1];
+//     let lineNumber = frame.split(":")[2];
+//     let functionName = frame.split(" ")[5];
+//     return functionName + ":" + lineNumber + " " + message;
+// }
+// function myCallingFunction() {
+//     logger.info(debugLine());
+// }
+// myCallingFunction();
+
 //setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
 setInterval(showTime, 1000 * 60 * 60);
 
 
-//logger.debug('Debugging info');
-
 https.createServer(options, app).listen(port, () => {
     logger.info("Server is listening on port " + port);
-    //console.log("Server is listening on port " + port);
+    //logger.info(((new Error().stack).split("at ")[3]).trim())
 });
 
 // app.listen(port, () => {

@@ -31,6 +31,10 @@ try {
     var EMPTokenJSON = JSON.parse(fs.readFileSync(path.join(rootPath, 'EMPToken.json'), 'utf8'));
     var AssetToken = JSON.parse(fs.readFileSync(path.join(rootPath, 'AssetToken.json'), 'utf8'));
 
+    if (EMPTokenJSON === undefined || AssetToken === undefined) {
+        throw 'JSON files are missing'
+    }
+
     const abi = EMPTokenJSON["abi"]
     const address = EMPTokenJSON["networks"][process.env.blockNetwork]["address"]
     const EMPContract = new web3.eth.Contract(abi, address)
@@ -44,6 +48,14 @@ try {
     assetDecoder.addABI(asset_abi);
     //track 10 ethereum accounts
     var usrID = [];
+    function debugLine(message) {
+        let e = new Error();
+        let frame = e.stack.split("\n")[2];
+        let fileName = frame.split(":")[1];
+        let lineNumber = frame.split(":")[2];
+        let functionName = frame.split(" ")[5];
+        return functionName + ":" + lineNumber + " " + message;
+    }
     /************************** */
 
     /**************************/
@@ -51,6 +63,7 @@ try {
     /**************************/
 
     exports.getOwner = (req, res) => {
+        logger.info(debugLine());
         var admin = req.body.admin;
         EMPContract.methods.getOwner().call()
             .then(r => {
@@ -740,7 +753,7 @@ try {
                 req.app.result = r;
                 //console.log(r)
                 next();
-              // res.json({ statusCode: 200, result: req.app.result })
+                // res.json({ statusCode: 200, result: req.app.result })
             })
             .catch(r => {
                 console.log(r)
@@ -1003,6 +1016,6 @@ try {
 
 
 } catch (error) {
-    console.log("in catch")
+    logger.error(error)
     process.kill(process.pid, 'SIGTERM')
 }
