@@ -235,9 +235,7 @@ try {
         return Math.floor(Math.random() * 10);
     }
     exports.registerUser = async (req, res, next) => {
-        console.log('web3 registerUser')
         try {
-
             var rndInt = null;
             //usrID.push(0)
             if (usrID.includes(0)) {
@@ -248,28 +246,29 @@ try {
                     }
                     else {
                         usrID.push(rndInt)
-                        req.app.user = "user"
+                        req.app.locals.user = "user"
                         break;
                     }
                 }
             }
             else {
                 rndInt = 0;
-                req.app.user = "admin"
+                req.app.locals.user = "admin"
                 usrID.push(rndInt)
             }
-            console.log(rndInt)
+            //console.log(rndInt)
             var usrAddress = String((await web3.eth.getAccounts())[rndInt]);
             EMPContract.methods.registerUser(usrAddress).send({ from: usrAddress })
                 .then(r => {
                     //res.json({ statusCode: 200, data: { address: usrAddress, result: dataConfig.UserRegistration } });
                     usrID.push(rndInt);
-                    req.app.usrAddress = usrAddress;
-                    console.log("next")
+                    req.app.locals.usrAddress = usrAddress;
+                    //console.log("next")
                     next();
                 })
                 .catch(err => {
-                    console.log(err.message)
+                    logger.error(common.debugLine(err));
+                    logger.error(common.debugLine(common.generateReq(req)));
                     var errMsg = null;
                     if (String(err.message).includes("revert User already Exists")) {
                         errMsg = "User Exists. Try to Login"
@@ -280,7 +279,8 @@ try {
                     res.json({ statusCode: 500, result: errMsg });
                 });
         } catch (error) {
-            console.log(error)
+            logger.error(common.debugLine(error));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
         }
     }

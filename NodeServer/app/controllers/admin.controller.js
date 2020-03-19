@@ -7,7 +7,7 @@ try {
     var dice = require('dice-coefficient')
     const Notification = require('../models/notification.model');
     const logger = require('../../logger');
-
+    const common = require('../config/common');
 
     function debugLine(message) {
         let e = new Error();
@@ -39,6 +39,7 @@ try {
         }
         return jsonCmbd
     }
+
     exports.revertTransactions = (req, res, next) => {
         Notification.find({ deal: false, active: true })
             .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
@@ -480,8 +481,9 @@ try {
             //res.json(Date.now())
         } catch (error) {
             
-            logger.error(debugLine(error))
-            logger.error(debugLine(generateReq(req)))
+            logger.error(common.debugLine(error))
+            logger.error(common.debugLine(common.generateReq(req)))
+            //console.log(common.generateReq(req))
             res.json(Date.now())
            
         }

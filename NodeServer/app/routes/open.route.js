@@ -12,10 +12,5 @@ module.exports = (app) => {
     // validate Token
     app.get('/open/val', checkrequest.DecodeToken);
 
-   // app.get('/open/token', checkrequest.returnToken);
-
-    //test
-    app.get('/open/test', open.testme);
-
 
 }

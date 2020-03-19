@@ -1,40 +1,34 @@
 const jwt = require('jsonwebtoken');
 const argon2 = require('argon2');
-const tokenExpiry = "6h"
+const tokenExpiry = "1h"
 const errMsg = "something went wrong! try again"
 const User = require('../models/user.model.js');
 const logger = require('../../logger');
+const common = require('../config/common');
 
 /*
 https://github.com/ranisalt/node-argon2/wiki/Options
-
 */
-function debugLine(message) {
-    let e = new Error();
-    let frame = e.stack.split("\n")[2];
-    let fileName = frame.split(":")[1];
-    fileName=fileName.split("\\")[fileName.split("\\").length-1];
-    let lineNumber = frame.split(":")[2];
-    let functionName = frame.split(" ")[5];
-    return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
-}
-exports.checkUser=(req,res,next)=>{
+
+exports.checkUser = (req, res, next) => {
     User.findOne({ email: req.body.email })
-    .then(data=>{
-        if (data) {
-            // table has user so end the request
-            return res.json({ statusCode: 300, result: "Username already exists. Try Logging in" })
-        }
-        else{
-            next();
-        }
-    })
-    .catch(err => {
-        res.json({
-            statusCode: 500,
-            result: err.message || errMsg
+        .then(data => {
+            if (data) {
+                // table has user so end the request
+                return res.json({ statusCode: 300, result: "Username already exists. Try Logging in" })
+            }
+            else {
+                next();
+            }
         })
-    });
+        .catch(err => {
+            logger.error(common.debugLine(err))
+            logger.error(common.debugLine(common.generateReq(req)))
+            res.json({
+                statusCode: 500,
+                result: err.message || errMsg
+            })
+        });
 }
 
 
@@ -57,8 +51,8 @@ exports.registerUser = (req, res) => {
                         "password": hash,
                         "email": req.body.email,
                         "emailverified": false,
-                        "usertype": req.app.user,
-                        "address": req.app.usrAddress,
+                        "usertype": req.app.locals.user,
+                        "address": req.app.locals.usrAddress,
                         "signupmethod": "registration"
                     };
                     const user = new User(userObj);
@@ -71,12 +65,14 @@ exports.registerUser = (req, res) => {
                                 //"emailverified": data["emailverified"],
                                 "userType": data["usertype"]
                             }
-                            req.app.usrAddress = null;
-                            req.app.user = null;
+                            req.app.locals.usrAddress = null;
+                            req.app.locals.user = null;
                             let token = jwt.sign(objToken, req.secret, { expiresIn: tokenExpiry });
                             res.json({ statusCode: 200, result: objToken, "WWW-Authenticate": token });
                         })
                         .catch(err => {
+                            logger.error(common.debugLine(err))
+                            logger.error(common.debugLine(common.generateReq(req)))
                             res.json({
                                 statusCode: 500,
                                 result: err.message || errMsg
@@ -84,6 +80,8 @@ exports.registerUser = (req, res) => {
                         });
                 }
             } catch (err) {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: err.message || errMsg
@@ -91,6 +89,8 @@ exports.registerUser = (req, res) => {
             }
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: err.message || errMsg
@@ -125,6 +125,8 @@ exports.validateLogin = (req, res) => {
                 }
             } catch (err) {
                 // internal failure
+                logger.error(common.debugLine(err));
+                logger.error(common.debugLine(common.generateReq(req)));
                 res.json({
                     statusCode: 500, result: err.message || errMsg
                 })
@@ -132,15 +134,10 @@ exports.validateLogin = (req, res) => {
 
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500, result: err.message || errMsg
             })
         });
-};
-
-
-exports.testme = (req, res) => {
-   // console.log(req.body);
-   
-   res.json({ statusCode: 200, s: "trt" })
 };
