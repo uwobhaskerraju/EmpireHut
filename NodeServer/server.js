@@ -130,7 +130,7 @@ function logResponse(obj) {
                     if (typeof (body[entries[i]]) != "string") {
                         body[entries[i]] = String(body[entries[i]])
                     }
-                    body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
+                   // body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
                 }
             }
         }
@@ -161,8 +161,8 @@ function sanitizeRequest(req) {
         const entries = Object.keys(body)
         const inserts = {}
         for (let i = 0; i < entries.length; i++) {
-            req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
-            //req.body[entries[i]] = req.sanitize(Object.values(body)[i])
+            //req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
+            req.body[entries[i]] = req.sanitize(Object.values(body)[i])
         }
     }
 

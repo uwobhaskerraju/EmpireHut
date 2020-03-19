@@ -4,6 +4,17 @@ const Notification = require('../models/notification.model');
 const dataConfig = require('../config/data.config.js');
 var mongoose = require('mongoose');
 var dice = require('dice-coefficient')
+const logger = require('../../logger');
+
+function debugLine(message) {
+    let e = new Error();
+    let frame = e.stack.split("\n")[2];
+    let fileName = frame.split(":")[1];
+    fileName=fileName.split("\\")[fileName.split("\\").length-1];
+    let lineNumber = frame.split(":")[2];
+    let functionName = frame.split(" ")[5];
+    return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
+}
 
 exports.getUserDetails = (req, res, next) => {
     try {

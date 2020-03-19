@@ -3,12 +3,21 @@ const argon2 = require('argon2');
 const tokenExpiry = "6h"
 const errMsg = "something went wrong! try again"
 const User = require('../models/user.model.js');
+const logger = require('../../logger');
 
 /*
 https://github.com/ranisalt/node-argon2/wiki/Options
 
 */
-
+function debugLine(message) {
+    let e = new Error();
+    let frame = e.stack.split("\n")[2];
+    let fileName = frame.split(":")[1];
+    fileName=fileName.split("\\")[fileName.split("\\").length-1];
+    let lineNumber = frame.split(":")[2];
+    let functionName = frame.split(" ")[5];
+    return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
+}
 exports.checkUser=(req,res,next)=>{
     User.findOne({ email: req.body.email })
     .then(data=>{

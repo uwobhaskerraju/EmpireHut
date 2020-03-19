@@ -36,11 +36,16 @@ export class CreateassetComponent implements OnInit {
     let area = this.asset["area"]
     let address = this.asset["address"]
     let name = this.asset["name"]
+    let province = this.asset["province"]
+    let city = this.asset["city"]
+    let postalcode = this.asset["postalcode"]
 
  
-    if (!Boolean(area) || !Boolean(address) || !Boolean(name)) {
+    if (!Boolean(area) || !Boolean(address) || !Boolean(name)|| 
+    !Boolean(province)|| !Boolean(city)|| !Boolean(postalcode)) {
       errMsg = errMsg.concat("All fields are mandatory||")
       this._val.generateToast(errMsg)
+      this.loader=false;
     }
     else {
 
@@ -49,6 +54,12 @@ export class CreateassetComponent implements OnInit {
       errMsg = errMsg.concat(this._val.validateAssetAddress(String(address).trim()))
 
       errMsg = errMsg.concat(this._val.validateAssetName(String(name).trim()))
+
+      errMsg = errMsg.concat(this._val.validateAssetCity(String(city).trim()))
+
+      errMsg = errMsg.concat(this._val.validateAssetPostal(String(postalcode).trim()))
+
+      errMsg = errMsg.concat(this._val.validateAssetProvince(String(name).trim()))
 
       if (!Boolean(errMsg)) {
       //  console.log("true")

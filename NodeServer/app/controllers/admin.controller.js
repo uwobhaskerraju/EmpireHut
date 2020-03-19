@@ -6,7 +6,39 @@ try {
     var mongoose = require('mongoose');
     var dice = require('dice-coefficient')
     const Notification = require('../models/notification.model');
+    const logger = require('../../logger');
 
+
+    function debugLine(message) {
+        let e = new Error();
+        let frame = e.stack.split("\n")[2];
+        let fileName = frame.split(":")[1];
+        fileName = fileName.split("\\")[fileName.split("\\").length - 1];
+        let lineNumber = frame.split(":")[2];
+        let functionName = frame.split(" ")[5];
+        return functionName + ":" + fileName + ":" + lineNumber + " " + message;
+    }
+    function generateReq(req){
+        let jsonCmbd = '';
+        if(typeof(req.app.locals)!="undefined"){
+            if (Object.keys(req.app.locals).length > 1) {
+                delete req.app.locals.settings
+                const entries = Object.keys(req.app.locals)
+              
+                for (let index = 0; index < entries.length; index++) {
+                    jsonCmbd = jsonCmbd.concat("{" + entries[index] + ":" + Object.values(req.app.locals)[index] + "}")
+                }
+    
+            }
+        }
+        if(typeof(req.body)!="undefined"){
+                const entries = Object.keys(req.body)      
+                for (let index = 0; index < entries.length; index++) {
+                    jsonCmbd = jsonCmbd.concat("{" + entries[index] + ":" + Object.values(req.body)[index] + "}")
+                }
+        }
+        return jsonCmbd
+    }
     exports.revertTransactions = (req, res, next) => {
         Notification.find({ deal: false, active: true })
             .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
@@ -91,8 +123,8 @@ try {
         //generate a random string
         // blockchain has owner and tokenID
         //we store tokenID in mongo as well to link with the metadata
-
-        Asset.find({ address: req.body.address })
+        logger.info(debugLine())
+        Asset.find({ address: req.body.address, city: req.body.city, postalcode: req.body.postal, province: req.body.province })
             .then(r => {
                 console.log(r)
                 if (r.length == 0) {
@@ -107,6 +139,7 @@ try {
                 }
             })
             .catch(err => {
+                logger.error(debugLine(err))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -128,7 +161,10 @@ try {
             "picture": randomNumber() + ".jpg",
             "price": req.app.price,
             "area": req.body.area,
-            "latlong": req.app.latlong
+            "latlong": req.app.latlong,
+            "postalcode": req.body.postal,
+            "city": req.body.city,
+            "province": req.body.province
         };
         //console.log(assetObj);
         const asset = new Asset(assetObj);
@@ -423,10 +459,36 @@ try {
             });
     }
 
-    exports.someTest = (req, res) => {
-        //console.log(Date.now())
-        res.json(Date.now())
-    }
-} catch (error) {
+    exports.someTest = (req, res, next) => {
+        try {
+            logger.info(debugLine())
+            // res.json(Date.now())
+            req.app.locals.some = "e"
+            // throw 'sd'
+            next()
+        } catch (error) {
+            logger.error(debugLine(error))
+            res.json(Date.now())
+        }
 
+    }
+
+    exports.test2 = (req, res) => {
+        try {
+            logger.info(debugLine())
+            throw 'sd'
+            //res.json(Date.now())
+        } catch (error) {
+            
+            logger.error(debugLine(error))
+            logger.error(debugLine(generateReq(req)))
+            res.json(Date.now())
+           
+        }
+    }
+
+   
+} catch (error) {
+    logger.error(debugLine(error))
+    process.kill(process.pid, 'SIGTERM')
 }

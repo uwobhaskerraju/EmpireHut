@@ -37,7 +37,10 @@ export class AdminService {
     let jsnData = {
       name: value.name,
       address: value.address,
-      area: value.area
+      area: value.area,
+      postal:value.postalcode,
+      city:value.city,
+      province:value.province
     }
     return this._http.post(URL, jsnData);
   }

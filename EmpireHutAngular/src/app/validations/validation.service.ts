@@ -156,6 +156,58 @@ export class ValidationService {
     return errMsg
   }
 
+  validateAssetCity(city: any) {
+    //console.log(area);
+    if (String(city).length == 0) {
+      return "city cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(city)) {
+      if (String(city).length < 0 || String(city).length > 16) {
+        //console.log("here area")
+        errMsg = errMsg.concat('city should be max of 15 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('city cannot be empty||')
+    }
+    return errMsg;
+  }
+  validateAssetPostal(postal: any) {
+    //console.log(area);
+    if (String(postal).length == 0) {
+      return "postal cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(postal)) {
+      if (String(postal).length < 0 || String(postal).length > 7) {
+        //console.log("here area")
+        errMsg = errMsg.concat('postal should be max of 6 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('postal cannot be empty||')
+    }
+    return errMsg;
+  }
+
+  validateAssetProvince(province: any) {
+    //console.log(area);
+    if (String(province).length == 0) {
+      return "province cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(province)) {
+      if (String(province).length < 0 || String(province).length > 16) {
+        //console.log("here area")
+        errMsg = errMsg.concat('province should be max of 15 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('province cannot be empty||')
+    }
+    return errMsg;
+  }
   validateAssetArea(area: any) {
     //console.log(area);
     if (String(area).length == 0) {

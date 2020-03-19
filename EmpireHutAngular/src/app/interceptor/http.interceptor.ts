@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment.prod'
 //https://scotch.io/@vigneshsithirai/angular-6-7-http-client-interceptor-with-error-handling
 //https://github.com/vigneshsithirai/Angular-Interceptor/blob/master/src/app/interceptor/httpconfig.interceptor.ts
 //https://medium.com/@rubenvermeulen/running-angular-cli-over-https-with-a-trusted-certificate-4a0d5f92747a
+declare var M: any;
 @Injectable()
 export class MockHttpCalIInterceptor implements HttpInterceptor {
     constructor(private injector: Injector) { }
@@ -172,6 +173,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         status: error.status
                     };
                     console.log(error)
+                    M.toast({ html: 'Something went wrong', classes: 'rounded' })
                     return throwError(error);//url,message
                 })
 

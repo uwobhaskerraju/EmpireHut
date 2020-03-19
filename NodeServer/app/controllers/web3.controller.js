@@ -52,9 +52,10 @@ try {
         let e = new Error();
         let frame = e.stack.split("\n")[2];
         let fileName = frame.split(":")[1];
+        fileName=fileName.split("\\")[fileName.split("\\").length-1];
         let lineNumber = frame.split(":")[2];
         let functionName = frame.split(" ")[5];
-        return functionName + ":" + lineNumber + " " + message;
+        return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
     }
     /************************** */
 
@@ -1016,6 +1017,6 @@ try {
 
 
 } catch (error) {
-    logger.error(error)
+    logger.error(debugLine(error))
     process.kill(process.pid, 'SIGTERM')
 }

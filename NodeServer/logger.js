@@ -10,7 +10,7 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-const filename = path.join(logDir, 'results.log');
+const filename = path.join(logDir, new Date().toISOString().slice(0,10)+'_results.log');
 
 const logger = createLogger({
   level: 'debug',
@@ -31,7 +31,11 @@ const logger = createLogger({
       )
     )
   }),
-    new transports.File({ filename })]
+  new transports.File({
+    level:'error',
+    filename
+  })
+  ]
 });
 
 module.exports = logger;
