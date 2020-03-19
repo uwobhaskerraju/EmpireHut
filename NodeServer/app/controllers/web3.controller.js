@@ -30,7 +30,7 @@ try {
     var rootPath = path.join('.', 'build', 'contracts');
     var EMPTokenJSON = JSON.parse(fs.readFileSync(path.join(rootPath, 'EMPToken.json'), 'utf8'));
     var AssetToken = JSON.parse(fs.readFileSync(path.join(rootPath, 'AssetToken.json'), 'utf8'));
-
+    //logger.info(MPTokenJSON["networks"][process.env.blockNetwork]["address"])
     if (EMPTokenJSON === undefined || AssetToken === undefined) {
         throw 'JSON files are missing'
     }
@@ -38,10 +38,29 @@ try {
     const abi = EMPTokenJSON["abi"]
     const address = EMPTokenJSON["networks"][process.env.blockNetwork]["address"]
     const EMPContract = new web3.eth.Contract(abi, address)
-
+    //logger.info(address)
     const asset_abi = AssetToken["abi"]
     const asset_address = AssetToken["networks"][process.env.blockNetwork]["address"]
     const assetcontract = new web3.eth.Contract(asset_abi, asset_address)
+
+    web3.eth.getCode(address).then(r => {
+        if (r == '0x') {
+            throw 'Contracts not deployed'
+        }
+    })
+        .catch(rr => {
+            logger.error(debugLine(rr))
+            process.kill(process.pid, 'SIGTERM')
+        })
+    web3.eth.getCode(asset_address).then(r => {
+        if (r == '0x') {
+            throw 'Contracts not deployed'
+        }
+    })
+        .catch(rr => {
+            logger.error(debugLine(rr))
+            process.kill(process.pid, 'SIGTERM')
+        })
 
 
     abiDecoder.addABI(abi)
@@ -52,10 +71,10 @@ try {
         let e = new Error();
         let frame = e.stack.split("\n")[2];
         let fileName = frame.split(":")[1];
-        fileName=fileName.split("\\")[fileName.split("\\").length-1];
+        fileName = fileName.split("\\")[fileName.split("\\").length - 1];
         let lineNumber = frame.split(":")[2];
         let functionName = frame.split(" ")[5];
-        return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
+        return functionName + ":" + fileName + ":" + lineNumber + " " + message;
     }
     /************************** */
 

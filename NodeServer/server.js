@@ -125,12 +125,12 @@ function logResponse(obj) {
                     }
                 }
                 else {
-                    console.log(body[entries[i]])
-                    console.log("not an object")
+                   // console.log(body[entries[i]])
+                    //console.log("not an object")
                     if (typeof (body[entries[i]]) != "string") {
                         body[entries[i]] = String(body[entries[i]])
                     }
-                   // body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
+                    body[entries[i]] = CryptoJS.AES.encrypt(Object.values(body)[i], process.env.key).toString()
                 }
             }
         }
@@ -148,8 +148,7 @@ app.use(function (req, res, next) {
     const orig_send = res.send;
     res.send = function (arg) {
         var a = logResponse(arg);
-        // console.log("final response")
-        //console.log(a)
+        logger.info("This route was responded: " + req.url);
         orig_send.call(res, a);
     };
     next();
@@ -161,8 +160,8 @@ function sanitizeRequest(req) {
         const entries = Object.keys(body)
         const inserts = {}
         for (let i = 0; i < entries.length; i++) {
-            //req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
-            req.body[entries[i]] = req.sanitize(Object.values(body)[i])
+            req.body[entries[i]] = req.sanitize(CryptoJS.AES.decrypt(Object.values(body)[i], process.env.key).toString(CryptoJS.enc.Utf8))
+            //req.body[entries[i]] = req.sanitize(Object.values(body)[i])
         }
     }
 
@@ -191,19 +190,6 @@ function showTime() {
         }
     );
 }
-
-// function debugLine(message) {
-//     let e = new Error();
-//     let frame = e.stack.split("\n")[2];
-//     let fileName = frame.split(":")[1];
-//     let lineNumber = frame.split(":")[2];
-//     let functionName = frame.split(" ")[5];
-//     return functionName + ":" + lineNumber + " " + message;
-// }
-// function myCallingFunction() {
-//     logger.info(debugLine());
-// }
-// myCallingFunction();
 
 //setInterval(showTime, 1000 * 60 * 60 * 24); //1000 * 60 = 1min
 setInterval(showTime, 1000 * 60 * 60);
