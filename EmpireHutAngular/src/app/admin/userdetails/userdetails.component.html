@@ -19,21 +19,31 @@
 </div>
 <ng-template #fulldetails>
     <table class="striped">
-        <thead>
-            <tr>
+        <thead>   
                 <th>Name</th>
                 <th>Email</th>
-                <th>Total Assets</th>
-            </tr>
+                <th>Total Assets</th>    
         </thead>
-
         <tbody>
             <tr>
                 <td>{{userDetails["username"]}}</td>
                 <td>{{userDetails["email"]}}</td>
                 <td>{{userDetails["ownedTokens"]}}</td>
             </tr>
-
+        </tbody>
+    </table>
+    <table class="striped">
+        <thead>   
+                <th>Home Address</th>
+                <th>Home PostalCode</th>
+                <th>Home Phone</th>    
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{userDetails["homeaddress"]}}</td>
+                <td>{{userDetails["homepostalcode"]}}</td>
+                <td>{{userDetails["homePhone"]}}</td>
+            </tr>
         </tbody>
     </table>
 </ng-template>

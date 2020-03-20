@@ -18,8 +18,18 @@ export class UsersComponent implements OnInit {
     this._http.getAllUsers()
       .subscribe(r => {
         this.nousers=false;
+        
         if (r["statusCode"] == 200) {
-          this.allUsers = r["result"]
+          if (r["result"].length == undefined) {
+            var temp = [];
+            temp.push(r["result"])
+            this.allUsers = temp;
+          }
+          else{
+            this.allUsers = r["result"]
+          }
+         // this.allUsers = r["result"]
+         // console.log(this.allUsers)
         }
       });
   }

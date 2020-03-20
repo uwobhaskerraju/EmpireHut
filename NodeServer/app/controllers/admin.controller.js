@@ -165,7 +165,7 @@ try {
     exports.getAssetDetails = (req, res, next) => {
         logger.info(common.debugLine(''))
         var assetID = mongoose.Types.ObjectId(req.params.id)
-       
+
         Asset.find({ _id: assetID })
             .then(r => {
                 ////console.log(r)
@@ -365,7 +365,7 @@ try {
     exports.getAllUserDetails = (req, res, next) => {
         logger.info(common.debugLine(''))
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { _id: req.params.id }] })
-            .select({ username: 1, email: 1, _id: 1, address: 1 })
+            .select({ username: 1, email: 1, _id: 1, address: 1, homeaddress: 1, homepostalcode: 1, homePhone: 1 })
             .then(r => {
                 //res.json({ statusCode: 200, result: r });
                 if (r.length > 0) {
@@ -480,16 +480,16 @@ try {
     //         throw 'sd'
     //         //res.json(Date.now())
     //     } catch (error) {
-            
+
     //         logger.error(common.debugLine(error))
     //         logger.error(common.debugLine(common.generateReq(req)))
     //         ////console.log(common.generateReq(req))
     //         res.json(Date.now())
-           
+
     //     }
     // }
 
-   
+
 } catch (error) {
     logger.error(common.debugLine(error))
     process.kill(process.pid, 'SIGTERM')

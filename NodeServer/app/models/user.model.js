@@ -11,7 +11,8 @@ var UserSchema = mongoose.Schema({
     usertype: { type: String, default: "user" },
     signupmethod: { type: String, required: true },
     homeaddress: { type: String ,default:'NA'},
-    homepostalcode: { type: String ,default:'NA'}
+    homepostalcode: { type: String ,default:'NA'},
+    homePhone:{type:String, maxlength: 10,default:'NA'}
 }, {
     versionKey: false
 });
