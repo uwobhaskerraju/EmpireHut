@@ -9,7 +9,9 @@ var UserSchema = mongoose.Schema({
     address: { type: String, required: true },
     active: { type: Boolean, default: true },
     usertype: { type: String, default: "user" },
-    signupmethod: { type: String, required: true }
+    signupmethod: { type: String, required: true },
+    homeaddress: { type: String ,default:'NA'},
+    homepostalcode: { type: String ,default:'NA'}
 }, {
     versionKey: false
 });

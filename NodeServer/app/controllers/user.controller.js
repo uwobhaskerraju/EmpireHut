@@ -5,38 +5,34 @@ const dataConfig = require('../config/data.config.js');
 var mongoose = require('mongoose');
 var dice = require('dice-coefficient')
 const logger = require('../../logger');
+const common = require('../config/common');
 
-function debugLine(message) {
-    let e = new Error();
-    let frame = e.stack.split("\n")[2];
-    let fileName = frame.split(":")[1];
-    fileName=fileName.split("\\")[fileName.split("\\").length-1];
-    let lineNumber = frame.split(":")[2];
-    let functionName = frame.split(" ")[5];
-    return functionName + ":" +fileName  + ":" + lineNumber + " " + message;
-}
 
 exports.getUserDetails = (req, res, next) => {
+    logger.info(common.debugLine(''))
     try {
 
-        console.log("getUserDetails")
+        //console.log("getUserDetails")
         var address = String(req.body.address).trim();
-        console.log(address)
+        //console.log(address)
         User.find({ address: address })
             .select({ username: 1, _id: 0, email: 1, address: 1 })
             .then(r => {
-                console.log(r)
+                //console.log(r)
                 req.app.user = r;
                 next();
             })
             .catch(err => {
+                logger.error(common.debugLine(err));
+                logger.error(common.debugLine(common.generateReq(req)));
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
                 })
             });
     } catch (error) {
-        console.log(error)
+        logger.error(common.debugLine(error));
+        logger.error(common.debugLine(common.generateReq(req)));
         res.json({
             statusCode: 500,
             result: dataConfig.GlobalErrMsg
@@ -45,13 +41,13 @@ exports.getUserDetails = (req, res, next) => {
 };
 
 exports.getAllAssets = async (req, res) => {
-    console.log("getAllAssets")
+    logger.info(common.debugLine(''))
     var result = [];
     const details = async () => {
         var tokenIDs = req.app.tokenIDs
         for (var token of tokenIDs) {
             const ret = await getDetails(token);
-            // console.log(ret)
+            // //console.log(ret)
             if (ret.length > 0) {
                 var filtered = ret.filter(function () { return true });
                 result.push(filtered[0]);
@@ -76,6 +72,8 @@ exports.getAllAssets = async (req, res) => {
         res.json({ statusCode: 200, result: result })
     })
         .catch(r => {
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -91,6 +89,7 @@ function generateKeyValueFromBody(body) {
     return inserts;
 }
 exports.addNotifications = (req, res, next) => {
+    logger.info(common.debugLine(''))
     // proposal request data is stored on mongoDB only since, it is temporary...
     // the only thing that goes into blockchain is the amount for token(EMP) tracking
     var obj = new Notification(generateKeyValueFromBody(req.body));
@@ -114,6 +113,8 @@ exports.addNotifications = (req, res, next) => {
             }
         })
         .catch(r => {
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -123,6 +124,7 @@ exports.addNotifications = (req, res, next) => {
 //get asset token
 
 exports.getAssetToken = (req, res, next) => {
+    logger.info(common.debugLine(''))
     var assetID = req.body.assetID;//mongoID
     Asset.find({ _id: assetID })
         .select({ tokenID: 1, _id: 0 })
@@ -130,7 +132,7 @@ exports.getAssetToken = (req, res, next) => {
             if (r != null || r != undefined) {
                 req.app.tokenID = r[0]["tokenID"];
                 req.app.transferType = "Property Purchase"
-                console.log("next")
+                //console.log("next")
                 next();
                 //res.json(r[0]);
             }
@@ -142,7 +144,8 @@ exports.getAssetToken = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.log(err.message)
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -152,18 +155,18 @@ exports.getAssetToken = (req, res, next) => {
 
 //end of asset token
 exports.getUserNameFrmAddress = async (req, res) => {
-    console.log("getUserNameFrmAddress")
+    logger.info(common.debugLine(''))
     var fnlRes = [];
     var getData = (ad) => {
         return new Promise((resolve, reject) => {
             try {
-                // console.log(ad)
+                // //console.log(ad)
                 regex = ad.map(function (e) { return new RegExp(e, "i"); });
                 User.find({ address: { $in: regex } })
                     //User.find({ address: ad1 })
                     .select({ username: 1, _id: 0, address: 1 })
                     .then(r => {
-                        // console.log(r)
+                        // //console.log(r)
                         resolve(r);
                     })
                     .catch(r => {
@@ -178,7 +181,7 @@ exports.getUserNameFrmAddress = async (req, res) => {
     var details = async () => {
 
         var result = req.app.result;
-        // console.log(result)
+        // //console.log(result)
         //var reldup = result;
         req.app.result = null;
         var ret = [];
@@ -192,7 +195,7 @@ exports.getUserNameFrmAddress = async (req, res) => {
             if (String(ad2).includes('0x')) {
                 ad.push(String(ad2).toLowerCase())
             }
-            //console.log(ad1 + " " + ad2)
+            ////console.log(ad1 + " " + ad2)
             if (ad.length > 0) {
                 var ret = await getData(ad);
                 for (var x of ret) {
@@ -207,15 +210,16 @@ exports.getUserNameFrmAddress = async (req, res) => {
 
         }
         return result.reverse();
-        //console.log(result)
+        ////console.log(result)
     }
 
     details().then(r => {
-        //console.log(r)
+        ////console.log(r)
         res.json({ statusCode: 200, result: r })
     })
         .catch(r => {
-            console.log(r)
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -226,13 +230,13 @@ exports.getUserNameFrmAddress = async (req, res) => {
 
 //get asset details
 exports.getAssetDetails = (req, res, next) => {
-    console.log("user getAssetDetails")
-    //console.log(req.params.id)
+    logger.info(common.debugLine(''))
+    ////console.log(req.params.id)
     var assetID = mongoose.Types.ObjectId(req.params.id)
-    // console.log(assetID)
+    // //console.log(assetID)
     Asset.find({ _id: assetID, hidden: false })
         .then(r => {
-            //console.log(r)
+            ////console.log(r)
             if (r != null || r != undefined) {
                 req.app.assetD = r;
                 next();
@@ -245,6 +249,8 @@ exports.getAssetDetails = (req, res, next) => {
             }
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -252,19 +258,23 @@ exports.getAssetDetails = (req, res, next) => {
         });
 };
 exports.toggleAsset = (req, res) => {
+    logger.info(common.debugLine(''))
     var assetID = req.body.id
     var state = req.body.state
     state = (state == 1) ? "true" : "false";
-    console.log(state)
+    //console.log(state)
     Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
         .then(r => {
             res.json({ statusCode: 200, result: true });
         })
         .catch(r => {
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({ statusCode: 500, result: false });
         })
 }
 exports.getUserAssets = (req, res) => {
+    logger.info(common.debugLine(''))
     var tokenIDs = req.app.tokenIDs
     Asset.find({ tokenID: { $in: tokenIDs } })
         .select({ picture: 1, name: 1, _id: 1 })
@@ -272,6 +282,8 @@ exports.getUserAssets = (req, res) => {
             res.json({ statusCode: 200, result: r })
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -280,6 +292,7 @@ exports.getUserAssets = (req, res) => {
 }
 
 exports.getUserAddress = (req, res, next) => {
+    logger.info(common.debugLine(''))
     var id = req.params.id
     User.find({ _id: mongoose.Types.ObjectId(id) })
         .select({ address: 1, _id: 0 })
@@ -288,6 +301,8 @@ exports.getUserAddress = (req, res, next) => {
             next();
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -296,7 +311,7 @@ exports.getUserAddress = (req, res, next) => {
 };
 
 exports.getUserName = (req, res) => {
-    console.log("user getUserName")
+    logger.info(common.debugLine(''))
     var asset = req.app.assetD[0];
     User.find({ address: asset["owner"] })
         .select({ username: 1, _id: 0, address: 1 })
@@ -306,10 +321,12 @@ exports.getUserName = (req, res) => {
             delete asset.tokenID
             asset.owner = r[0].username;
             asset.ownerAdd = r[0].address;
-            //console.log(asset)
+            ////console.log(asset)
             res.json({ statusCode: 200, result: asset });
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -319,6 +336,7 @@ exports.getUserName = (req, res) => {
 
 
 exports.getAllProposalUsers = (req, res) => {
+    logger.info(common.debugLine(''))
     var assets = req.app.notassets;
     var users = [];
     function onlyUnique(value, index, self) {
@@ -332,9 +350,9 @@ exports.getAllProposalUsers = (req, res) => {
     User.find({ address: { $in: users } })
         .select({ username: 1, address: 1, _id: 0 })
         .then(r => {
-            // console.log(r)
+            // //console.log(r)
             for (var asset of assets) {
-                //console.log(asset)
+                ////console.log(asset)
                 for (var x of r) {
                     if (String(x["address"]).toLowerCase() == String(asset["owner"]).toLowerCase()) {
                         asset["owner_username"] = x["username"]
@@ -347,7 +365,8 @@ exports.getAllProposalUsers = (req, res) => {
             res.json({ statusCode: 200, result: assets })
         })
         .catch(err => {
-            console.log(err)
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -358,7 +377,7 @@ exports.getAllProposalUsers = (req, res) => {
 
 
 exports.getAllUserProposals = (req, res, next) => {
-    console.log("getAllUserProposals")
+    logger.info(common.debugLine(''))
     var usrAddress = req.params.id;
 
     Notification.aggregate([
@@ -400,6 +419,8 @@ exports.getAllUserProposals = (req, res, next) => {
 
         })
         .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -409,6 +430,7 @@ exports.getAllUserProposals = (req, res, next) => {
 }
 
 exports.rejectProposal = (req, res, next) => {
+    logger.info(common.debugLine(''))
     var assetID = req.body.assetID;
     var notID = req.body.notID;
     req.app.transferType = "[Rejected] Purchase Proposal"
@@ -417,7 +439,8 @@ exports.rejectProposal = (req, res, next) => {
             next();
         })
         .catch(err => {
-            console.log(err)
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -426,20 +449,22 @@ exports.rejectProposal = (req, res, next) => {
 };
 
 exports.toggleNotification = (req, res, next) => {
-    console.log("toggleNotification")
+    logger.info(common.debugLine(''))
     var data = req.app.proposal;
     // Notification.updateMany({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
     //     .then(r => {
-    // console.log(r)
+    // //console.log(r)
     Notification.updateOne({ _id: mongoose.Types.ObjectId(data["_id"]) }, { $set: { deal: true, active: false } })
         .then(r => {
-            //console.log(r)
+            ////console.log(r)
             //req.app.proposal = null;
-            //console.log(req.app)
+            ////console.log(req.app)
             next();
         })
         .catch(err => {
-            console.log(err)
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            //console.log(err)
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -447,7 +472,7 @@ exports.toggleNotification = (req, res, next) => {
         });
     // })
     // .catch(err => {
-    //     console.log(err)
+    //     //console.log(err)
     //     res.json({
     //         statusCode: 500,
     //         result: dataConfig.GlobalErrMsg
@@ -455,6 +480,7 @@ exports.toggleNotification = (req, res, next) => {
     // });
 };
 exports.getSearchedAssets = (req, res) => {
+    logger.info(common.debugLine(''))
     var threshold = 0.25
     var q = req.body.value
     var ownedTokens = req.app.tokenIDs
@@ -462,9 +488,9 @@ exports.getSearchedAssets = (req, res) => {
         .select({ "name": 1, "_id": 1, "picture": 1 })
         .then(data => {
             var fnlJson = []
-            //console.log(data)
+            ////console.log(data)
             data.forEach(d => {
-                //console.log(Object.keys(d.toObject()))
+                ////console.log(Object.keys(d.toObject()))
                 Object.keys(d.toObject()).forEach(function (key) {
                     // console.table('Key : ' + key + ', Value : ' + d[key])
                     if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
@@ -472,14 +498,15 @@ exports.getSearchedAssets = (req, res) => {
                     }
                 })
                 //return false
-                //console.log("next loop")
+                ////console.log("next loop")
             })
             fnlJson = [...new Set(fnlJson)];
-            //console.log("ou loop")
+            ////console.log("ou loop")
             res.json({ statusCode: 200, result: fnlJson })
         })
         .catch(r => {
-            console.log(r)
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg
@@ -487,13 +514,14 @@ exports.getSearchedAssets = (req, res) => {
         });
 };
 exports.approveProposal = (req, res, next) => {
+    logger.info(common.debugLine(''))
     //check whether any amount has been transferred to admin
-    console.log("approveProposal")
+    //console.log("approveProposal")
 
     //check whether the proposal expired or not
     //finally deactivate all other proposals on this asset
     var notID = req.body.notID;
-    console.log(notID)
+    //console.log(notID)
     Notification.aggregate([
         { $match: { $and: [{ "active": true }, { _id: mongoose.Types.ObjectId(notID) }] } }
         //{ $match: { _id: mongoose.Types.ObjectId(notID) } }
@@ -522,7 +550,7 @@ exports.approveProposal = (req, res, next) => {
         }
     ])
         .then(data => {
-            //console.log(data)
+            ////console.log(data)
             if (data.length > 0) {
 
                 req.app.proposal = data[0];
@@ -531,7 +559,7 @@ exports.approveProposal = (req, res, next) => {
                 // req.body.amount = data["proposedAmount"]
                 req.app.transferType = "[Approved] Purchase Proposal"
                 req.app.tokenID = data[0]["tokenID"]
-                //console.log(req.app.tokenID)
+                ////console.log(req.app.tokenID)
                 //res.json(data);
                 next()
             }
@@ -546,7 +574,8 @@ exports.approveProposal = (req, res, next) => {
             //res.json(data)
         })
         .catch(err => {
-            console.log(err)
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
             res.json({
                 statusCode: 500,
                 result: dataConfig.GlobalErrMsg

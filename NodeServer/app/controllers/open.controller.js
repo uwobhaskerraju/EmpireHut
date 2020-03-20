@@ -11,6 +11,7 @@ https://github.com/ranisalt/node-argon2/wiki/Options
 */
 
 exports.checkUser = (req, res, next) => {
+    logger.info(common.debugLine(''))
     User.findOne({ email: req.body.email })
         .then(data => {
             if (data) {
@@ -33,10 +34,10 @@ exports.checkUser = (req, res, next) => {
 
 
 exports.registerUser = (req, res) => {
-
+    logger.info(common.debugLine(''))
     User.findOne({ email: req.body.email })
         .then(async data => {
-            console.log('open registerUser')
+            //console.log('open registerUser')
             try {
                 if (data) {
                     // table has user so end the request
@@ -101,6 +102,7 @@ exports.registerUser = (req, res) => {
 
 
 exports.validateLogin = (req, res) => {
+    logger.info(common.debugLine(''))
     User.findOne({ email: req.body.email })
         .then(async data => {
             try {

@@ -9,58 +9,28 @@ try {
     const logger = require('../../logger');
     const common = require('../config/common');
 
-    function debugLine(message) {
-        let e = new Error();
-        let frame = e.stack.split("\n")[2];
-        let fileName = frame.split(":")[1];
-        fileName = fileName.split("\\")[fileName.split("\\").length - 1];
-        let lineNumber = frame.split(":")[2];
-        let functionName = frame.split(" ")[5];
-        return functionName + ":" + fileName + ":" + lineNumber + " " + message;
-    }
-    function generateReq(req){
-        let jsonCmbd = '';
-        if(typeof(req.app.locals)!="undefined"){
-            if (Object.keys(req.app.locals).length > 1) {
-                delete req.app.locals.settings
-                const entries = Object.keys(req.app.locals)
-              
-                for (let index = 0; index < entries.length; index++) {
-                    jsonCmbd = jsonCmbd.concat("{" + entries[index] + ":" + Object.values(req.app.locals)[index] + "}")
-                }
-    
-            }
-        }
-        if(typeof(req.body)!="undefined"){
-                const entries = Object.keys(req.body)      
-                for (let index = 0; index < entries.length; index++) {
-                    jsonCmbd = jsonCmbd.concat("{" + entries[index] + ":" + Object.values(req.body)[index] + "}")
-                }
-        }
-        return jsonCmbd
-    }
-
     exports.revertTransactions = (req, res, next) => {
+        logger.info(common.debugLine(''))
         Notification.find({ deal: false, active: true })
             .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
             .then(nots => {
-                console.log(nots.length)
+                ////console.log(nots.length)
                 var fnlRes = [];
                 if (nots.length > 0) {
                     for (var not of nots) {
                         // // To calculate the time difference of two dates 
                         // var Difference_In_Time = (new Date()).getTime() - (new Date(not["datetime"])).getTime();
-                        // // console.log(Difference_In_Time)
+                        // // //console.log(Difference_In_Time)
                         // // To calculate the no. of days between two dates 
                         // var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-                        // console.log(Difference_In_Days)
+                        // //console.log(Difference_In_Days)
                         // if (Math.floor(Difference_In_Days) >= 1) {
                         fnlRes.push({ _to: not["proposalAddr"], _value: not["proposedAmount"], _id: not["_id"], done: false })
                         // }
                     }
                     if (fnlRes.length > 0) {
                         req.app.result = fnlRes;
-                        console.log(fnlRes.length);
+                        ////console.log(fnlRes.length);
                         next();
                         //  res.json({ statusCode: 200, result: "done" })
                     }
@@ -75,6 +45,8 @@ try {
                 //res.json(fnlRes);
             })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -83,7 +55,7 @@ try {
     }
 
     exports.revertTransUpdate = (req, res) => {
-        console.log("revert ")
+        logger.info(common.debugLine(''))
         const updateNotification = (not) => {
             return new Promise((resolve, reject) => {
                 Notification.updateOne({ _id: mongoose.Types.ObjectId(not["_id"]) }, { $set: { active: false, deal: false } })
@@ -97,7 +69,7 @@ try {
         }
         const noti = async () => {
             for (var not of req.app.result) {
-                console.log(not)
+                //console.log(not)
                 if (not["done"]) {
                     await updateNotification(not);
                 }
@@ -111,6 +83,8 @@ try {
             }
         })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -124,10 +98,10 @@ try {
         //generate a random string
         // blockchain has owner and tokenID
         //we store tokenID in mongo as well to link with the metadata
-        logger.info(debugLine())
+        logger.info(common.debugLine(''))
         Asset.find({ address: req.body.address, city: req.body.city, postalcode: req.body.postal, province: req.body.province })
             .then(r => {
-                console.log(r)
+                ////console.log(r)
                 if (r.length == 0) {
                     var rndStr = shortid.generate();
                     req.app.randomStr = rndStr;
@@ -140,7 +114,8 @@ try {
                 }
             })
             .catch(err => {
-                logger.error(debugLine(err))
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -152,6 +127,7 @@ try {
         return Math.floor(Math.random() * 9) + 1;
     }
     exports.insertAsset = (req, res) => {
+        logger.info(common.debugLine(''))
         var tokenID = req.app.tokenID;
         //var user = req.body.userID;
         var assetObj = {
@@ -167,14 +143,16 @@ try {
             "city": req.body.city,
             "province": req.body.province
         };
-        //console.log(assetObj);
+        ////console.log(assetObj);
         const asset = new Asset(assetObj);
         asset.save()
             .then(data => {
-                //console.log(data)
+                ////console.log(data)
                 res.json({ statusCode: 200, result: dataConfig.AssetRegistration });
             })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -185,20 +163,21 @@ try {
 
     //get asset details
     exports.getAssetDetails = (req, res, next) => {
-        //console.log(req.params.id)
-        console.log("getAssetDetails")
+        logger.info(common.debugLine(''))
         var assetID = mongoose.Types.ObjectId(req.params.id)
-        //console.log(assetID)
+       
         Asset.find({ _id: assetID })
             .then(r => {
-                //console.log(r)
+                ////console.log(r)
                 if (r != null || r != undefined) {
                     req.app.assetD = r;
-                    console.log("next")
+                    //console.log("next")
                     next();
                 }
             })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -206,15 +185,18 @@ try {
             });
     };
     exports.getUserDetails = (req, res, next) => {
+        logger.info(common.debugLine(''))
         var address = req.body.address;
         User.find({ address: address })
             .select({ username: 1, _id: 0, email: 1, address: 1 })
             .then(r => {
-                // console.log(r)
+                // //console.log(r)
                 req.app.user = r;
                 next();
             })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -222,7 +204,7 @@ try {
             });
     };
     exports.getUserName = (req, res) => {
-
+        logger.info(common.debugLine(''))
         var asset = req.app.assetD[0];
         User.find({ address: asset["owner"] })
             .select({ username: 1, _id: 0 })
@@ -232,10 +214,12 @@ try {
                 //asset = asset.toObject();
                 delete asset.tokenID
                 asset.owner = r[0].username;
-                //console.log(asset)
+                ////console.log(asset)
                 res.json({ statusCode: 200, result: asset });
             })
             .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -247,12 +231,13 @@ try {
     // get all assets
     //https://www.coreycleary.me/why-does-async-await-in-a-foreach-not-actually-await/
     exports.getAllAssets = async (req, res) => {
+        logger.info(common.debugLine(''))
         var result = [];
         const details = async () => {
             var tokenIDs = req.app.tokenIDs
             for (var token of tokenIDs) {
                 const ret = await getDetails(token);
-                // console.log(ret)
+                // //console.log(ret)
                 if (ret.length > 0) {
                     var filtered = ret.filter(function () { return true });
                     result.push(filtered[0]);
@@ -277,6 +262,8 @@ try {
             res.json({ statusCode: 200, result: result })
         })
             .catch(r => {
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -286,12 +273,15 @@ try {
     //end of get asset details
 
     exports.getAllUsers = (req, res) => {
+        logger.info(common.debugLine(''))
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }] })
             .select({ username: 1, email: 1, _id: 1 })
             .then(r => {
                 res.json({ statusCode: 200, result: r });
             })
             .catch(r => {
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -300,18 +290,18 @@ try {
     };
 
     exports.getUserNameFrmAddress = async (req, res) => {
-        console.log("getUserNameFrmAddress")
+        logger.info(common.debugLine(''))
         var fnlRes = [];
         var getData = (ad) => {
             return new Promise((resolve, reject) => {
                 try {
-                    // console.log(ad)
+                    // //console.log(ad)
                     regex = ad.map(function (e) { return new RegExp(e, "i"); });
                     User.find({ address: { $in: regex } })
                         //User.find({ address: ad1 })
                         .select({ username: 1, _id: 0, address: 1 })
                         .then(r => {
-                            // console.log(r)
+                            // //console.log(r)
                             resolve(r);
                         })
                         .catch(r => {
@@ -326,7 +316,7 @@ try {
         var details = async () => {
 
             var result = req.app.result;
-            // console.log(result)
+            // //console.log(result)
             //var reldup = result;
             req.app.result = null;
             var ret = [];
@@ -340,7 +330,7 @@ try {
                 if (String(ad2).includes('0x')) {
                     ad.push(String(ad2).toLowerCase())
                 }
-                //console.log(ad1 + " " + ad2)
+                ////console.log(ad1 + " " + ad2)
                 if (ad.length > 0) {
                     var ret = await getData(ad);
                     for (var x of ret) {
@@ -355,15 +345,16 @@ try {
 
             }
             return result.reverse();
-            //console.log(result)
+            ////console.log(result)
         }
 
         details().then(r => {
-            //console.log(r)
+            ////console.log(r)
             res.json({ statusCode: 200, result: r })
         })
             .catch(r => {
-                console.log(r)
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -372,6 +363,7 @@ try {
             });
     }
     exports.getAllUserDetails = (req, res, next) => {
+        logger.info(common.debugLine(''))
         User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { _id: req.params.id }] })
             .select({ username: 1, email: 1, _id: 1, address: 1 })
             .then(r => {
@@ -386,6 +378,8 @@ try {
 
             })
             .catch(r => {
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -394,15 +388,16 @@ try {
     };
 
     exports.getSearchedAssets = (req, res) => {
+        logger.info(common.debugLine(''))
         var threshold = 0.25
         var q = req.params.id
         Asset.find()
             .select({ "name": 1, "_id": 1, "picture": 1 })
             .then(data => {
                 var fnlJson = []
-                //console.log(data)
+                ////console.log(data)
                 data.forEach(d => {
-                    //console.log(Object.keys(d.toObject()))
+                    ////console.log(Object.keys(d.toObject()))
                     Object.keys(d.toObject()).forEach(function (key) {
                         // console.table('Key : ' + key + ', Value : ' + d[key])
                         if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
@@ -410,14 +405,15 @@ try {
                         }
                     })
                     //return false
-                    //console.log("next loop")
+                    ////console.log("next loop")
                 })
                 fnlJson = [...new Set(fnlJson)];
-                //console.log("ou loop")
+                ////console.log("ou loop")
                 res.json({ statusCode: 200, result: fnlJson })
             })
             .catch(r => {
-                console.log(r)
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -426,21 +422,24 @@ try {
     };
 
     exports.toggleAsset = (req, res) => {
+        logger.info(common.debugLine(''))
         var assetID = req.body.id
         var state = req.body.state
         state = (state == 1) ? "true" : "false";
-        console.log(state)
+        //console.log(state)
         Asset.updateOne({ _id: mongoose.Types.ObjectId(assetID) }, { $set: { hidden: state } })
             .then(r => {
                 res.json({ statusCode: 200, result: true });
             })
             .catch(r => {
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({ statusCode: 500, result: false });
             })
     }
 
     exports.getuserAssets = (req, res) => {
-        //res.json(req.app.details)
+        logger.info(common.debugLine(''))
         var details = req.app.details;
         Asset.find({ tokenID: { $in: details.tokenIds } })
             .select({ name: 1, _id: 1 })
@@ -452,7 +451,8 @@ try {
 
             })
             .catch(r => {
-                console.log(r)
+                logger.error(common.debugLine(r))
+                logger.error(common.debugLine(common.generateReq(req)))
                 res.json({
                     statusCode: 500,
                     result: dataConfig.GlobalErrMsg
@@ -460,37 +460,37 @@ try {
             });
     }
 
-    exports.someTest = (req, res, next) => {
-        try {
-            logger.info(debugLine())
-            // res.json(Date.now())
-            req.app.locals.some = "e"
-            // throw 'sd'
-            next()
-        } catch (error) {
-            logger.error(debugLine(error))
-            res.json(Date.now())
-        }
+    // exports.someTest = (req, res, next) => {
+    //     try {
+    //         logger.info(debugLine())
+    //         // res.json(Date.now())
+    //         req.app.locals.some = "e"
+    //         // throw 'sd'
+    //         next()
+    //     } catch (error) {
+    //         logger.error(debugLine(error))
+    //         res.json(Date.now())
+    //     }
 
-    }
+    // }
 
-    exports.test2 = (req, res) => {
-        try {
-            logger.info(debugLine())
-            throw 'sd'
-            //res.json(Date.now())
-        } catch (error) {
+    // exports.test2 = (req, res) => {
+    //     try {
+    //         logger.info(debugLine())
+    //         throw 'sd'
+    //         //res.json(Date.now())
+    //     } catch (error) {
             
-            logger.error(common.debugLine(error))
-            logger.error(common.debugLine(common.generateReq(req)))
-            //console.log(common.generateReq(req))
-            res.json(Date.now())
+    //         logger.error(common.debugLine(error))
+    //         logger.error(common.debugLine(common.generateReq(req)))
+    //         ////console.log(common.generateReq(req))
+    //         res.json(Date.now())
            
-        }
-    }
+    //     }
+    // }
 
    
 } catch (error) {
-    logger.error(debugLine(error))
+    logger.error(common.debugLine(error))
     process.kill(process.pid, 'SIGTERM')
 }
