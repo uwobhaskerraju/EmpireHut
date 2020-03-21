@@ -5,6 +5,8 @@ module.exports = (app) => {
 
     app.post('/user/balance', checkrequest.CheckToken, web3.getBalance);
 
+    app.get('/user/userdetails/:id', checkrequest.CheckToken, user.getAllUserDetails, web3.getUserAssetCount, user.getuserAssets);
+
     app.post('/user/udetails', checkrequest.CheckToken, user.getUserDetails, web3.getUserDetails);
 
     app.post('/user/admin', checkrequest.CheckToken, web3.getOwner);
@@ -37,12 +39,14 @@ module.exports = (app) => {
     app.get('/user/assettrans/:id',checkrequest.CheckToken,user.getAssetDetails,web3.getAssetTransactions,user.getUserNameFrmAddress);
 
     app.get('/user/count/:id',checkrequest.CheckToken,web3.getUserTokenCount)
+
+    app.post('/user/update',checkrequest.CheckToken,user.updateUserDetails)
     
     //test
-    app.get('/balance', web3.testblocks);
+    // app.get('/balance', web3.testblocks);
 
-    app.get('/testGas', web3.testEvents);
+    // app.get('/testGas', web3.testEvents);
 
-    app.get('/logs', web3.testLogs);
+    // app.get('/logs', web3.testLogs);
 
 }

@@ -40,13 +40,13 @@ export class OpenService {
   }
 
   validateToken() {
-    console.log("validate")
+    //console.log("validate")
     try {
       let URL = environment.apiBaseURL + 'open/val'
-      console.log(URL)
+     // console.log(URL)
       return this.http.get(URL);
     } catch (error) {
-      console.log(error)
+     // console.log(error)
     }
 
   }

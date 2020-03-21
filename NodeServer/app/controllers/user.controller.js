@@ -16,7 +16,7 @@ exports.getUserDetails = (req, res, next) => {
         var address = String(req.body.address).trim();
         //console.log(address)
         User.find({ address: address })
-            .select({ username: 1, _id: 0, email: 1, address: 1 })
+            .select({ username: 1, _id: 0, email: 1, address: 1, homephone: 1, homeaddress: 1, homepostalcode: 1 })
             .then(r => {
                 //console.log(r)
                 req.app.user = r;
@@ -39,6 +39,80 @@ exports.getUserDetails = (req, res, next) => {
         })
     }
 };
+
+exports.updateUserDetails=(req,res)=>{
+    logger.info(common.debugLine(''))
+    User.updateOne({address:req.body.address},{$set:{homephone:req.body.phone,homeaddress:req.body.homeaddress,homepostalcode:req.body.postal}})
+    .then(r=>{
+       // console.log(r)
+        if(r["nModified"]>0){
+            res.json({
+                statusCode: 200,
+                result: true
+            })
+        }
+        else{
+            res.json({
+                statusCode: 300,
+                result: "something went wrong"
+            })
+        }
+    })
+    .catch(err => {
+        logger.error(common.debugLine(err));
+        logger.error(common.debugLine(common.generateReq(req)));
+        res.json({
+            statusCode: 500,
+            result: dataConfig.GlobalErrMsg
+        })
+    });
+}
+
+exports.getAllUserDetails = (req, res, next) => {
+    logger.info(common.debugLine(''))
+    User.find({ $and: [{ usertype: { $ne: "admin" } }, { active: true }, { address: req.params.id }] })
+        .select({ username: 1, email: 1, _id: 1, address: 1, homeaddress: 1, homepostalcode: 1, homePhone: 1 })
+        .then(r => {
+            //res.json({ statusCode: 200, result: r });
+            if (r.length > 0) {
+                req.app.details = r;
+                next();
+            }
+            else {
+                res.json({ statusCode: 300, result: "Found Nothing" })
+            }
+
+        })
+        .catch(r => {
+            logger.error(common.debugLine(r))
+            logger.error(common.debugLine(common.generateReq(req)))
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
+exports.getuserAssets = (req, res) => {
+    logger.info(common.debugLine(''))
+    var details = req.app.details;
+    Asset.find({ tokenID: { $in: details.tokenIds } })
+        .select({ name: 1, _id: 1 })
+        .then(r => {
+            //details = details.toObject();
+            delete details.tokenIds
+            details.assets = r;
+            res.json({ statusCode: 200, result: details })
+
+        })
+        .catch(r => {
+            logger.error(common.debugLine(r))
+            logger.error(common.debugLine(common.generateReq(req)))
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
 
 exports.getAllAssets = async (req, res) => {
     logger.info(common.debugLine(''))

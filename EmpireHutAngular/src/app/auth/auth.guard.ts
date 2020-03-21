@@ -27,6 +27,7 @@ export class AuthGuard implements CanActivate {
           // }
           if ((r["statusCode"] == 200) && (r["result"]["userType"] == next.data.role)) {
             this._VariableService.userdetails = r["result"]
+            //console.log(r["result"])
             return true;
           }
           else {

@@ -264,4 +264,38 @@ export class ValidationService {
     }
     return errMsg;
   }
+
+  validatePhoneNumber(number:any){
+    if (String(number).length == 0) {
+      return "number cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(number)) {
+      if (String(number).length < 0 || String(number).length > 11) {
+        //console.log("here area")
+        errMsg = errMsg.concat('number should be max of 10 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('number cannot be empty||')
+    }
+    return errMsg;
+  }
+
+  validatecmbdAddress(address:String){
+    if (String(address).length == 0) {
+      return "address cannot be empty||"
+    }
+    let errMsg = '';
+    if (Boolean(address)) {
+      if (String(address).length < 0 || String(address).length > 21) {
+        //console.log("here area")
+        errMsg = errMsg.concat('address should be max of 20 characters||')
+      }
+    }
+    else {
+      errMsg = errMsg.concat('address cannot be empty||')
+    }
+    return errMsg;
+  }
 }

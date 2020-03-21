@@ -1,6 +1,69 @@
 <br>
 <div class="row">
     <blockquote>
+        <h3>My Details</h3>
+    </blockquote>
+</div>
+<div *ngIf="nomydetails; else mydetails" class="center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #mydetails>
+    <table class="striped">
+        <thead>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Total Assets</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{userDetails["username"]}}</td>
+                <td>{{userDetails["email"]}}</td>
+                <td>{{userDetails["ownedTokens"]}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="striped">
+        <thead>
+            <th>Home Address</th>
+            <th>Home PostalCode</th>
+            <th>Home Phone</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input type="text" class="validate" [(ngModel)]="userDetails['homeaddress']" maxlength="25" (input)="showButton(false)">
+                </td>
+                <td> <input type="text" class="validate" [(ngModel)]="userDetails['homepostalcode']" maxlength="6" (input)="showButton(false)"></td>
+                <td><input type="text" class="validate" [(ngModel)]="userDetails['homePhone']" maxlength="10" (input)="showButton(false)"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <div class="row" style="display:none" id="updateBtn">
+        <div class="center">
+            <a class="waves-effect waves-light btn blue" (click)="updateDetails()"><i class="material-icons right">cloud</i>Update</a>
+        </div>
+    </div>
+</ng-template>
+<br>
+<br>
+<div class="divider"></div>
+<br>
+<div class="row">
+    <blockquote>
         <h3>My Assets</h3>
     </blockquote>
 </div>

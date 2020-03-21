@@ -20,7 +20,7 @@ import { UserComponent } from '../app/user/user.component'
 import { AssetsComponent } from '../app/user/assets/assets.component'
 import { AssetdetailsComponent } from '../app/user/assetdetails/assetdetails.component'
 import { ProposalsComponent } from '../app/user/proposals/proposals.component'
-import { MyassetsComponent } from '../app/user/myassets/myassets.component'
+import { UserDetailsComponent } from '../app/user/myassets/myassets.component'
 import { TransactionsComponent } from '../app/user/transactions/transactions.component'
 
 const routes: Routes = [
@@ -40,7 +40,7 @@ const routes: Routes = [
       { path: '', component: AssetsComponent },
       { path: 'asset/:id', component: AssetdetailsComponent },
       { path: 'proposals', component: ProposalsComponent },
-      { path: 'personal', component: MyassetsComponent },
+      { path: 'personal', component: UserDetailsComponent },
       { path: 'transactions', component: TransactionsComponent }
     ], canActivate: [AuthGuard], data: { role: 'user' }
   }

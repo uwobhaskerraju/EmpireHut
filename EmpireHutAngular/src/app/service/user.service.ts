@@ -20,7 +20,7 @@ export class UserService {
     return this._http.get(URL);
   }
 
-  getOwnedAssets(address:any) {
+  getOwnedAssets(address: any) {
     let URL = environment.apiBaseURL + 'user/count/' + address
     return this._http.get(URL);
   }
@@ -32,6 +32,23 @@ export class UserService {
     }
     return this._http.post(url, jsnData);
   }
+
+  getuserPersonalDetails(id: any) {
+    let url = environment.apiBaseURL + 'user/userdetails/' + id
+    //console.log(url)
+    return this._http.get(url);
+  }
+updateUserDetails(userDetails:any){
+  let url=environment.apiBaseURL+'user/update'
+  let jsnData={
+    address:userDetails["address"],
+    phone:userDetails['homePhone'],
+    postal:userDetails['homepostalcode'],
+    homeaddress:userDetails['homeaddress']
+  }
+
+  return this._http.post(url,jsnData)
+}
 
   getUserDetails(add: String) {
     let URL = environment.apiBaseURL + 'user/udetails';
@@ -73,7 +90,7 @@ export class UserService {
     return this._http.post(URL, jsnData);
   }
 
-  purchaseAsset(assetDetails: any, usrAdd: any,_amount:any) {
+  purchaseAsset(assetDetails: any, usrAdd: any, _amount: any) {
     let URL = environment.apiBaseURL + 'user/purchase';
     let jsnData = {
       owner: assetDetails["ownerAdd"],
@@ -123,7 +140,7 @@ export class UserService {
 
   toggleAsset(id: any, hidden: any) {
     let URL = environment.apiBaseURL + 'user/asset/toggle';
-    let jsnData ={
+    let jsnData = {
       id: id,
       state: hidden
     }
@@ -133,7 +150,7 @@ export class UserService {
 
   getSearchedAssets(address: any, value: any) {
     let URL = environment.apiBaseURL + 'user/search/assets/' + address;
-    let jsnData ={
+    let jsnData = {
       value: value
     };
     return this._http.post(URL, jsnData);

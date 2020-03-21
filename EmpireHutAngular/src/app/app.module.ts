@@ -20,7 +20,7 @@ import { AssetdetailsComponent } from './user/assetdetails/assetdetails.componen
 import { UsersComponent } from './admin/users/users.component';
 import { UserdetailsComponent } from './admin/userdetails/userdetails.component';
 import { ProposalsComponent } from './user/proposals/proposals.component';
-import { MyassetsComponent } from './user/myassets/myassets.component';
+import { UserDetailsComponent } from './user/myassets/myassets.component';
 import { TransactionsComponent } from './user/transactions/transactions.component';
 import { AuthGuard } from './auth/auth.guard';
 
@@ -41,7 +41,7 @@ import { AuthGuard } from './auth/auth.guard';
     UsersComponent,
     UserdetailsComponent,
     ProposalsComponent,
-    MyassetsComponent,
+    UserDetailsComponent,
     TransactionsComponent
   ],
   imports: [
