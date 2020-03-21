@@ -15,7 +15,7 @@ declare var M: any;
 export class AssetdetailsComponent implements OnInit {
   @Output() _userBal: EventEmitter<any> = new EventEmitter();
   @Output() _UsertokenCount: EventEmitter<any> = new EventEmitter();
-  
+
 
   assetDetails = [];
   imagePath: String;
@@ -26,6 +26,7 @@ export class AssetdetailsComponent implements OnInit {
   assetTrans = [];
   nodetails: boolean
   notrans: boolean
+  assetValue:String
 
   constructor(private _http: UserService, private route: ActivatedRoute, private router: Router,
     private _var: VariableService) {
@@ -57,9 +58,14 @@ export class AssetdetailsComponent implements OnInit {
       });
   }
 
+  updateAssetValue(){
+    this._http.updateAssetValue(this.assetValue,this.assetID)
+  }
+
   goBack() {
     this.router.navigate(['user'])
   }
+
 
   getAssetTransactionHistory() {
     this._http.getAssetTransactionHistory(this.assetID)
@@ -84,11 +90,11 @@ export class AssetdetailsComponent implements OnInit {
           //this._VariableService.tokenCount = r["data"]["result"];
           this._userBal.emit(r["result"]);
           this._http.getOwnedAssets(this._var.userdetails["address"])
-          .subscribe(r=>{
-            this._UsertokenCount.emit(r["result"])
-            this.router.navigate(['user'])
-          });
-         
+            .subscribe(r => {
+              this._UsertokenCount.emit(r["result"])
+              this.router.navigate(['user'])
+            });
+
         }
         else {
           //console.log("something went wrong in getting balance")
@@ -139,14 +145,14 @@ export class AssetdetailsComponent implements OnInit {
             .subscribe(r => {
               if (r["statusCode"] == 200) {
                 M.toast({ html: "Submitted Proposal", classes: 'rounded' })
-                 //call parent method
-                 this.updateCount();
-                 //;
+                //call parent method
+                this.updateCount();
+                //;
               }
               else {
                 M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
               }
-             // console.log(r);
+              // console.log(r);
 
             });
         }

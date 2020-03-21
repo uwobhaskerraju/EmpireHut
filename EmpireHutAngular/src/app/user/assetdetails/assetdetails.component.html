@@ -42,7 +42,23 @@
         </div>
     </div>
     <div class="divider"></div>
-
+    <div *ngIf="self">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        Change Asset value(EMP) : 
+                    </td>
+                    <td>
+                        <input type="number" class="validate" min="1" max="999" [(ngModel)]="assetValue">
+                    </td>
+                    <td>
+                        <a class="waves-effect waves-light btn" (click)="updateAssetValue()"><i class="material-icons right">cloud</i>update</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <div *ngIf="self; else notSelf">
 
         <div class="section center">

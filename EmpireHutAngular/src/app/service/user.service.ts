@@ -50,6 +50,15 @@ updateUserDetails(userDetails:any){
   return this._http.post(url,jsnData)
 }
 
+updateAssetValue(amount,assetid){
+  let url =environment.apiBaseURL+'user/update/asset'
+  let jsnData={
+    assetID:assetid,
+    amount:amount
+  }
+  return this._http.post(url,jsnData)
+}
+
   getUserDetails(add: String) {
     let URL = environment.apiBaseURL + 'user/udetails';
     let jsnData = {

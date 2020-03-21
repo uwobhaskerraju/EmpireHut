@@ -40,6 +40,33 @@ exports.getUserDetails = (req, res, next) => {
     }
 };
 
+exports.updateAssetDetails=(req,res)=>{
+    logger.info(common.debugLine(''))
+    Asset.updateOne({_id:mongoose.Types.ObjectId(req.body.assetID)},{$set:{price:req.body.amount}})
+    .then(r=>{
+        if(r["nModified"]>0){
+            res.json({
+                statusCode: 200,
+                result: true
+            })
+        }
+        else{
+            res.json({
+                statusCode: 300,
+                result: "something went wrong"
+            })
+        }
+    })
+    .catch(err => {
+        logger.error(common.debugLine(err));
+        logger.error(common.debugLine(common.generateReq(req)));
+        res.json({
+            statusCode: 500,
+            result: dataConfig.GlobalErrMsg
+        })
+    });
+}
+
 exports.updateUserDetails=(req,res)=>{
     logger.info(common.debugLine(''))
     User.updateOne({address:req.body.address},{$set:{homephone:req.body.phone,homeaddress:req.body.homeaddress,homepostalcode:req.body.postal}})

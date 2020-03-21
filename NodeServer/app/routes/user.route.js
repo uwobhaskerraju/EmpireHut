@@ -42,6 +42,7 @@ module.exports = (app) => {
 
     app.post('/user/update',checkrequest.CheckToken,user.updateUserDetails)
     
+    app.post('/user/update/asset',checkrequest.CheckToken,user.updateAssetDetails)
     //test
     // app.get('/balance', web3.testblocks);
 
