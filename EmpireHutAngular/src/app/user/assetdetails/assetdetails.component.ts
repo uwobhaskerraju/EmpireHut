@@ -26,7 +26,7 @@ export class AssetdetailsComponent implements OnInit {
   assetTrans = [];
   nodetails: boolean
   notrans: boolean
-  assetValue:String
+  assetValue: String
 
   constructor(private _http: UserService, private route: ActivatedRoute, private router: Router,
     private _var: VariableService) {
@@ -58,8 +58,17 @@ export class AssetdetailsComponent implements OnInit {
       });
   }
 
-  updateAssetValue(){
-    this._http.updateAssetValue(this.assetValue,this.assetID)
+  updateAssetValue() {
+    this._http.updateAssetValue(this.assetValue, this.assetID)
+      .subscribe(r => {
+        if (r["statusCode"] == 200) {
+          M.toast({ html: "Operation Succesfull", classes: 'rounded' })
+        }
+        else {
+          M.toast({ html: "Operation failed", classes: 'rounded' })
+        }
+
+      })
   }
 
   goBack() {
