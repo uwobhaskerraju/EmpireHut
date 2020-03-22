@@ -60,11 +60,6 @@ module.exports = (app) => {
     app.post('/user/update/asset', checkrequest.CheckToken, user.updateAssetDetails)
 
     app.post('/user/create/ticket', checkrequest.CheckToken,upload.single('image'), user.createTicket, user.createTicketReponse)
-    //test
-    // app.get('/balance', web3.testblocks);
-
-    // app.get('/testGas', web3.testEvents);
-
-    // app.get('/logs', web3.testLogs);
-
+    
+    app.get('/user/tickets/:id',checkrequest.CheckToken,user.getTickets);
 }

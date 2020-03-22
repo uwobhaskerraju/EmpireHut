@@ -158,6 +158,10 @@ export class UserService {
     return this._http.get(URL);
   }
 
+  getUserTickets(address:String){
+    let url=environment.apiBaseURL+'/user/tickets/'+address;
+    return this._http.get(url)
+  }
 
   toggleAsset(id: any, hidden: any) {
     let URL = environment.apiBaseURL + 'user/asset/toggle';

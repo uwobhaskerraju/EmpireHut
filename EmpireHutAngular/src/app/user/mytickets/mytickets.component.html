@@ -10,8 +10,6 @@
   <div id="test1" class="col s12">
     <br>
     <Br>
-
-
     <div class="row">
       <div class="input-field col s8">
         <i class="material-icons prefix">account_circle</i>
@@ -39,10 +37,41 @@
       </div>
     </div>
     <div class="row center">
-      <a class="btn-floating btn-large waves-effect waves-light red" (click)="createTicket()"><i class="material-icons">play_arrow</i></a>
+      <a class="btn-floating btn-large waves-effect waves-light red" (click)="createTicket()"><i
+          class="material-icons">play_arrow</i></a>
     </div>
 
   </div>
   <!--end of first div-->
-  <div id="test2" class="col s12">Test 2</div>
+  <div id="test2" class="col s12">
+    <br>
+    <br>
+    <ul class="collection with-header" *ngIf="openTickets">
+      <li class="collection-header">
+        <h4>Open</h4>
+      </li>
+      <li class="collection-item" *ngFor="let ticket of openTickets">
+        <div class="truncate">{{ticket["subject"]}}<a href="#!" class="secondary-content"><i
+              class="material-icons">send</i></a></div>
+      </li>
+    </ul>
+    <div class="row center-align" *ngIf="openTickets?.length == 0">
+      <h3 class="blue-text">No Open Tickets</h3>
+    </div>
+    <br>
+    <div class="divider"></div>
+    <br>
+    <ul class="collection with-header" *ngIf="resTickets">
+      <li class="collection-header">
+        <h4>Resolved</h4>
+      </li>
+      <li class="collection-item" *ngFor="let ticket of resTickets">
+        <div class="truncate">{{ticket["subject"]}}<a href="#!" class="secondary-content"><i
+              class="material-icons">send</i></a></div>
+      </li>
+    </ul>
+    <div class="row center-align" *ngIf="resTickets?.length == 0">
+      <h3 class="blue-text">No Resolved Tickets</h3>
+    </div>
+  </div>
 </div>

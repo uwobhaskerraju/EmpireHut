@@ -122,7 +122,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                     if (event instanceof HttpResponse) {
                         //console.log('event--->>>', event);
                         var body = event["body"]
-                        console.log(event["body"])
+                      //  console.log(event["body"])
                         if (body != null || body != undefined) {
                             const entries = Object.keys(body)
                             for (let i = 0; i < entries.length; i++) {
@@ -147,7 +147,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                                             body[entries[i]] = singleObjectDecrypt(resp)
                                         }
                                         else {
-                                            console.log(resp)
+                                            //console.log(resp)
                                             for (var u = 0; u < resp.length; u++) {
                                                 //console.log(resp[u])
                                                 // var keys = Object.keys(resp[u])

@@ -10,10 +10,11 @@ var TicketRespSchema = mongoose.Schema({
     name: { type: String, required: true },
     comment: { type: String, required: true },
     owner: { type: String, required: true },
-    createdOn: { type: Date, default:dateToronto},
+    //createdOn: { type: Date, default:dateToronto},
     active: { type: Boolean, default: true }
 }, {
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 module.exports = mongoose.model('TicketResp', TicketRespSchema, 'TicketResp');

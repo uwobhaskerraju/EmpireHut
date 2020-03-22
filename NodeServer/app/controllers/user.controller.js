@@ -49,12 +49,14 @@ exports.createTicket = (req, res, next) => {
         "subject": req.body.subject,
         //"description":req.body.desc,
         "owner": req.body.address,
-        "filePath": String(req.body.address).toString().concat('_',req.body.date,'_',req.file.originalname)
+        "filePath": String(req.body.address).toString().concat('_', req.body.date, '_', req.file.originalname)
     }
-
-    const ticketObj = new Ticket(ticketJsn)
+    //console.log(ticketJsn)
+    var ticketObj = new Ticket(ticketJsn)
+    console.log(ticketObj)
     ticketObj.save()
         .then(r => {
+            ticketObj = null
             //res.json({statusCode:200,result:true})
             User.find({ address: req.body.address })
                 .select({ username: 1 })
@@ -83,61 +85,62 @@ exports.createTicket = (req, res, next) => {
 
 }
 
-// exports.createDir = (req, res, next) => {
-//     try {
-//         logger.info(common.debugLine(''))
-//         console.log(req.app.locals.defaultfolder)
-//         console.log(req.body.address)
-//         console.log(req.body.date)
-//         var dir = path.join(req.app.locals.defaultfolder, 'upload', req.body.address, req.body.date);
-//         if (!fs.existsSync(dir)) {
-//             fs.mkdirSync(dir);
-//         }
-//         req.app.locals.newPath = dir;
-//         next();
-//     } catch (error) {
-//         logger.error(common.debugLine(error));
-//         logger.error(common.debugLine(common.generateReq(req)));
-//         res.json({
-//             statusCode: 500,
-//             result: dataConfig.GlobalErrMsg
-//         })
-//     }
-
-// }
-
 exports.createTicketReponse = (req, res) => {
     logger.info(common.debugLine(''))
-    let tickJsn={
-        "ticketID":req.app.locals.tickid,
-        "name":req.app.locals.user,
-        "comment":req.body.desc,
-        "owner":req.body.address
+    let tickJsn = {
+        "ticketID": req.app.locals.tickid,
+        "name": req.app.locals.user,
+        "comment": req.body.desc,
+        "owner": req.body.address
     }
-    var tickReObj=new TicketResp(tickJsn)
+    var tickReObj = new TicketResp(tickJsn)
     tickReObj.save()
-    .then(r=>{
-        if(r["_id"]){
-            res.json({
-                statusCode: 200,
-                result: true
-            })
-        }
-        else{
-            res.json({
-                statusCode: 300,
-                result: false
-            })
-        }
-    })
-    .catch(err => {
-        logger.error(common.debugLine(err));
-        logger.error(common.debugLine(common.generateReq(req)));
-        res.json({
-            statusCode: 500,
-            result: dataConfig.GlobalErrMsg
+        .then(r => {
+            if (r["_id"]) {
+                res.json({
+                    statusCode: 200,
+                    result: true
+                })
+            }
+            else {
+                res.json({
+                    statusCode: 300,
+                    result: false
+                })
+            }
         })
-    });
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
+
+exports.getTickets = (req, res) => {
+    logger.info(common.debugLine(''))
+    var address = req.params.id
+    Ticket.find({ owner: address })
+        .sort({ createdAt: 1, resolved: 1 })
+        .then(r => {
+           // console.log(r)
+            if (r.length > 0) {
+                res.json({ statusCode: 200, result: r })
+            }
+            else {
+                res.json({ statusCode: 300, result: false })
+            }
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
 }
 
 exports.updateAssetDetails = (req, res) => {

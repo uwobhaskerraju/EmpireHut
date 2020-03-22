@@ -112,3 +112,4 @@ server.crt
 server.key
 .gitignore
 EmpireHutAngular/.gitignore
+uploads/

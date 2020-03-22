@@ -12,9 +12,11 @@ declare var M: any;
 export class MyticketsComponent implements OnInit {
   ticket: {}
   selectedFile: File = null;
-  constructor(private _http: UserService, 
+  openTickets= []
+  resTickets= []
+  constructor(private _http: UserService,
     private _var: VariableService, private _val: ValidationService
-    ,private _router:Router) {
+    , private _router: Router) {
 
   }
 
@@ -24,7 +26,48 @@ export class MyticketsComponent implements OnInit {
     M.CharacterCounter.init(textNeedCount);
     this.ticket = { subject: '' }
     this.ticket['desc'] = ''
+
+    this._http.getUserTickets(this._var.userdetails["address"])
+      .subscribe(r => {
+        if(r["statusCode"]==200){
+          console.log(r["result"])
+          var temp = []
+          if (r["result"].length == undefined) {
+            temp.push(r["result"])
+            if (r["result"]["resolved"]) {
+              this.resTickets = temp;
+            }
+            else {
+              this.openTickets = temp;
+            }
+          }
+          else {
+        
+            for (var i = 0; i < r["result"].length; i++) {
+          
+              if (r["result"][i]["resolved"]) {
+                this.resTickets.push(r["result"][i])
+              }
+              else {
+                this.openTickets.push(r["result"][i])
+              }
+           
+            }
+          }
+        }
+        else{
+          M.toast({ html: "Operation Failed", classes: 'rounded' })
+        }
+        console.log(this.openTickets)
+        console.log( this.resTickets)
+      })
+   
   }
+
+  // onSearchChange(){
+  //   this._http.searchTickets()
+  //   .subscribe()
+  // }
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
