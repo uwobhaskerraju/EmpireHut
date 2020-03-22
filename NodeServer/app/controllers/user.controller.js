@@ -1,12 +1,14 @@
 const Asset = require('../models/asset.model');
 const User = require('../models/user.model');
 const Notification = require('../models/notification.model');
+const Ticket = require('../models/ticket.model');
+const TicketResp = require('../models/ticketresponse.model');
 const dataConfig = require('../config/data.config.js');
 var mongoose = require('mongoose');
 var dice = require('dice-coefficient')
 const logger = require('../../logger');
 const common = require('../config/common');
-
+var path = require('path');
 
 exports.getUserDetails = (req, res, next) => {
     logger.info(common.debugLine(''))
@@ -40,11 +42,82 @@ exports.getUserDetails = (req, res, next) => {
     }
 };
 
-exports.updateAssetDetails=(req,res)=>{
+exports.createTicket = (req, res, next) => {
     logger.info(common.debugLine(''))
-    Asset.updateOne({_id:mongoose.Types.ObjectId(req.body.assetID)},{$set:{price:req.body.amount}})
+
+    var ticketJsn = {
+        "subject": req.body.subject,
+        //"description":req.body.desc,
+        "owner": req.body.address,
+        "filePath": String(req.body.address).toString().concat('_',req.body.date,'_',req.file.originalname)
+    }
+
+    const ticketObj = new Ticket(ticketJsn)
+    ticketObj.save()
+        .then(r => {
+            //res.json({statusCode:200,result:true})
+            User.find({ address: req.body.address })
+                .select({ username: 1 })
+                .then(rr => {
+                    req.app.locals.user = rr[0]["username"]
+                    req.app.locals.tickid = r["_id"]
+                    next()
+                })
+                .catch(err => {
+                    logger.error(common.debugLine(err));
+                    logger.error(common.debugLine(common.generateReq(req)));
+                    res.json({
+                        statusCode: 500,
+                        result: dataConfig.GlobalErrMsg
+                    })
+                });
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+
+}
+
+// exports.createDir = (req, res, next) => {
+//     try {
+//         logger.info(common.debugLine(''))
+//         console.log(req.app.locals.defaultfolder)
+//         console.log(req.body.address)
+//         console.log(req.body.date)
+//         var dir = path.join(req.app.locals.defaultfolder, 'upload', req.body.address, req.body.date);
+//         if (!fs.existsSync(dir)) {
+//             fs.mkdirSync(dir);
+//         }
+//         req.app.locals.newPath = dir;
+//         next();
+//     } catch (error) {
+//         logger.error(common.debugLine(error));
+//         logger.error(common.debugLine(common.generateReq(req)));
+//         res.json({
+//             statusCode: 500,
+//             result: dataConfig.GlobalErrMsg
+//         })
+//     }
+
+// }
+
+exports.createTicketReponse = (req, res) => {
+    logger.info(common.debugLine(''))
+    let tickJsn={
+        "ticketID":req.app.locals.tickid,
+        "name":req.app.locals.user,
+        "comment":req.body.desc,
+        "owner":req.body.address
+    }
+    var tickReObj=new TicketResp(tickJsn)
+    tickReObj.save()
     .then(r=>{
-        if(r["nModified"]>0){
+        if(r["_id"]){
             res.json({
                 statusCode: 200,
                 result: true
@@ -53,7 +126,7 @@ exports.updateAssetDetails=(req,res)=>{
         else{
             res.json({
                 statusCode: 300,
-                result: "something went wrong"
+                result: false
             })
         }
     })
@@ -67,32 +140,59 @@ exports.updateAssetDetails=(req,res)=>{
     });
 }
 
-exports.updateUserDetails=(req,res)=>{
+exports.updateAssetDetails = (req, res) => {
     logger.info(common.debugLine(''))
-    User.updateOne({address:req.body.address},{$set:{homephone:req.body.phone,homeaddress:req.body.homeaddress,homepostalcode:req.body.postal}})
-    .then(r=>{
-       // console.log(r)
-        if(r["nModified"]>0){
-            res.json({
-                statusCode: 200,
-                result: true
-            })
-        }
-        else{
-            res.json({
-                statusCode: 300,
-                result: "something went wrong"
-            })
-        }
-    })
-    .catch(err => {
-        logger.error(common.debugLine(err));
-        logger.error(common.debugLine(common.generateReq(req)));
-        res.json({
-            statusCode: 500,
-            result: dataConfig.GlobalErrMsg
+    Asset.updateOne({ _id: mongoose.Types.ObjectId(req.body.assetID) }, { $set: { price: req.body.amount } })
+        .then(r => {
+            if (r["nModified"] > 0) {
+                res.json({
+                    statusCode: 200,
+                    result: true
+                })
+            }
+            else {
+                res.json({
+                    statusCode: 300,
+                    result: "something went wrong"
+                })
+            }
         })
-    });
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
+
+exports.updateUserDetails = (req, res) => {
+    logger.info(common.debugLine(''))
+    User.updateOne({ address: req.body.address }, { $set: { homephone: req.body.phone, homeaddress: req.body.homeaddress, homepostalcode: req.body.postal } })
+        .then(r => {
+            // console.log(r)
+            if (r["nModified"] > 0) {
+                res.json({
+                    statusCode: 200,
+                    result: true
+                })
+            }
+            else {
+                res.json({
+                    statusCode: 300,
+                    result: "something went wrong"
+                })
+            }
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
 }
 
 exports.getAllUserDetails = (req, res, next) => {

@@ -31,7 +31,7 @@ app.use(expressSanitizer());
 app.use(bodyParser.urlencoded({ extended: true }))
 
 // parse requests of content-type - application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '50mb' }))
 
 // Configuring the database
 const mongoose = require('mongoose');
@@ -125,7 +125,7 @@ function logResponse(obj) {
                     }
                 }
                 else {
-                   // console.log(body[entries[i]])
+                    // console.log(body[entries[i]])
                     //console.log("not an object")
                     if (typeof (body[entries[i]]) != "string") {
                         body[entries[i]] = String(body[entries[i]])
@@ -155,7 +155,9 @@ app.use(function (req, res, next) {
 });
 
 function sanitizeRequest(req) {
+    req.app.locals.defaultfolder = __dirname
     var body = req.body
+    //logger.info(body)
     if (body != null || body != undefined) {
         const entries = Object.keys(body)
         const inserts = {}

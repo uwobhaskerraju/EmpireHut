@@ -68,7 +68,7 @@ export class UserComponent implements OnInit {
 
   logout() {
     localStorage.clear();
-    this._VariableService.userdetails=null;
+    this._VariableService.userdetails = null;
     this.router.navigate([''])
   }
 
@@ -86,6 +86,9 @@ export class UserComponent implements OnInit {
         break;
       case 4:
         this.router.navigate(['transactions'], { relativeTo: this.route })
+        break;
+      case 5:
+        this.router.navigate(['tickets'], { relativeTo: this.route })
         break;
     }
 

@@ -11,6 +11,31 @@ export class ValidationService {
   loggedInUser = {}
   constructor() { }
 
+  validateTicketDesc(desc:String){
+    let msg = ''
+    if (Boolean(desc)) {
+      if (String(desc).length < 1 || String(desc).length > 1001) {
+        msg = msg.concat("Query should be less than 1000||")
+      }
+    }
+    else {
+      msg = 'Query shouldnt be empty||'
+    }
+    return msg
+  }
+
+  validateSubject(subject:String){
+    let msg = ''
+    if (Boolean(subject)) {
+      if (String(subject).length < 1 || String(subject).length > 101) {
+        msg = msg.concat("subject should be less than 100||")
+      }
+    }
+    else {
+      msg = 'subject shouldnt be empty||'
+    }
+    return msg
+  }
 
   validateYear(year: any) {
     let msg = ''

@@ -23,6 +23,7 @@ import { ProposalsComponent } from './user/proposals/proposals.component';
 import { UserDetailsComponent } from './user/myassets/myassets.component';
 import { TransactionsComponent } from './user/transactions/transactions.component';
 import { AuthGuard } from './auth/auth.guard';
+import { MyticketsComponent } from './user/mytickets/mytickets.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { AuthGuard } from './auth/auth.guard';
     UserdetailsComponent,
     ProposalsComponent,
     UserDetailsComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    MyticketsComponent
   ],
   imports: [
     BrowserModule,

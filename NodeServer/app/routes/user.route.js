@@ -2,6 +2,21 @@ module.exports = (app) => {
     const user = require('../controllers/user.controller.js');
     const checkrequest = require('../middleware/appmiddleware.js');
     const web3 = require('../controllers/web3.controller.js');
+    var path = require('path');
+    var multer = require('multer')
+   // const fs = require('fs');
+
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, './uploads/');
+        },
+        filename: function (req, file, cb) {
+            cb(null, String(req.body.address).toString().concat('_',req.body.date,'_',file.originalname));
+        }
+    });
+    var upload = multer({ storage: storage })
+
+
 
     app.post('/user/balance', checkrequest.CheckToken, web3.getBalance);
 
@@ -36,13 +51,15 @@ module.exports = (app) => {
 
     app.post('/user/trans', checkrequest.CheckToken, web3.getTransactions, user.getUserNameFrmAddress);
 
-    app.get('/user/assettrans/:id',checkrequest.CheckToken,user.getAssetDetails,web3.getAssetTransactions,user.getUserNameFrmAddress);
+    app.get('/user/assettrans/:id', checkrequest.CheckToken, user.getAssetDetails, web3.getAssetTransactions, user.getUserNameFrmAddress);
 
-    app.get('/user/count/:id',checkrequest.CheckToken,web3.getUserTokenCount)
+    app.get('/user/count/:id', checkrequest.CheckToken, web3.getUserTokenCount)
 
-    app.post('/user/update',checkrequest.CheckToken,user.updateUserDetails)
-    
-    app.post('/user/update/asset',checkrequest.CheckToken,user.updateAssetDetails)
+    app.post('/user/update', checkrequest.CheckToken, user.updateUserDetails)
+
+    app.post('/user/update/asset', checkrequest.CheckToken, user.updateAssetDetails)
+
+    app.post('/user/create/ticket', checkrequest.CheckToken,upload.single('image'), user.createTicket, user.createTicketReponse)
     //test
     // app.get('/balance', web3.testblocks);
 

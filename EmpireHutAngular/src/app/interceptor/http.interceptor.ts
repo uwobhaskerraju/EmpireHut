@@ -32,7 +32,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                 }
             }
 
-            //console.log(request.body)
+            //console.log(request.url.toLowerCase().toString())
             if (request.url.toLowerCase().toString().includes("open")) {
                 if (request.url.toLowerCase().toString().includes("open/val")) {
                     req = request.clone({
@@ -60,6 +60,7 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         // , body: { body: CryptoJS.AES.encrypt(request.body, environment.key) }
                     });
                 }
+              
 
             }
             if (request.url.toLowerCase().toString().includes("user")
@@ -74,6 +75,20 @@ export class MockHttpCalIInterceptor implements HttpInterceptor {
                         }
                     )
                 });
+
+                if(request.url.toLowerCase().toString().includes("create/ticket")){
+                   // console.log("inside")
+                    req = request.clone({
+                        headers: new HttpHeaders(
+                            {
+                               // 'Content-Type': 'multipart/form-data',
+                               'Accept': '*/*',
+                               'authorization': 'Bearer ' + localStorage.getItem('ACCESS_TOKEN')
+                            }
+                        )
+                        // , body: { body: CryptoJS.AES.encrypt(request.body, environment.key) }
+                    });
+                }
             }
 
             function singleObjectDecrypt(resp) {

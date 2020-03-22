@@ -38,26 +38,26 @@ export class UserService {
     //console.log(url)
     return this._http.get(url);
   }
-updateUserDetails(userDetails:any){
-  let url=environment.apiBaseURL+'user/update'
-  let jsnData={
-    address:userDetails["address"],
-    phone:userDetails['homePhone'],
-    postal:userDetails['homepostalcode'],
-    homeaddress:userDetails['homeaddress']
+  updateUserDetails(userDetails: any) {
+    let url = environment.apiBaseURL + 'user/update'
+    let jsnData = {
+      address: userDetails["address"],
+      phone: userDetails['homePhone'],
+      postal: userDetails['homepostalcode'],
+      homeaddress: userDetails['homeaddress']
+    }
+
+    return this._http.post(url, jsnData)
   }
 
-  return this._http.post(url,jsnData)
-}
-
-updateAssetValue(amount,assetid){
-  let url =environment.apiBaseURL+'user/update/asset'
-  let jsnData={
-    assetID:assetid,
-    amount:amount
+  updateAssetValue(amount, assetid) {
+    let url = environment.apiBaseURL + 'user/update/asset'
+    let jsnData = {
+      assetID: assetid,
+      amount: amount
+    }
+    return this._http.post(url, jsnData)
   }
-  return this._http.post(url,jsnData)
-}
 
   getUserDetails(add: String) {
     let URL = environment.apiBaseURL + 'user/udetails';
@@ -127,6 +127,18 @@ updateAssetValue(amount,assetid){
     }
     //console.log
     return this._http.post(URL, jsnData);
+  }
+
+  createTicket(fileObj,address,ticket) {
+    let url = environment.apiBaseURL + 'user/create/ticket';
+    const fd = new FormData();
+    fd.append('address', address);
+    fd.append('date',new Date().toISOString().slice(0,10).concat('_',(new Date()).getTime().toString()));
+    fd.append('subject',ticket['subject']);
+    fd.append('desc',ticket['desc']);
+    fd.append('image', fileObj, fileObj.name);
+ 
+    return this._http.post(url,fd)
   }
 
   rejectProposal(propObj: any) {
