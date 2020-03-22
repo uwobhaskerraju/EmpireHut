@@ -1,0 +1,61 @@
+<h4><a href="javascript:void(0)" (click)="goBack()"><i class="material-icons">arrow_back</i></a></h4>
+<div class="row">
+    <div class="col s12">
+        <div class="card-panel light-blue white-text">
+            <h5 class="truncate">{{ticketDetails["subject"]}}</h5>
+            <table class="centered highlight responsive-table">
+                <thead>
+                    <tr>
+                        <th>Created Date</th>
+                        <th>Attachment(s)</th>
+                        <th>Updated Date</th>
+                        <th *ngIf="!ticketDetails['resolved']">Resolved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ticketDetails["createdAt"]}}</td>
+                        <td>{{ticketDetails["filePath"]}}</td>
+                        <td>{{ticketDetails["updatedAt"]}}</td>
+                        <td *ngIf="!ticketDetails['resolved']">
+                            <div class="switch">
+
+                                <label class="white-text">
+                                    No
+                                    <input type="checkbox" id="{{ticketID}}" [(ngModel)]="ticketDetails['resolved']"
+                                        ng-true-value="true" (change)="checkAll($event)" ng-false-value="false">
+                                    <span class="lever"></span>
+                                    Yes
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<ul class="collection" *ngIf="ticketResp">
+    <li class="collection-item avatar" *ngFor="let resp of ticketResp">
+        <img src="{{imagePath}}icons/3.png" alt="" class="circle">
+        <span class="right">{{resp["createdAt"]}}</span>
+        <span class="title">{{resp["name"]}}</span>
+        <p>{{resp["comment"]}}
+        </p>
+        <!-- <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a> -->
+    </li>
+
+</ul>
+<div class="row">
+    <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        <textarea id="comment" class="materialize-textarea" [(ngModel)]="comment" maxlength="500"
+            data-length="500"></textarea>
+        <label for="comment" class="active">Comment</label>
+    </div>
+</div>
+<div class="row center">
+    <a class="btn-floating btn-large waves-effect waves-light red" (click)="submitResponse($event)"><i id="{{ticketID}}"
+            class="material-icons">play_arrow</i></a>
+</div>

@@ -24,6 +24,7 @@ import { UserDetailsComponent } from './user/myassets/myassets.component';
 import { TransactionsComponent } from './user/transactions/transactions.component';
 import { AuthGuard } from './auth/auth.guard';
 import { MyticketsComponent } from './user/mytickets/mytickets.component';
+import { TicketdetailsComponent } from './user/ticketdetails/ticketdetails.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { MyticketsComponent } from './user/mytickets/mytickets.component';
     ProposalsComponent,
     UserDetailsComponent,
     TransactionsComponent,
-    MyticketsComponent
+    MyticketsComponent,
+    TicketdetailsComponent
   ],
   imports: [
     BrowserModule,

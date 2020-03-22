@@ -51,8 +51,8 @@
         <h4>Open</h4>
       </li>
       <li class="collection-item" *ngFor="let ticket of openTickets">
-        <div class="truncate">{{ticket["subject"]}}<a href="#!" class="secondary-content"><i
-              class="material-icons">send</i></a></div>
+        <div class="truncate">{{ticket["subject"]}}<a href="javascript:void(0);"  class="secondary-content" (click)="viewTicket($event)"><i
+          id="{{ticket['_id']}}"  class="material-icons">send</i></a></div>
       </li>
     </ul>
     <div class="row center-align" *ngIf="openTickets?.length == 0">
@@ -66,8 +66,8 @@
         <h4>Resolved</h4>
       </li>
       <li class="collection-item" *ngFor="let ticket of resTickets">
-        <div class="truncate">{{ticket["subject"]}}<a href="#!" class="secondary-content"><i
-              class="material-icons">send</i></a></div>
+        <div class="truncate">{{ticket["subject"]}}<a href="javascript:void(0);" (click)="viewTicket($event)" class="secondary-content"><i
+          id="{{ticket['_id']}}"  class="material-icons">send</i></a></div>
       </li>
     </ul>
     <div class="row center-align" *ngIf="resTickets?.length == 0">

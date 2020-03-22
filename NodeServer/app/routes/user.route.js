@@ -2,16 +2,16 @@ module.exports = (app) => {
     const user = require('../controllers/user.controller.js');
     const checkrequest = require('../middleware/appmiddleware.js');
     const web3 = require('../controllers/web3.controller.js');
-    var path = require('path');
+    
     var multer = require('multer')
-   // const fs = require('fs');
+    // const fs = require('fs');
 
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
             cb(null, './uploads/');
         },
         filename: function (req, file, cb) {
-            cb(null, String(req.body.address).toString().concat('_',req.body.date,'_',file.originalname));
+            cb(null, String(req.body.address).toString().concat('___', req.body.date, '___', file.originalname));
         }
     });
     var upload = multer({ storage: storage })
@@ -59,7 +59,14 @@ module.exports = (app) => {
 
     app.post('/user/update/asset', checkrequest.CheckToken, user.updateAssetDetails)
 
-    app.post('/user/create/ticket', checkrequest.CheckToken,upload.single('image'), user.createTicket, user.createTicketReponse)
-    
-    app.get('/user/tickets/:id',checkrequest.CheckToken,user.getTickets);
+    app.post('/user/create/ticket', checkrequest.CheckToken, upload.single('image'), user.createTicket, user.createTicketReponse)
+
+    app.get('/user/tickets/:id', checkrequest.CheckToken, user.getTickets);
+
+    app.get('/user/tickets/fetch/:id', checkrequest.CheckToken,user.getTicketDetails, user.getTicketResponses)
+
+    app.post('/user/ticket/comment',checkrequest.CheckToken,user.createComment)
+
+    app.post('/user/ticket/resolve',checkrequest.CheckToken,user.resolveTicket)
+
 }

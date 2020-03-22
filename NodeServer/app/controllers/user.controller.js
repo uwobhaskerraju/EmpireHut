@@ -125,13 +125,59 @@ exports.getTickets = (req, res) => {
     Ticket.find({ owner: address })
         .sort({ createdAt: 1, resolved: 1 })
         .then(r => {
-           // console.log(r)
+            // console.log(r)
             if (r.length > 0) {
                 res.json({ statusCode: 200, result: r })
             }
             else {
                 res.json({ statusCode: 300, result: false })
             }
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
+
+exports.getTicketDetails = (req, res, next) => {
+    logger.info(common.debugLine(''))
+    Ticket.find({ _id: mongoose.Types.ObjectId(req.params.id) })
+        .select({ owner: 0, _id: 0 })
+        .then(r => {
+            if (r.length > 0) {
+                var createdAt = (new Date(r[0]["createdAt"])).toDateString();
+                var updatedAt = (new Date(r[0]["updatedAt"])).toDateString();
+                //console.log(Object.keys(r[0]))
+                r[0].updatedAt = updatedAt
+                r[0]["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
+                //console.log(r[0])
+                req.app.locals.ticket = r
+                next();
+            }
+            else {
+                res.json({ statusCode: 300, result: false })
+            }
+
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
+
+exports.getTicketResponses = (req, res) => {
+    TicketResp.find({ ticketID: mongoose.Types.ObjectId(req.params.id) })
+        .select({ name: 1, comment: 1, createdAt: 1, _id: 0 })
+        .then(r => {
+            res.json({ statusCode: 200, response: r, ticket: req.app.locals.ticket })
         })
         .catch(err => {
             logger.error(common.debugLine(err));
@@ -170,6 +216,48 @@ exports.updateAssetDetails = (req, res) => {
         });
 }
 
+exports.resolveTicket = (req, res) => {
+    logger.info(common.debugLine(''))
+    var state = req.body.state
+    state = (state == 1) ? "true" : "false";
+    Ticket.updateOne({ _id: mongoose.Types.ObjectId(req.body.ticketID) }, { $set: { resolved: state } })
+        .then(r => {
+            res.json({ statusCode: 200, result: true });
+        })
+        .catch(r => {
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({ statusCode: 500, result: false });
+        })
+}
+
+exports.createComment = (req, res) => {
+    logger.info(common.debugLine(''))
+    let tickJsn = {
+        "ticketID": req.body.ticketID,
+        "name": req.body.username,
+        "comment": req.body.comment,
+        "owner": req.body.address
+    }
+    let tickObj = new TicketResp(tickJsn);
+    tickObj.save()
+        .then(r => {
+            if (r["_id"]) {
+                res.json({ statusCode: 200, result: true })
+            }
+            else {
+                res.json({ statusCode: 300, result: false })
+            }
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+}
 exports.updateUserDetails = (req, res) => {
     logger.info(common.debugLine(''))
     User.updateOne({ address: req.body.address }, { $set: { homephone: req.body.phone, homeaddress: req.body.homeaddress, homepostalcode: req.body.postal } })

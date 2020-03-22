@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/service/user.service';
 import { VariableService } from 'src/app/service/variable.service';
 import { ValidationService } from 'src/app/validations/validation.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 declare var M: any;
 @Component({
   selector: 'app-mytickets',
@@ -12,11 +12,11 @@ declare var M: any;
 export class MyticketsComponent implements OnInit {
   ticket: {}
   selectedFile: File = null;
-  openTickets= []
-  resTickets= []
+  openTickets = []
+  resTickets = []
   constructor(private _http: UserService,
     private _var: VariableService, private _val: ValidationService
-    , private _router: Router) {
+    , private _router: Router, private _route: ActivatedRoute) {
 
   }
 
@@ -29,7 +29,7 @@ export class MyticketsComponent implements OnInit {
 
     this._http.getUserTickets(this._var.userdetails["address"])
       .subscribe(r => {
-        if(r["statusCode"]==200){
+        if (r["statusCode"] == 200) {
           console.log(r["result"])
           var temp = []
           if (r["result"].length == undefined) {
@@ -42,32 +42,32 @@ export class MyticketsComponent implements OnInit {
             }
           }
           else {
-        
+
             for (var i = 0; i < r["result"].length; i++) {
-          
+
               if (r["result"][i]["resolved"]) {
                 this.resTickets.push(r["result"][i])
               }
               else {
                 this.openTickets.push(r["result"][i])
               }
-           
+
             }
           }
         }
-        else{
+        else {
           M.toast({ html: "Operation Failed", classes: 'rounded' })
         }
         console.log(this.openTickets)
-        console.log( this.resTickets)
+        console.log(this.resTickets)
       })
-   
+
   }
 
-  // onSearchChange(){
-  //   this._http.searchTickets()
-  //   .subscribe()
-  // }
+  viewTicket(event: any) {
+    //console.log(event.srcElement.id)
+    this._router.navigate(['user/ticket', event.srcElement.id])
+  }
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];

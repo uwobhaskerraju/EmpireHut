@@ -129,16 +129,16 @@ export class UserService {
     return this._http.post(URL, jsnData);
   }
 
-  createTicket(fileObj,address,ticket) {
+  createTicket(fileObj, address, ticket) {
     let url = environment.apiBaseURL + 'user/create/ticket';
     const fd = new FormData();
     fd.append('address', address);
-    fd.append('date',new Date().toISOString().slice(0,10).concat('_',(new Date()).getTime().toString()));
-    fd.append('subject',ticket['subject']);
-    fd.append('desc',ticket['desc']);
+    fd.append('date', new Date().toISOString().slice(0, 10).concat('_', (new Date()).getTime().toString()));
+    fd.append('subject', ticket['subject']);
+    fd.append('desc', ticket['desc']);
     fd.append('image', fileObj, fileObj.name);
- 
-    return this._http.post(url,fd)
+
+    return this._http.post(url, fd)
   }
 
   rejectProposal(propObj: any) {
@@ -158,9 +158,32 @@ export class UserService {
     return this._http.get(URL);
   }
 
-  getUserTickets(address:String){
-    let url=environment.apiBaseURL+'/user/tickets/'+address;
+  getUserTickets(address: String) {
+    let url = environment.apiBaseURL + 'user/tickets/' + address;
     return this._http.get(url)
+  }
+
+  getTicketDetails(ticketID: String) {
+    let url = environment.apiBaseURL + 'user/tickets/fetch/' + ticketID;
+    return this._http.get(url)
+  }
+  resolveTicket(ticketID,state) {
+    let url = environment.apiBaseURL + 'user/ticket/resolve'
+    let jsnData={
+      ticketID:ticketID,
+      state:state
+    }
+    return this._http.post(url,jsnData)
+  }
+  submitTicketComment(ticketID: String, name: String, comment: String, address) {
+    let url = environment.apiBaseURL + 'user/ticket/comment';
+    let jsnData = {
+      username: name,
+      ticketID: ticketID,
+      comment: comment,
+      address: address
+    }
+    return this._http.post(url, jsnData)
   }
 
   toggleAsset(id: any, hidden: any) {
