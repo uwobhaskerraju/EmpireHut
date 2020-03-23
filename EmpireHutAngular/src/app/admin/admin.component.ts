@@ -12,14 +12,15 @@ import { VariableService } from '../service/variable.service';
 export class AdminComponent implements OnInit {
   imagePath: String
   userDetails: Object
-  tokenCount: String
+  tokenCount: any
   constructor(private _http: AdminService,
     private router: Router, private _VariableService: VariableService
     , private route: ActivatedRoute) {
     // this.userDetails["balance"] = 0;
   }
   ngOnChanges() {
-    this.userDetails["balance"] = 0;
+    this.userDetails = { balance: 0 }
+    this.tokenCount=0
   }
   ngOnInit() {
     // this should be like this as we are checking token to update userdetails
@@ -51,7 +52,7 @@ export class AdminComponent implements OnInit {
 
   logout() {
     localStorage.clear();
-    this._VariableService.userdetails=null;
+    this._VariableService.userdetails = null;
     this.router.navigate([''])
   }
 
@@ -67,8 +68,8 @@ export class AdminComponent implements OnInit {
       case 3:
         this.router.navigate(['user'], { relativeTo: this.route });
         break;
-        case 4:
-          this.router.navigate(['tickets'],{ relativeTo: this.route })
+      case 4:
+        this.router.navigate(['tickets'], { relativeTo: this.route })
     }
 
   }

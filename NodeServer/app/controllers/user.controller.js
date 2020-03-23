@@ -777,16 +777,18 @@ exports.getSearchedAssets = (req, res) => {
     var q = req.body.value
     var ownedTokens = req.app.tokenIDs
     Asset.find({ hidden: false, tokenID: { $nin: ownedTokens } })
-        .select({ "name": 1, "_id": 1, "picture": 1 })
-        .then(data => {
+    .select({ "name": 1, "_id": 1, "picture": 1, "address": 1, "postalcode": 1, "city": 1, province: 1 })
+    .then(data => {
             var fnlJson = []
             ////console.log(data)
             data.forEach(d => {
-                ////console.log(Object.keys(d.toObject()))
+                var temp = ['_id', 'picture']
                 Object.keys(d.toObject()).forEach(function (key) {
                     // console.table('Key : ' + key + ', Value : ' + d[key])
-                    if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
-                        fnlJson.push(d)
+                    if (!temp.includes(key)) {
+                        if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
+                            fnlJson.push(d)
+                        }
                     }
                 })
                 //return false

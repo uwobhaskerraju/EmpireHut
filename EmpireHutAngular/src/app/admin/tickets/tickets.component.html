@@ -1,12 +1,24 @@
 <blockquote>
-    <h3>Open Tickets</h3>
+  <h3>Open Tickets</h3>
 </blockquote>
+<nav>
+  <div class="nav-wrapper">
+    <form>
+      <div class="input-field">
+        <input placeholder="Search Tickets"
+          (input)="onSearchChange($event.target.value)" type="search" required>
+        <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+        <i class="material-icons">close</i>
+      </div>
+    </form>
+  </div>
+</nav>
 <ul class="collection with-header" *ngIf="tickets">
-    <li class="collection-header">
-      <h4>Tickets</h4>
-    </li>
-    <li class="collection-item" *ngFor="let ticket of tickets">
-      <div class="truncate">{{ticket["subject"]}}<a href="javascript:void(0);" (click)="viewTicket($event)" class="secondary-content"><i
-        id="{{ticket['_id']}}"  class="material-icons">send</i></a></div>
-    </li>
-  </ul>
+  <li class="collection-header">
+    <h4>Tickets</h4>
+  </li>
+  <li class="collection-item" *ngFor="let ticket of tickets">
+    <div class="truncate">{{ticket["subject"]}}<a href="javascript:void(0);" (click)="viewTicket($event)"
+        class="secondary-content"><i id="{{ticket['_id']}}" class="material-icons">send</i></a></div>
+  </li>
+</ul>

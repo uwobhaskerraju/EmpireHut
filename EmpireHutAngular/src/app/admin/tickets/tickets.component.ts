@@ -8,9 +8,9 @@ declare var M: any;
   styleUrls: ['./tickets.component.css']
 })
 export class TicketsComponent implements OnInit {
-  tickets: {}
+  tickets: any
   constructor(private _router: Router, private _http: AdminService) {
-    this.tickets = { subject: '' }
+    //this.tickets = { subject: '' }
   }
 
   ngOnInit() {
@@ -35,5 +35,19 @@ export class TicketsComponent implements OnInit {
   viewTicket(event) {
     this._router.navigate(['admin/ticket', event.srcElement.id])
   }
+  onSearchChange(value) {
+    if (String(value).length > 0 && this.tickets.length > 1) {
+      var temp = [];
+      for (var i = 0; i < this.tickets.length; i++) {
+        if (String(this.tickets[i].subject).includes(value)) {
+          temp = this.tickets[i]
+        }
+      }
+      this.tickets = temp;
+    }
+    else {
+      this.ngOnInit()
+    }
 
+  }
 }

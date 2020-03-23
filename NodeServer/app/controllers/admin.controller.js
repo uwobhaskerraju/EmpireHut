@@ -83,7 +83,7 @@ try {
                 })
             });
     }
-    exports.getTicketDetails = (req, res,next) => {
+    exports.getTicketDetails = (req, res, next) => {
         logger.info(common.debugLine(''))
         Ticket.find({ _id: mongoose.Types.ObjectId(req.params.id) })
             .select({ owner: 0, _id: 0 })
@@ -483,17 +483,20 @@ try {
         var threshold = 0.25
         var q = req.params.id
         Asset.find()
-            .select({ "name": 1, "_id": 1, "picture": 1 })
+            .select({ "name": 1, "_id": 1, "picture": 1, "address": 1, "postalcode": 1, "city": 1, province: 1 })
             .then(data => {
                 var fnlJson = []
                 ////console.log(data)
                 data.forEach(d => {
-                    ////console.log(Object.keys(d.toObject()))
+                    var temp = ['_id', 'picture']
                     Object.keys(d.toObject()).forEach(function (key) {
-                        // console.table('Key : ' + key + ', Value : ' + d[key])
-                        if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
-                            fnlJson.push(d)
+                        //console.table('Key : ' + key + ', Value : ' + d[key])
+                        if (!temp.includes(key)) {
+                            if (dice(String(d[key]).toLowerCase(), String(q).toLowerCase()) >= threshold) {
+                                fnlJson.push(d)
+                            }
                         }
+
                     })
                     //return false
                     ////console.log("next loop")
