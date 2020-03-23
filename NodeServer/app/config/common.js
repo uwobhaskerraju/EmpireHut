@@ -5,7 +5,7 @@
         fileName = fileName.split("\\")[fileName.split("\\").length - 1];
         let lineNumber = frame.split(":")[2];
         let functionName = frame.split(" ")[5];
-        return functionName + ":" + fileName + ":" + lineNumber + " " + message;
+        return functionName + "||" + fileName + "||" + lineNumber + "||" + message;
     }
     function generateReq(req){
         let jsonCmbd = '';
