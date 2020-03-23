@@ -67,6 +67,8 @@ export class AdminComponent implements OnInit {
       case 3:
         this.router.navigate(['user'], { relativeTo: this.route });
         break;
+        case 4:
+          this.router.navigate(['tickets'],{ relativeTo: this.route })
     }
 
   }

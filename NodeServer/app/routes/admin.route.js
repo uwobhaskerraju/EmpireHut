@@ -27,5 +27,9 @@ module.exports = (app) => {
 
     app.get('/admin/expire', admin.revertTransactions, web3.revertTransactions, admin.revertTransUpdate);
 
-    //app.post('/admin/test', admin.someTest,admin.test2);
+    app.get('/admin/tickets',checkrequest.CheckToken,admin.getTickets)
+
+    app.get('/admin/ticket/:id',checkrequest.CheckToken,admin.getTicketDetails, admin.getTicketResponses)
+
+    app.post('/admin/ticket/comment',checkrequest.CheckToken,admin.createComment)
 }

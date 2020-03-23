@@ -3,6 +3,8 @@ try {
     const shortid = require('shortid');
     const Asset = require('../models/asset.model');
     const User = require('../models/user.model');
+    const Ticket = require('../models/ticket.model');
+    const TicketResp = require('../models/ticketresponse.model');
     var mongoose = require('mongoose');
     var dice = require('dice-coefficient')
     const Notification = require('../models/notification.model');
@@ -53,6 +55,95 @@ try {
                 })
             });
     }
+
+    exports.createComment = (req, res) => {
+        logger.info(common.debugLine(''))
+        let tickJsn = {
+            "ticketID": req.body.ticketID,
+            "name": req.body.username,
+            "comment": req.body.comment,
+            "owner": req.body.address
+        }
+        let tickObj = new TicketResp(tickJsn);
+        tickObj.save()
+            .then(r => {
+                if (r["_id"]) {
+                    res.json({ statusCode: 200, result: true })
+                }
+                else {
+                    res.json({ statusCode: 300, result: false })
+                }
+            })
+            .catch(err => {
+                logger.error(common.debugLine(err));
+                logger.error(common.debugLine(common.generateReq(req)));
+                res.json({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
+    exports.getTicketDetails = (req, res,next) => {
+        logger.info(common.debugLine(''))
+        Ticket.find({ _id: mongoose.Types.ObjectId(req.params.id) })
+            .select({ owner: 0, _id: 0 })
+            .then(r => {
+                if (r.length > 0) {
+                    var createdAt = (new Date(r[0]["createdAt"])).toDateString();
+                    var updatedAt = (new Date(r[0]["updatedAt"])).toDateString();
+                    //console.log(Object.keys(r[0]))
+                    r[0].updatedAt = updatedAt
+                    r[0]["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
+                    //console.log(r[0])
+                    req.app.locals.ticket = r
+                    next();
+                }
+                else {
+                    res.json({ statusCode: 300, result: false })
+                }
+
+            })
+            .catch(err => {
+                logger.error(common.debugLine(err));
+                logger.error(common.debugLine(common.generateReq(req)));
+                res.json({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
+
+    exports.getTicketResponses = (req, res) => {
+        TicketResp.find({ ticketID: mongoose.Types.ObjectId(req.params.id) })
+            .select({ name: 1, comment: 1, createdAt: 1, _id: 0 })
+            .then(r => {
+                res.json({ statusCode: 200, response: r, ticket: req.app.locals.ticket })
+            })
+            .catch(err => {
+                logger.error(common.debugLine(err));
+                logger.error(common.debugLine(common.generateReq(req)));
+                res.json({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
+    exports.getTickets = (req, res) => {
+        logger.info(common.debugLine(''))
+        Ticket.find({ resolved: false })
+            .then(r => {
+                res.json({ statusCode: 200, result: r })
+            })
+            .catch(err => {
+                logger.error(common.debugLine(err))
+                logger.error(common.debugLine(common.generateReq(req)))
+                res.json({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            });
+    }
+
 
     exports.revertTransUpdate = (req, res) => {
         logger.info(common.debugLine(''))

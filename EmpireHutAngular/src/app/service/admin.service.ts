@@ -38,9 +38,9 @@ export class AdminService {
       name: value.name,
       address: value.address,
       area: value.area,
-      postal:value.postalcode,
-      city:value.city,
-      province:value.province
+      postal: value.postalcode,
+      city: value.city,
+      province: value.province
     }
     return this._http.post(URL, jsnData);
   }
@@ -81,11 +81,32 @@ export class AdminService {
 
   toggleAsset(id: any, hidden: any) {
     let URL = environment.apiBaseURL + 'admin/asset/toggle';
-    let jsnData ={
+    let jsnData = {
       id: id,
       state: hidden
     }
     console.log(jsnData)
     return this._http.post(URL, jsnData)
+  }
+
+  getTickets() {
+    let url = environment.apiBaseURL + 'admin/tickets'
+    return this._http.get(url)
+  }
+
+  getTicketDetails(ticket: any) {
+    let url = environment.apiBaseURL + 'admin/ticket/' + ticket
+    return this._http.get(url)
+  }
+
+  submitTicketComment(ticketID: String, name: String, comment: String, address) {
+    let url = environment.apiBaseURL + 'admin/ticket/comment';
+    let jsnData = {
+      username: name,
+      ticketID: ticketID,
+      comment: comment,
+      address: address
+    }
+    return this._http.post(url, jsnData)
   }
 }

@@ -23,7 +23,18 @@ export class ValidationService {
     }
     return msg
   }
-
+  validateTicketComment(comment){
+    let msg = ''
+    if (Boolean(comment)) {
+      if (String(comment).length < 1 || String(comment).length > 500) {
+        msg = msg.concat("comment should be less than 500||")
+      }
+    }
+    else {
+      msg = 'comment shouldnt be empty||'
+    }
+    return msg
+  }
   validateSubject(subject:String){
     let msg = ''
     if (Boolean(subject)) {

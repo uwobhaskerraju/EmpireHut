@@ -13,8 +13,8 @@ import { AdminhomdetailsComponent } from '../app/admin/adminhomdetails/adminhomd
 import { CreateassetComponent } from '../app/admin/createasset/createasset.component'
 import { UsersComponent } from '../app/admin/users/users.component'
 import { UserdetailsComponent } from '../app/admin/userdetails/userdetails.component'
-
-
+import { TicketsComponent } from '../app/admin/tickets/tickets.component'
+import{AdminticketdetailsComponent} from '../app/admin/adminticketdetails/adminticketdetails.component'
 
 import { UserComponent } from '../app/user/user.component'
 import { AssetsComponent } from '../app/user/assets/assets.component'
@@ -34,7 +34,9 @@ const routes: Routes = [
       { path: 'asset/:id', component: AdminhomdetailsComponent },
       { path: 'create', component: CreateassetComponent },
       { path: 'user', component: UsersComponent },
-      { path: 'user/view/:id', component: UserdetailsComponent }
+      { path: 'user/view/:id', component: UserdetailsComponent },
+      { path: 'tickets', component: TicketsComponent },
+      { path: 'ticket/:id', component: AdminticketdetailsComponent }
     ], canActivate: [AuthGuard], data: { role: 'admin' }
   },
   {
