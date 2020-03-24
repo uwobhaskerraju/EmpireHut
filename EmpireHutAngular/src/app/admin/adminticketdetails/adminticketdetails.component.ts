@@ -62,6 +62,7 @@ export class AdminticketdetailsComponent implements OnInit {
         .subscribe(r => {
           if (r["statusCode"] == 200) {
             M.toast({ html: "Operation Successful", classes: 'rounded' })
+            this.ngOnInit()
           }
           else {
             M.toast({ html: "Operation Failed", classes: 'rounded' })

@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 var validator = require("email-validator");
 require('dotenv').config()
-
+const logger = require('../../logger');
+const common = require('../config/common');
 //References:
 // 1. https://www.youtube.com/watch?v=mbsmsi7l3r4 - how to setup jwt secret key
 
@@ -113,22 +114,32 @@ function userLoginCheck(req, res, next) {
 }
 
 function checkToken(req, res, next) {
-    //console.log(req.headers)
-    // console.log("inside checktoken")
-    var bearerHeader = req.headers["authorization"]
-    if (bearerHeader === undefined) {
-        return res.json({ statusCode: 500, message: errMsg })
+    try{
+        logger.info(common.debugLine(''))
+        var bearerHeader = req.headers["authorization"]
+        if (bearerHeader === undefined) {
+            return res.json({ statusCode: 500, message: errMsg })
+        }
+        else {
+    
+            var reqToken = bearerHeader.split(' ')[1]
+            jwt.verify(reqToken, secret, (err, decoded) => {
+                if (err) return res.status(500).send({ message: errMsg })
+                req.secret = secret;
+                req.token = reqToken;
+                next();
+            });
+        }
     }
-    else {
-
-        var reqToken = bearerHeader.split(' ')[1]
-        jwt.verify(reqToken, secret, (err, decoded) => {
-            if (err) return res.status(500).send({ message: errMsg })
-            req.secret = secret;
-            req.token = reqToken;
-            next();
-        });
+    catch(error){
+        logger.error(common.debugLine(error));
+        logger.error(common.debugLine(common.generateReq(req)));
+        res.json({
+            statusCode: 500,
+            result: dataConfig.GlobalErrMsg
+        })
     }
+    
 }
 
 function decodetoken(req, res, next) {
@@ -138,7 +149,7 @@ function decodetoken(req, res, next) {
         return res.json({ statusCode: 500, result: errMsg })
     }
     else {
-        
+
         var role = ['user', 'admin']
         var reqToken = bearerHeader.split(' ')[1]
         //console.log(reqToken)

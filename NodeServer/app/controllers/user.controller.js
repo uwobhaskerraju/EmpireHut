@@ -145,17 +145,19 @@ exports.getTickets = (req, res) => {
 
 exports.getTicketDetails = (req, res, next) => {
     logger.info(common.debugLine(''))
-    Ticket.find({ _id: mongoose.Types.ObjectId(req.params.id) })
+    Ticket.find({ _id: mongoose.Types.ObjectId(req.body.ticketID), owner: req.body.address })
         .select({ owner: 0, _id: 0 })
         .then(r => {
             if (r.length > 0) {
-                var createdAt = (new Date(r[0]["createdAt"])).toDateString();
-                var updatedAt = (new Date(r[0]["updatedAt"])).toDateString();
-                //console.log(Object.keys(r[0]))
-                r[0].updatedAt = updatedAt
-                r[0]["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
-                //console.log(r[0])
-                req.app.locals.ticket = r
+                var clone = JSON.parse(JSON.stringify(Object.create(r[0])))
+                var createdAt = (new Date(clone["createdAt"])).toDateString();
+                var updatedAt = (new Date(clone["updatedAt"])).toDateString();
+                //console.log(clone['createdAt'])
+                // clone.updatedAt = updatedAt
+                clone["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
+                clone["createdAt"] = createdAt
+                clone["updatedAt"] = updatedAt
+                req.app.locals.ticket = clone
                 next();
             }
             else {
@@ -177,7 +179,16 @@ exports.getTicketResponses = (req, res) => {
     TicketResp.find({ ticketID: mongoose.Types.ObjectId(req.params.id) })
         .select({ name: 1, comment: 1, createdAt: 1, _id: 0 })
         .then(r => {
-            res.json({ statusCode: 200, response: r, ticket: req.app.locals.ticket })
+            // console.log(r)
+            var clone = [];
+            for (var i = 0; i < r.length; i++) {
+                clone.push(JSON.parse(JSON.stringify(Object.create(r[i]))))
+            }
+            for (var i = 0; i < clone.length; i++) {
+                clone[i]["createdAt"] = (new Date(clone[i]["createdAt"])).toDateString();
+            }
+            //console.log(clone)
+            res.json({ statusCode: 200, response: clone, ticket: req.app.locals.ticket })
         })
         .catch(err => {
             logger.error(common.debugLine(err));
@@ -242,8 +253,21 @@ exports.createComment = (req, res) => {
     let tickObj = new TicketResp(tickJsn);
     tickObj.save()
         .then(r => {
+            //console.log(r)
             if (r["_id"]) {
-                res.json({ statusCode: 200, result: true })
+                Ticket.updateOne({ _id: mongoose.Types.ObjectId(req.body.ticketID) }, { $set: { resolved: false } })
+                    .then(rr => {
+                        res.json({ statusCode: 200, result: true })
+                    })
+                    .catch(err => {
+                        logger.error(common.debugLine(err));
+                        logger.error(common.debugLine(common.generateReq(req)));
+                        res.json({
+                            statusCode: 500,
+                            result: dataConfig.GlobalErrMsg
+                        })
+                    });
+
             }
             else {
                 res.json({ statusCode: 300, result: false })
@@ -777,8 +801,8 @@ exports.getSearchedAssets = (req, res) => {
     var q = req.body.value
     var ownedTokens = req.app.tokenIDs
     Asset.find({ hidden: false, tokenID: { $nin: ownedTokens } })
-    .select({ "name": 1, "_id": 1, "picture": 1, "address": 1, "postalcode": 1, "city": 1, province: 1 })
-    .then(data => {
+        .select({ "name": 1, "_id": 1, "picture": 1, "address": 1, "postalcode": 1, "city": 1, province: 1 })
+        .then(data => {
             var fnlJson = []
             ////console.log(data)
             data.forEach(d => {

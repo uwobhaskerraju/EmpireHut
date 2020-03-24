@@ -163,17 +163,21 @@ export class UserService {
     return this._http.get(url)
   }
 
-  getTicketDetails(ticketID: String) {
-    let url = environment.apiBaseURL + 'user/tickets/fetch/' + ticketID;
-    return this._http.get(url)
-  }
-  resolveTicket(ticketID,state) {
-    let url = environment.apiBaseURL + 'user/ticket/resolve'
-    let jsnData={
-      ticketID:ticketID,
-      state:state
+  getTicketDetails(ticketID: String, address: String) {
+    let url = environment.apiBaseURL + 'user/tickets/fetch'
+    let jsnData = {
+      ticketID: ticketID,
+      address: address
     }
-    return this._http.post(url,jsnData)
+    return this._http.post(url, jsnData)
+  }
+  resolveTicket(ticketID, state) {
+    let url = environment.apiBaseURL + 'user/ticket/resolve'
+    let jsnData = {
+      ticketID: ticketID,
+      state: state
+    }
+    return this._http.post(url, jsnData)
   }
   submitTicketComment(ticketID: String, name: String, comment: String, address) {
     let url = environment.apiBaseURL + 'user/ticket/comment';

@@ -63,7 +63,7 @@ module.exports = (app) => {
 
     app.get('/user/tickets/:id', checkrequest.CheckToken, user.getTickets);
 
-    app.get('/user/tickets/fetch/:id', checkrequest.CheckToken,user.getTicketDetails, user.getTicketResponses)
+    app.post('/user/tickets/fetch', checkrequest.CheckToken,user.getTicketDetails, user.getTicketResponses)
 
     app.post('/user/ticket/comment',checkrequest.CheckToken,user.createComment)
 

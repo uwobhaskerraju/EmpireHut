@@ -28,7 +28,7 @@ export class TicketdetailsComponent implements OnInit {
     this.routeSub = this.route.params.subscribe(params => {
       this.ticketID = params['id']
     });
-    this._http.getTicketDetails(this.ticketID)
+    this._http.getTicketDetails(this.ticketID, this._var.userdetails["address"])
       .subscribe(r => {
         var temp = []
         if (r["statusCode"] == 200) {
@@ -44,7 +44,8 @@ export class TicketdetailsComponent implements OnInit {
           // console.log(this.ticketResp)
         }
         else {
-          M.toast({ html: "Something went wrong", classes: 'rounded' })
+          M.toast({ html: "Not Authorized", classes: 'rounded' })
+          this._router.navigate(['user/tickets'])
         }
       })
   }
@@ -79,6 +80,7 @@ export class TicketdetailsComponent implements OnInit {
       .subscribe(r => {
         if (r["statusCode"] == 200) {
           M.toast({ html: "Operation Successful", classes: 'rounded' })
+          this.ngOnInit()
         }
         else {
           M.toast({ html: "Operation Failed", classes: 'rounded' })

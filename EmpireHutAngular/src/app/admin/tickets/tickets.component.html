@@ -22,3 +22,6 @@
         class="secondary-content"><i id="{{ticket['_id']}}" class="material-icons">send</i></a></div>
   </li>
 </ul>
+<div class="row center-align" *ngIf="tickets?.length == 0">
+  <h3 class="blue-text">No Tickets</h3>
+</div>

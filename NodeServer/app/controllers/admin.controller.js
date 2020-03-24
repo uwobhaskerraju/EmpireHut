@@ -89,13 +89,15 @@ try {
             .select({ owner: 0, _id: 0 })
             .then(r => {
                 if (r.length > 0) {
-                    var createdAt = (new Date(r[0]["createdAt"])).toDateString();
-                    var updatedAt = (new Date(r[0]["updatedAt"])).toDateString();
-                    //console.log(Object.keys(r[0]))
-                    r[0].updatedAt = updatedAt
-                    r[0]["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
-                    //console.log(r[0])
-                    req.app.locals.ticket = r
+                    var clone = JSON.parse(JSON.stringify(Object.create(r[0])))
+                    var createdAt = (new Date(clone["createdAt"])).toDateString();
+                    var updatedAt = (new Date(clone["updatedAt"])).toDateString();
+                    //console.log(clone['createdAt'])
+                    // clone.updatedAt = updatedAt
+                    clone["filePath"] = String(r[0]["filePath"]).split('___')[String(r[0]["filePath"]).split('___').length - 1]
+                    clone["createdAt"] = createdAt
+                    clone["updatedAt"] = updatedAt
+                    req.app.locals.ticket = clone
                     next();
                 }
                 else {
