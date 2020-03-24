@@ -138,7 +138,7 @@ function logResponse(obj) {
         return JSON.stringify(body);
     }
     catch (r) {
-        logger.error(r);
+        logger.error(common.debugLine(r))
     }
 
 }
@@ -187,6 +187,10 @@ require('./app/routes/user.route.js')(router);
 function showTime() {
     app.runMiddleware(
         "/api/admin/expire",
+        {
+            method: 'get'
+        }
+        ,
         function (code, data, headers) {
             //console.log(data); // it will be show 'this-is-the-cookie'
         }

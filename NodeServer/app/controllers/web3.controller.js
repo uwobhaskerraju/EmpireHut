@@ -813,10 +813,7 @@ try {
             .catch(r => {
                 logger.error(common.debugLine(r));
                 logger.error(common.debugLine(common.generateReq(req)));
-                res.json({
-                    statusCode: 500,
-                    result: dataConfig.GlobalErrMsg
-                })
+                res.end()
             });
 
 

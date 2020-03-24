@@ -16,7 +16,7 @@ try {
         Notification.find({ deal: false, active: true })
             .select({ _id: 1, proposalAddr: 1, proposedAmount: 1, datetime: 1 })
             .then(nots => {
-                ////console.log(nots.length)
+              //  console.log(nots)
                 var fnlRes = [];
                 if (nots.length > 0) {
                     for (var not of nots) {
@@ -32,27 +32,26 @@ try {
                     }
                     if (fnlRes.length > 0) {
                         req.app.result = fnlRes;
-                        ////console.log(fnlRes.length);
+                        //console.log(fnlRes.length);
                         next();
                         //  res.json({ statusCode: 200, result: "done" })
                     }
                     else {
-                        res.json({ statusCode: 200, result: "No Notifications" })
+                        res.end()
                     }
 
                 }
                 else {
-                    res.json({ statusCode: 200, result: "No Notifications" })
+                    //logger.info("hello")
+                   // res.setHeader('content-type', 'application/json')
+                    res.end()
                 }
                 //res.json(fnlRes);
             })
             .catch(err => {
                 logger.error(common.debugLine(err))
                 logger.error(common.debugLine(common.generateReq(req)))
-                res.json({
-                    statusCode: 500,
-                    result: dataConfig.GlobalErrMsg
-                })
+                res.end()
             });
     }
 
@@ -172,16 +171,14 @@ try {
 
         noti().then(r => {
             if (r) {
-                res.json({ statusCode: 200, result: "done" })
+                logger.info(common.debugLine('Revert Transactions Done'))
+                res.end()
             }
         })
             .catch(err => {
                 logger.error(common.debugLine(err))
                 logger.error(common.debugLine(common.generateReq(req)))
-                res.json({
-                    statusCode: 500,
-                    result: dataConfig.GlobalErrMsg
-                })
+                res.end()
             });
     }
 

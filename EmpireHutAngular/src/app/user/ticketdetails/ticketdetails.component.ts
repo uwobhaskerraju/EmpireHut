@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment.prod';
 import { VariableService } from 'src/app/service/variable.service';
+import { ValidationService } from 'src/app/validations/validation.service';
 declare var M: any;
 @Component({
   selector: 'app-ticketdetails',
@@ -19,7 +20,7 @@ export class TicketdetailsComponent implements OnInit {
   comment: String
 
   constructor(private _http: UserService, private route: ActivatedRoute,
-    private _var: VariableService, private _router: Router) {
+    private _var: VariableService, private _router: Router, private _val: ValidationService) {
     this.ticketDetails = { subject: '' }
     this.imagePath = environment.imagePath
   }
@@ -75,17 +76,24 @@ export class TicketdetailsComponent implements OnInit {
   }
 
   submitResponse(event) {
-    //console.log(event.srcElement.id)
-    this._http.submitTicketComment(event.srcElement.id, this._var.userdetails["username"], this.comment, this._var.userdetails["address"])
-      .subscribe(r => {
-        if (r["statusCode"] == 200) {
-          M.toast({ html: "Operation Successful", classes: 'rounded' })
-          this.ngOnInit()
-        }
-        else {
-          M.toast({ html: "Operation Failed", classes: 'rounded' })
-        }
-      })
+    let errMsg = ''
+
+    errMsg = errMsg.concat(this._val.validateTicketComment(String(this.comment).trim()))
+    if (!Boolean(errMsg)) {
+      this._http.submitTicketComment(event.srcElement.id, this._var.userdetails["username"], this.comment, this._var.userdetails["address"])
+        .subscribe(r => {
+          if (r["statusCode"] == 200) {
+            M.toast({ html: "Operation Successful", classes: 'rounded' })
+            this.ngOnInit()
+          }
+          else {
+            M.toast({ html: "Operation Failed", classes: 'rounded' })
+          }
+        })
+    }
+    else {
+      this._val.generateToast(errMsg)
+    }
   }
 
 }
