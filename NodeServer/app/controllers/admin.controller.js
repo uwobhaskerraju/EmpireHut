@@ -31,7 +31,7 @@ try {
                         // }
                     }
                     if (fnlRes.length > 0) {
-                        req.app.result = fnlRes;
+                        req.app.locals.result = fnlRes;
                         //console.log(fnlRes.length);
                         next();
                         //  res.json({ statusCode: 200, result: "done" })
@@ -160,7 +160,7 @@ try {
             });
         }
         const noti = async () => {
-            for (var not of req.app.result) {
+            for (var not of req.app.locals.result) {
                 //console.log(not)
                 if (not["done"]) {
                     await updateNotification(not);
@@ -194,9 +194,9 @@ try {
                 ////console.log(r)
                 if (r.length == 0) {
                     var rndStr = shortid.generate();
-                    req.app.randomStr = rndStr;
-                    req.app.price = req.body.area * dataConfig.pricesqft;
-                    req.app.latlong = Math.floor(Math.random() * (90 - (-90) + 1) + (-90)) + "/" + Math.floor(Math.random() * (180 - (-180) + 1) + (-180))
+                    req.app.locals.randomStr = rndStr;
+                    req.app.locals.price = req.body.area * dataConfig.pricesqft;
+                    req.app.locals.latlong = Math.floor(Math.random() * (90 - (-90) + 1) + (-90)) + "/" + Math.floor(Math.random() * (180 - (-180) + 1) + (-180))
                     next();
                 }
                 else {
@@ -218,7 +218,7 @@ try {
     }
     exports.insertAsset = (req, res) => {
         logger.info(common.debugLine(''))
-        var tokenID = req.app.tokenID;
+        var tokenID = req.app.locals.tokenID;
         //var user = req.body.userID;
         var assetObj = {
             "tokenID": tokenID,
@@ -226,9 +226,9 @@ try {
             "address": req.body.address,
             //  "owner": user,
             "picture": randomNumber() + ".jpg",
-            "price": req.app.price,
+            "price": req.app.locals.price,
             "area": req.body.area,
-            "latlong": req.app.latlong,
+            "latlong": req.app.locals.latlong,
             "postalcode": req.body.postal,
             "city": req.body.city,
             "province": req.body.province
@@ -260,7 +260,7 @@ try {
             .then(r => {
                 ////console.log(r)
                 if (r != null || r != undefined) {
-                    req.app.assetD = r;
+                    req.app.locals.assetD = r;
                     //console.log("next")
                     next();
                 }
@@ -281,7 +281,7 @@ try {
             .select({ username: 1, _id: 0, email: 1, address: 1 })
             .then(r => {
                 // //console.log(r)
-                req.app.user = r;
+                req.app.locals.user = r;
                 next();
             })
             .catch(err => {
@@ -295,12 +295,12 @@ try {
     };
     exports.getUserName = (req, res) => {
         logger.info(common.debugLine(''))
-        var asset = req.app.assetD[0];
+        var asset = req.app.locals.assetD[0];
         User.find({ address: asset["owner"] })
             .select({ username: 1, _id: 0 })
             .then(r => {
 
-                req.app.assetD[0] = null;
+                req.app.locals.assetD[0] = null;
                 //asset = asset.toObject();
                 delete asset.tokenID
                 asset.owner = r[0].username;
@@ -324,7 +324,7 @@ try {
         logger.info(common.debugLine(''))
         var result = [];
         const details = async () => {
-            var tokenIDs = req.app.tokenIDs
+            var tokenIDs = req.app.locals.tokenIDs
             for (var token of tokenIDs) {
                 const ret = await getDetails(token);
                 // //console.log(ret)
@@ -348,7 +348,7 @@ try {
             });
         }
         details().then(r => {
-            req.app.tokenIDs = null;
+            req.app.locals.tokenIDs = null;
             res.json({ statusCode: 200, result: result })
         })
             .catch(r => {
@@ -405,10 +405,10 @@ try {
         }
         var details = async () => {
 
-            var result = req.app.result;
+            var result = req.app.locals.result;
             // //console.log(result)
             //var reldup = result;
-            req.app.result = null;
+            req.app.locals.result = null;
             var ret = [];
             for (var value of result) {
                 var ad = []
@@ -459,7 +459,7 @@ try {
             .then(r => {
                 //res.json({ statusCode: 200, result: r });
                 if (r.length > 0) {
-                    req.app.details = r;
+                    req.app.locals.details = r;
                     next();
                 }
                 else {
@@ -533,7 +533,7 @@ try {
 
     exports.getuserAssets = (req, res) => {
         logger.info(common.debugLine(''))
-        var details = req.app.details;
+        var details = req.app.locals.details;
         Asset.find({ tokenID: { $in: details.tokenIds } })
             .select({ name: 1, _id: 1 })
             .then(r => {

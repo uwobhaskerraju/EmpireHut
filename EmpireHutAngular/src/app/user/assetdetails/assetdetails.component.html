@@ -47,13 +47,14 @@
             <tbody>
                 <tr>
                     <td>
-                        Change Asset value(EMP) : 
+                        Change Asset value(EMP) :
                     </td>
                     <td>
                         <input type="number" class="validate" min="1" max="999" [(ngModel)]="assetValue">
                     </td>
                     <td>
-                        <a class="waves-effect waves-light btn" (click)="updateAssetValue()"><i class="material-icons right">cloud</i>update</a>
+                        <a class="waves-effect waves-light btn" (click)="updateAssetValue()"><i
+                                class="material-icons right">cloud</i>update</a>
                     </td>
                 </tr>
             </tbody>
@@ -64,7 +65,10 @@
         <div class="section center">
             <h2>Transaction History</h2>
         </div>
-
+        <div class="row center">
+            <!-- <spam>Download Title History :</spam> -->
+            <a class="waves-effect waves-light btn" (click)="downloadPDF()"><i class="material-icons right">cloud_download</i>Download Title History</a>
+        </div>
         <div *ngIf="assetTrans">
             <table class="centered responsive-table">
                 <thead>

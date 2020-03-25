@@ -12,7 +12,7 @@ const expressSanitizer = require('express-sanitizer');
 const CryptoJS = require('crypto-js')
 const runMiddleware = require('run-middleware');
 const logger = require('./logger');
-
+//const common = require('/app/config/common');
 
 const https = require('https');
 const fs = require('fs');
@@ -64,33 +64,41 @@ router.use(function (req, res, next) {
     next()// make sure we go to the next routes and don't stop here
 });
 function encruptObject(body, entries, i) {
-    logger.info("inside encruptObject");
-    for (var entry of body[entries[i]]) {
-        var res = entry
-        // console.log(res)
-        var keys = Object.keys(res)
-        //console.log(keys)
-        for (let j = 0; j < keys.length; j++) {
-            //console.log(typeof(res[keys[j]]))
-            if (typeof (res[keys[j]]) == "object") {
-                if (res[keys[j]].length > 0) {
-                    encruptObject(entry, keys, j);
+    try {
+        logger.info("inside encruptObject");
+        //logger.info(Object.keys(body))
+        // logger.info(entries)
+        for (var entry of body[entries[i]]) {
+            var res = entry
+            // console.log(res)
+            var keys = Object.keys(res)
+           // console.log(keys)
+            for (let j = 0; j < keys.length; j++) {
+                //console.log(typeof(res[keys[j]]))
+                if (typeof (res[keys[j]]) == "object") {
+                    if (res[keys[j]].length > 0) {
+                        encruptObject(entry, keys, j);
+                    }
+                    //we are ignoring if length is zero
                 }
-                //we are ignoring if length is zero
-            }
-            else {
-                // console.log(j)
-                // console.log(keys[j])
-                // console.log(res[keys[j]])//value
-                //console.log(entry)
-                if (typeof (res[keys[j]]) != "string") {
-                    res[keys[j]] = String(res[keys[j]])
+                else {
+                    // console.log(j)
+                    // console.log(keys[j])
+                    // console.log(res[keys[j]])//value
+                    //console.log(entry)
+                    if (typeof (res[keys[j]]) != "string") {
+                        res[keys[j]] = String(res[keys[j]])
+                    }
+                    res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
                 }
-                res[keys[j]] = CryptoJS.AES.encrypt(res[keys[j]], process.env.key).toString()
+    
             }
-
         }
+     }
+    catch (error) {
+        logger.error(error)
     }
+   
 
 }
 
@@ -138,7 +146,7 @@ function logResponse(obj) {
         return JSON.stringify(body);
     }
     catch (r) {
-        logger.error(common.debugLine(r))
+        logger.error(r)
     }
 
 }

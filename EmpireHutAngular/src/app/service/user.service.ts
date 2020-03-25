@@ -99,6 +99,15 @@ export class UserService {
     return this._http.post(URL, jsnData);
   }
 
+  downloadPDF(address, assetID) {
+    let url = environment.apiBaseURL + 'user/asset/download'
+    let jsnData = {
+      address: address,
+      assetID: assetID
+    }
+
+    return this._http.post(url, jsnData)
+  }
   purchaseAsset(assetDetails: any, usrAdd: any, _amount: any) {
     let URL = environment.apiBaseURL + 'user/purchase';
     let jsnData = {

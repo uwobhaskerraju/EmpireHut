@@ -21,7 +21,7 @@ exports.getUserDetails = (req, res, next) => {
             .select({ username: 1, _id: 0, email: 1, address: 1, homephone: 1, homeaddress: 1, homepostalcode: 1 })
             .then(r => {
                 //console.log(r)
-                req.app.user = r;
+                req.app.locals.user = r;
                 next();
             })
             .catch(err => {
@@ -317,7 +317,7 @@ exports.getAllUserDetails = (req, res, next) => {
         .then(r => {
             //res.json({ statusCode: 200, result: r });
             if (r.length > 0) {
-                req.app.details = r;
+                req.app.locals.details = r;
                 next();
             }
             else {
@@ -336,7 +336,7 @@ exports.getAllUserDetails = (req, res, next) => {
 };
 exports.getuserAssets = (req, res) => {
     logger.info(common.debugLine(''))
-    var details = req.app.details;
+    var details = req.app.locals.details;
     Asset.find({ tokenID: { $in: details.tokenIds } })
         .select({ name: 1, _id: 1 })
         .then(r => {
@@ -360,7 +360,7 @@ exports.getAllAssets = async (req, res) => {
     logger.info(common.debugLine(''))
     var result = [];
     const details = async () => {
-        var tokenIDs = req.app.tokenIDs
+        var tokenIDs = req.app.locals.tokenIDs
         for (var token of tokenIDs) {
             const ret = await getDetails(token);
             // //console.log(ret)
@@ -384,7 +384,7 @@ exports.getAllAssets = async (req, res) => {
         });
     }
     details().then(r => {
-        req.app.tokenIDs = null;
+        req.app.locals.tokenIDs = null;
         res.json({ statusCode: 200, result: result })
     })
         .catch(r => {
@@ -413,7 +413,7 @@ exports.addNotifications = (req, res, next) => {
     obj.save()
         .then(r => {
             if (r != null || r != undefined) {
-                req.app.transferType = "Purchase Proposal Request"
+                req.app.locals.transferType = "Purchase Proposal Request"
                 req.body.to = req.body.proposalAddr;
                 req.body.proposalAddr = null;
                 req.body.amount = req.body.proposedAmount
@@ -446,9 +446,9 @@ exports.getAssetToken = (req, res, next) => {
         .select({ tokenID: 1, _id: 0 })
         .then(r => {
             if (r != null || r != undefined) {
-                req.app.tokenID = r[0]["tokenID"];
-                req.app.transferType = "Property Purchase"
-                //console.log("next")
+                req.app.locals.tokenID = r[0]["tokenID"];
+                req.app.locals.transferType = "Property Purchase"
+                //console.log(req.app.locals)
                 next();
                 //res.json(r[0]);
             }
@@ -496,10 +496,10 @@ exports.getUserNameFrmAddress = async (req, res) => {
     }
     var details = async () => {
 
-        var result = req.app.result;
+        var result = req.app.locals.result;
         // //console.log(result)
         //var reldup = result;
-        req.app.result = null;
+        req.app.locals.result = null;
         var ret = [];
         for (var value of result) {
             var ad = []
@@ -544,6 +544,153 @@ exports.getUserNameFrmAddress = async (req, res) => {
         });
 }
 
+exports.generateHTML = (req, res) => {
+    logger.info(common.debugLine(''))
+    var asset = req.app.locals.assetD[0]
+    var history = req.app.locals.history
+    var data = ''
+    for (var i = 0; i < history.length; i++) {
+        data = data.concat(`<tr><td> ${history[i]["date"]}</td><td>${history[i]["from"]}</td><td>${history[i]["to"]}</td></tr>`)
+    }
+    var html = `
+    <html>
+
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
+    </head>
+    
+    <body style="font-family: 'Pacifico', cursive;">
+        <div align="right">
+            <h4>Ticket ID : ${String(String(asset["_id"]).substr(String(asset["_id"]).length - 8)).toUpperCase()}</h4>
+        </div>
+        <div align="center">
+            <h1>Government of Canada</h1>
+            <h4>Government of Ontario</h4>
+        </div>
+        <div align="center">
+            <h1 style="font-family: 'Pacifico', cursive;">Title History Document</h1>
+        </div>
+        <hr>
+        <div align="center">
+        <h4>Asset Details</h4>
+    </div>
+    <div style="overflow-x:auto;">
+        <table>
+            <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>City,Province</th>
+            <th>Postal</th>
+            <th>Area (SqFt)</th>
+            </tr>
+            <tr>
+            <td>${asset["name"]}</td>
+            <td>${asset["address"]}</td>
+            <td>${asset["city"]} , ${asset["province"]} </td>
+            <td>${asset["postalcode"]}</td>
+            <td>${asset["area"]}</td>
+            </tr>
+        </table>
+        </div>
+        <br>
+        <div align="center">
+        <h4>Transaction History</h4>
+    </div>
+    <table>
+<tr>
+<th> Date</th>
+<th> From</th>
+<th> To</th>
+</tr>
+{data}
+    </table>
+    </body>
+    
+    </html>
+    `
+    html = html.replace('{data}', data)
+    //console.log(data)
+   // console.log(html)
+    //res.json({ statusCode: 200, result: req.app.locals.history, response: req.app.locals.assetD })
+    res.json({ statusCode: 200, result: html})
+}
+
+exports.getUserNameFrmAddressDown = async (req, res, next) => {
+    logger.info(common.debugLine(''))
+    var fnlRes = [];
+    var getData = (ad) => {
+        return new Promise((resolve, reject) => {
+            try {
+                // //console.log(ad)
+                regex = ad.map(function (e) { return new RegExp(e, "i"); });
+                User.find({ address: { $in: regex } })
+                    //User.find({ address: ad1 })
+                    .select({ username: 1, _id: 0, address: 1 })
+                    .then(r => {
+                        // //console.log(r)
+                        resolve(r);
+                    })
+                    .catch(r => {
+                        reject(r);
+                    });
+            } catch (error) {
+                reject(error);
+            }
+
+        });
+    }
+    var details = async () => {
+
+        var result = req.app.locals.result;
+        // //console.log(result)
+        //var reldup = result;
+        req.app.locals.result = null;
+        var ret = [];
+        for (var value of result) {
+            var ad = []
+            var ad1 = value["from"]
+            var ad2 = value["to"]
+            if (String(ad1).includes('0x')) {
+                ad.push(String(ad1).toLowerCase())
+            }
+            if (String(ad2).includes('0x')) {
+                ad.push(String(ad2).toLowerCase())
+            }
+            ////console.log(ad1 + " " + ad2)
+            if (ad.length > 0) {
+                var ret = await getData(ad);
+                for (var x of ret) {
+                    if (String(x["address"]).toLowerCase() == value["from"].toLowerCase()) {
+                        value["from"] = x["username"]
+                    }
+                    if (String(x["address"]).toLowerCase() == value["to"].toLowerCase()) {
+                        value["to"] = x["username"]
+                    }
+                }
+            }
+
+        }
+        return result.reverse();
+        ////console.log(result)
+    }
+
+    details().then(r => {
+        req.app.locals.history = r
+        next()
+        //res.json({ statusCode: 200, result: r })
+    })
+        .catch(r => {
+            logger.error(common.debugLine(r));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+
+        });
+}
+
+
 //get asset details
 exports.getAssetDetails = (req, res, next) => {
     logger.info(common.debugLine(''))
@@ -554,7 +701,37 @@ exports.getAssetDetails = (req, res, next) => {
         .then(r => {
             ////console.log(r)
             if (r != null || r != undefined) {
-                req.app.assetD = r;
+                req.app.locals.assetD = r;
+                next();
+            }
+            else {
+                res.json({
+                    statusCode: 500,
+                    result: dataConfig.GlobalErrMsg
+                })
+            }
+        })
+        .catch(err => {
+            logger.error(common.debugLine(err));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({
+                statusCode: 500,
+                result: dataConfig.GlobalErrMsg
+            })
+        });
+};
+
+//get asset details
+exports.getAssetDetailsTwo = (req, res, next) => {
+    logger.info(common.debugLine(''))
+    ////console.log(req.params.id)
+    var assetID = mongoose.Types.ObjectId(req.body.assetID)
+    // //console.log(assetID)
+    Asset.find({ _id: assetID, hidden: false })
+        .then(r => {
+            ////console.log(r)
+            if (r != null || r != undefined) {
+                req.app.locals.assetD = r;
                 next();
             }
             else {
@@ -591,7 +768,7 @@ exports.toggleAsset = (req, res) => {
 }
 exports.getUserAssets = (req, res) => {
     logger.info(common.debugLine(''))
-    var tokenIDs = req.app.tokenIDs
+    var tokenIDs = req.app.locals.tokenIDs
     Asset.find({ tokenID: { $in: tokenIDs } })
         .select({ picture: 1, name: 1, _id: 1 })
         .then(r => {
@@ -613,7 +790,7 @@ exports.getUserAddress = (req, res, next) => {
     User.find({ _id: mongoose.Types.ObjectId(id) })
         .select({ address: 1, _id: 0 })
         .then(r => {
-            req.app.address = r[0];
+            req.app.locals.address = r[0];
             next();
         })
         .catch(err => {
@@ -628,11 +805,11 @@ exports.getUserAddress = (req, res, next) => {
 
 exports.getUserName = (req, res) => {
     logger.info(common.debugLine(''))
-    var asset = req.app.assetD[0];
+    var asset = req.app.locals.assetD[0];
     User.find({ address: asset["owner"] })
         .select({ username: 1, _id: 0, address: 1 })
         .then(r => {
-            req.app.assetD[0] = null;
+            req.app.locals.assetD[0] = null;
             //asset = asset.toObject();
             delete asset.tokenID
             asset.owner = r[0].username;
@@ -653,7 +830,7 @@ exports.getUserName = (req, res) => {
 
 exports.getAllProposalUsers = (req, res) => {
     logger.info(common.debugLine(''))
-    var assets = req.app.notassets;
+    var assets = req.app.locals.notassets;
     var users = [];
     function onlyUnique(value, index, self) {
         return self.indexOf(value) === index;
@@ -726,7 +903,7 @@ exports.getAllUserProposals = (req, res, next) => {
     ])
         .then(r => {
             if (r.length > 0) {
-                req.app.notassets = r;
+                req.app.locals.notassets = r;
                 next();
             }
             else {
@@ -749,7 +926,7 @@ exports.rejectProposal = (req, res, next) => {
     logger.info(common.debugLine(''))
     var assetID = req.body.assetID;
     var notID = req.body.notID;
-    req.app.transferType = "[Rejected] Purchase Proposal"
+    req.app.locals.transferType = "[Rejected] Purchase Proposal"
     Notification.updateOne({ _id: mongoose.Types.ObjectId(notID) }, { $set: { active: false, deal: false } })
         .then(r => {
             next();
@@ -766,7 +943,7 @@ exports.rejectProposal = (req, res, next) => {
 
 exports.toggleNotification = (req, res, next) => {
     logger.info(common.debugLine(''))
-    var data = req.app.proposal;
+    var data = req.app.locals.proposal;
     // Notification.updateMany({ assetId: mongoose.Types.ObjectId(data["assetId"]) }, { $set: { active: false, deal: false } })
     //     .then(r => {
     // //console.log(r)
@@ -799,7 +976,7 @@ exports.getSearchedAssets = (req, res) => {
     logger.info(common.debugLine(''))
     var threshold = 0.25
     var q = req.body.value
-    var ownedTokens = req.app.tokenIDs
+    var ownedTokens = req.app.locals.tokenIDs
     Asset.find({ hidden: false, tokenID: { $nin: ownedTokens } })
         .select({ "name": 1, "_id": 1, "picture": 1, "address": 1, "postalcode": 1, "city": 1, province: 1 })
         .then(data => {
@@ -871,12 +1048,12 @@ exports.approveProposal = (req, res, next) => {
             ////console.log(data)
             if (data.length > 0) {
 
-                req.app.proposal = data[0];
+                req.app.locals.proposal = data[0];
                 // req.body.to = data["proposalAddr"]
                 // req.body.owner = data["owner"]
                 // req.body.amount = data["proposedAmount"]
-                req.app.transferType = "[Approved] Purchase Proposal"
-                req.app.tokenID = data[0]["tokenID"]
+                req.app.locals.transferType = "[Approved] Purchase Proposal"
+                req.app.locals.tokenID = data[0]["tokenID"]
                 ////console.log(req.app.tokenID)
                 //res.json(data);
                 next()

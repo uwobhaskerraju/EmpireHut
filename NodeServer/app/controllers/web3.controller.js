@@ -126,7 +126,7 @@ try {
             var _from = req.body.to;//(await web3.eth.getAccounts())[0];
             var _to = adminAddr;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
-            var type = req.app.transferType;
+            var type = req.app.locals.transferType;
             //console.log(_from + " " + _to + " " + value + " " + type)
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
                 res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
@@ -158,7 +158,7 @@ try {
             var _from = adminAddr;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
-            var type = req.app.transferType;
+            var type = req.app.locals.transferType;
             //console.log(_from + " " + _to + " " + value + " " + type)
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
                 res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
@@ -190,7 +190,7 @@ try {
             var _from = adminAddr;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
-            var type = req.app.transferType;
+            var type = req.app.locals.transferType;
 
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
                 res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
@@ -221,14 +221,15 @@ try {
         }
     }
 
-    exports.transferTo = (req, res, next) => {
-        logger.info(common.debugLine(''));
+    exports.transferTo = (req, res) => {
         try {
+            logger.info(common.debugLine(''));
+            //logger.info(req.app.locals)
             //_from =user , _to=owner. it will be opposite in next()
             var _from = req.body.to;//(await web3.eth.getAccounts())[0];
             var _to = req.body.owner;//(await web3.eth.getAccounts())[3];
             var value = req.body.amount;
-            var type = req.app.transferType;
+            var type = req.app.locals.transferType;
 
             if (!web3.utils.isAddress(_from) || !web3.utils.isAddress(_to)) {
                 res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
@@ -242,7 +243,7 @@ try {
                     // balance got deducted
                     //console.log("next")
                     //console.log(req.app.tokenID)
-                    next();
+                    res.json({ statusCode: 200, result: true });
                     //res.json({ statusCode: 200, data: { address: _to, balance: bal } });
                 })
                 .catch(err => {
@@ -316,7 +317,7 @@ try {
     exports.getUserDetails = (req, res) => {
         logger.info(common.debugLine(''));
         try {
-            var user = req.app.user;
+            var user = req.app.locals.user;
             // //console.log(user)
             var usrAddress = user[0]["address"]
             //var usrAddress = (await web3.eth.getAccounts())[3];
@@ -327,7 +328,7 @@ try {
                         // //console.log(bal);
                         user = user[0].toObject();
                         user.balance = bal;
-                        req.app.user = null;
+                        req.app.locals.user = null;
                         res.json({ statusCode: 200, result: user });
                     })
                     .catch(err => {
@@ -355,12 +356,14 @@ try {
     // calls to AssetToken
     /**************************/
 
-    exports.transferAsset = (req, res) => {
-        logger.info(common.debugLine(''));
+    exports.transferAsset = (req, res, next) => {
+
         try {
+            logger.info(common.debugLine(''));
+            //logger.info(req.app.locals)
             var _to = req.body.to;//(await web3.eth.getAccounts())[0];
             var _from = req.body.owner;//(await web3.eth.getAccounts())[3];
-            var tokenID = req.app.tokenID;
+            var tokenID = req.app.locals.tokenID;
             ////console.log(req.body)
             ////console.log(req.app)
             //console.log(_from + " " + _to + " " + tokenID)
@@ -375,7 +378,8 @@ try {
                 assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 50000, gas: gas })
                     .on('confirmation', function (confirmationNumber, receipt) {
                         ////console.log(receipt)
-                        res.json({ statusCode: 200, result: receipt });
+
+                        next();
                     })
                     .on('error', function (error, receipt) {
                         logger.error(common.debugLine(error));
@@ -399,7 +403,7 @@ try {
         try {
             // var adminAddr = req.body.userID;
 
-            var rndStr = String(web3.utils.soliditySha3(req.app.randomStr));
+            var rndStr = String(web3.utils.soliditySha3(req.app.locals.randomStr));
             //console.log(rndStr);
             assetcontract.methods.createAsset(rndStr).send({ from: adminAddr, gas: 1000000 })
                 .on('confirmation', function (confirmationNumber, receipt) {
@@ -413,7 +417,7 @@ try {
                         else {
                             //console.log(event);
                             if (event.length > 0) {
-                                req.app.tokenID = event[0]["returnValues"]["_tokenID"];
+                                req.app.locals.tokenID = event[0]["returnValues"]["_tokenID"];
                                 // //console.log(req.app.tokenID);
                                 // update mongoDB
                                 next();
@@ -467,13 +471,13 @@ try {
 
     exports.getAssetDetails = (req, res, next) => {
         logger.info(common.debugLine(''));
-        var tokenID = req.app.assetD[0]["tokenID"]
-        var jsnObj = req.app.assetD[0];
+        var tokenID = req.app.locals.assetD[0]["tokenID"]
+        var jsnObj = req.app.locals.assetD[0];
         assetcontract.methods.ownerOf(tokenID).call()
             .then(r => {
                 jsnObj = jsnObj.toObject();
                 var a = Object.assign(jsnObj, { owner: r });
-                req.app.assetD[0] = a;
+                req.app.locals.assetD[0] = a;
                 next();
             })
             .catch(err => {
@@ -484,13 +488,13 @@ try {
     };
     exports.getAllUserTokens = (req, res, next) => {
         logger.info(common.debugLine(''));
-        var ownedTokens = req.app.tokenIDs;
+        var ownedTokens = req.app.locals.tokenIDs;
         //console.log("getAllTokens")
         assetcontract.methods.getAllTokens().call()
             .then(r => {
                 //res.json({ statusCode: 200, data: { address: adminAddr, result: r } });
                 let difference = r.filter(x => !ownedTokens.includes(x));
-                req.app.tokenIDs = difference;
+                req.app.locals.tokenIDs = difference;
                 // //console.log(r)
                 next();
             })
@@ -506,7 +510,7 @@ try {
             .then(r => {
                 //res.json({ statusCode: 200, data: { address: adminAddr, result: r } });
                 //let difference = r.filter(x => !ownedTokens.includes(x));
-                req.app.tokenIDs = r;
+                req.app.locals.tokenIDs = r;
                 // //console.log(r)
                 next();
             })
@@ -522,7 +526,7 @@ try {
         // //console.log(address);
         assetcontract.methods.ownedTokensOfUser(address).call()
             .then(r => {
-                req.app.tokenIDs = r;
+                req.app.locals.tokenIDs = r;
                 next()
             })
             .catch(err => {
@@ -535,7 +539,7 @@ try {
         logger.info(common.debugLine(''));
         //console.log("web3 getTokensOfUser")
         var user = req.body.userID;
-        var tokenIDs = req.app.tokenIDs;
+        var tokenIDs = req.app.locals.tokenIDs;
         var fnlTokens = []
         assetcontract.methods.ownedTokensOfUser(user).call()
             .then(r => {
@@ -544,7 +548,7 @@ try {
                 if (r.length > 0) {
                     fnlTokens = tokenIDs.filter(x => !r.includes(x));
                     //console.log(fnlTokens)
-                    req.app.tokenIDs = fnlTokens;
+                    req.app.locals.tokenIDs = fnlTokens;
                 }
                 next();
             })
@@ -559,7 +563,7 @@ try {
     exports.getUserAssetCount = (req, res, next) => {
         logger.info(common.debugLine(''));
         // //console.log(req.app.details)
-        var resu = req.app.details[0];
+        var resu = req.app.locals.details[0];
         var address = resu["address"];
         assetcontract.methods.tokenCount(address).call()
             .then(r => {
@@ -569,7 +573,7 @@ try {
                 assetcontract.methods.ownedTokensOfUser(address).call()
                     .then(data => {
                         resu.tokenIds = data
-                        req.app.details = resu
+                        req.app.locals.details = resu
                         next();
                     })
                     .catch(err => {
@@ -753,8 +757,8 @@ try {
             }
         }
         details().then(r => {
-            //req.app.tokenIDs = null;
-            req.app.result = fnlResult;
+            //req.app.locals.tokenIDs = null;
+            req.app.locals.result = fnlResult;
             //console.log("next")
             next();
             //res.json({ statusCode: 200, result: fnlResult })
@@ -794,7 +798,7 @@ try {
         }
         const details = async () => {
             var fnlRes = [];
-            for (var tran of req.app.result) {
+            for (var tran of req.app.locals.result) {
                 //console.log("inside")
                 //console.log(tran)
                 var r = await revert(tran)
@@ -805,7 +809,7 @@ try {
         }
         details()
             .then(r => {
-                req.app.result = r;
+                req.app.locals.result = r;
                 ////console.log(r)
                 next();
                 // res.json({ statusCode: 200, result: req.app.result })
@@ -932,7 +936,7 @@ try {
             });
         }
         const details = async () => {
-            var tokenID = req.app.assetD[0]["tokenID"];
+            var tokenID = req.app.locals.assetD[0]["tokenID"];
             var endBlockNumber = await web3.eth.getBlockNumber();
             var startBlockNumber = 0;
             //console.log("Searching Transactions on tokenID : " + tokenID);
@@ -960,7 +964,7 @@ try {
         }
         details().then(r => {
             //req.app.tokenIDs = null;
-            req.app.result = r;
+            req.app.locals.result = r;
             // //console.log(r)
             next();
             //res.json({ statusCode: 200, result: r })

@@ -2,7 +2,7 @@ module.exports = (app) => {
     const user = require('../controllers/user.controller.js');
     const checkrequest = require('../middleware/appmiddleware.js');
     const web3 = require('../controllers/web3.controller.js');
-    
+
     var multer = require('multer')
     // const fs = require('fs');
 
@@ -26,7 +26,7 @@ module.exports = (app) => {
 
     app.post('/user/admin', checkrequest.CheckToken, web3.getOwner);
 
-    app.post('/user/purchase', checkrequest.CheckToken, user.getAssetToken, web3.transferTo, web3.transferAsset);
+    app.post('/user/purchase', checkrequest.CheckToken, user.getAssetToken, web3.transferAsset, web3.transferTo);
 
     //getting all assets that are not hidden
     //web3.getTokensOfUser,
@@ -63,10 +63,11 @@ module.exports = (app) => {
 
     app.get('/user/tickets/:id', checkrequest.CheckToken, user.getTickets);
 
-    app.post('/user/tickets/fetch', checkrequest.CheckToken,user.getTicketDetails, user.getTicketResponses)
+    app.post('/user/tickets/fetch', checkrequest.CheckToken, user.getTicketDetails, user.getTicketResponses)
 
-    app.post('/user/ticket/comment',checkrequest.CheckToken,user.createComment)
+    app.post('/user/ticket/comment', checkrequest.CheckToken, user.createComment)
 
-    app.post('/user/ticket/resolve',checkrequest.CheckToken,user.resolveTicket)
+    app.post('/user/ticket/resolve', checkrequest.CheckToken, user.resolveTicket)
 
+    app.post('/user/asset/download', checkrequest.CheckToken, user.getAssetDetailsTwo, web3.getAssetTransactions, user.getUserNameFrmAddressDown, user.generateHTML)
 }

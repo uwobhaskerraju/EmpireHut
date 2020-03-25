@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment.prod';
 import { VariableService } from 'src/app/service/variable.service';
+import * as jspdf from 'jspdf';
 
 declare var M: any;
 
@@ -75,14 +76,50 @@ export class AssetdetailsComponent implements OnInit {
     this.router.navigate(['user'])
   }
 
+  downloadPDF() {
+    this._http.downloadPDF(this._var.userdetails["address"], this.assetID)
+      .subscribe(r => {
+        console.log(r)
+        var doc = new jspdf('p', 'pt', 'letter');
+        
+        doc.setFontSize(12);
+       let margins = {
+          top: 30,
+          bottom: 30,
+          left: 10,
+          width: 900
+      };
+        // let specialElementHandlers = {
+        //   '#editor': function (element, renderer) {
+        //     return true;
+        //   }
+        // }
+        doc.fromHTML(r["result"], margins.left, margins.top, {
+          'width': margins.width
+          // ,
+          // 'elementHandlers':specialElementHandlers
+        })
+
+        doc.save('file.pdf')
+
+      })
+  }
 
   getAssetTransactionHistory() {
     this._http.getAssetTransactionHistory(this.assetID)
       .subscribe(r => {
+        //console.log(r)
         this.notrans = false
         if (r["statusCode"] == 200) {
-          //M.toast({ html: "Proposal Rejected", classes: 'rounded' })
-          this.assetTrans = r["result"];
+          if (r["result"].length == undefined) {
+            var temp = []
+            temp.push(r["result"])
+            this.assetTrans = temp
+          }
+          else {
+            this.assetTrans = r["result"];
+          }
+
         }
         else {
           M.toast({ html: "No Transaction History", classes: 'rounded' })
@@ -136,6 +173,7 @@ export class AssetdetailsComponent implements OnInit {
           // yes owner is admin(govt), so we can directly buy 
           this._http.purchaseAsset(this.assetDetails[0], this._var.userdetails["address"], this.amount)
             .subscribe(r => {
+              console.log(r)
               if (r["statusCode"] == 200) {
                 M.toast({ html: "Asset Purchased! :) ", classes: 'rounded' })
 
@@ -146,7 +184,7 @@ export class AssetdetailsComponent implements OnInit {
               else {
                 M.toast({ html: "Something went wrong. Try Later ", classes: 'rounded' })
               }
-              console.log(r);
+              // console.log(r);
             });
         }
         else {
