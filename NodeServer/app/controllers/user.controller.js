@@ -574,7 +574,7 @@ exports.generateHTML = (req, res) => {
         <div align="center">
         <h4>Asset Details</h4>
     </div>
-    <div style="overflow-x:auto;">
+    <div>
         <table>
             <tr>
             <th>Name</th>

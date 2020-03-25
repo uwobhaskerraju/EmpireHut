@@ -86,7 +86,7 @@ export class AssetdetailsComponent implements OnInit {
        let margins = {
           top: 30,
           bottom: 30,
-          left: 10,
+          left: 20,
           width: 900
       };
         // let specialElementHandlers = {
