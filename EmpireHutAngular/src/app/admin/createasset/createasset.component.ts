@@ -20,6 +20,7 @@ export class CreateassetComponent implements OnInit {
     M.AutoInit();
     M.updateTextFields();
     this.loader=false;
+    this._tokenCount.emit(0);
   }
 
   ngOnInit() {

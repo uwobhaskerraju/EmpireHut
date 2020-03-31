@@ -23,6 +23,7 @@ export class UserComponent implements OnInit {
   constructor(private _http: UserService, private router: Router,
     private _VariableService: VariableService, private route: ActivatedRoute) {
     M.AutoInit();
+   // this._VariableService.userdetails={balance:0}
     this.callTokenAndPerDetails();
   }
 

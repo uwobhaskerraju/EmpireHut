@@ -39,11 +39,11 @@ export class ValidationService {
     let msg = ''
     if (Boolean(subject)) {
       if (String(subject).length < 1 || String(subject).length > 101) {
-        msg = msg.concat("subject should be less than 100||")
+        msg = msg.concat("Subject should be less than 100||")
       }
     }
     else {
-      msg = 'subject shouldnt be empty||'
+      msg = 'Subject shouldnt be empty||'
     }
     return msg
   }
@@ -303,17 +303,17 @@ export class ValidationService {
 
   validatePhoneNumber(number:any){
     if (String(number).length == 0) {
-      return "number cannot be empty||"
+      return "Phone Number cannot be empty||"
     }
     let errMsg = '';
     if (Boolean(number)) {
       if (String(number).length < 0 || String(number).length > 11) {
         //console.log("here area")
-        errMsg = errMsg.concat('number should be max of 10 characters||')
+        errMsg = errMsg.concat('Phone Number should be max of 10 characters||')
       }
     }
     else {
-      errMsg = errMsg.concat('number cannot be empty||')
+      errMsg = errMsg.concat('Phone Number cannot be empty||')
     }
     return errMsg;
   }

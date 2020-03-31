@@ -16,6 +16,7 @@ export class AdminhomeComponent implements OnInit {
 
   constructor(private _http: AdminService, private router: Router, private route: ActivatedRoute) {
     this.noassets = true;
+    this._tokenCount.emit(0);
   }
 
 

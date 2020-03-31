@@ -36,16 +36,18 @@ export class TicketsComponent implements OnInit {
     this._router.navigate(['admin/ticket', event.srcElement.id])
   }
   onSearchChange(value) {
-    if (String(value).length > 0 && this.tickets.length > 1) {
+    value=value.toLowerCase()
+    if (String(value).length > 0) {
       var temp = [];
       for (var i = 0; i < this.tickets.length; i++) {
-        if (String(this.tickets[i].subject).includes(value)) {
-          temp = this.tickets[i]
+        if (String(this.tickets[i].subject).toLowerCase().includes(value)) {
+          temp.push(this.tickets[i])
         }
       }
       this.tickets = temp;
     }
     else {
+      this.tickets=null
       this.ngOnInit()
     }
 

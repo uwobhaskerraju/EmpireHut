@@ -49,7 +49,7 @@ exports.createTicket = (req, res, next) => {
         "subject": req.body.subject,
         //"description":req.body.desc,
         "owner": req.body.address,
-        "filePath": String(req.body.address).toString().concat('_', req.body.date, '_', req.file.originalname)
+        "filePath": String(req.body.address).toString().concat('___', req.body.date, '___', req.file.originalname)
     }
     //console.log(ticketJsn)
     var ticketObj = new Ticket(ticketJsn)
@@ -176,10 +176,10 @@ exports.getTicketDetails = (req, res, next) => {
 }
 
 exports.getTicketResponses = (req, res) => {
-    TicketResp.find({ ticketID: mongoose.Types.ObjectId(req.params.id) })
+    TicketResp.find({ ticketID: mongoose.Types.ObjectId(req.body.ticketID) })
         .select({ name: 1, comment: 1, createdAt: 1, _id: 0 })
         .then(r => {
-            // console.log(r)
+             //console.log(r)
             var clone = [];
             for (var i = 0; i < r.length; i++) {
                 clone.push(JSON.parse(JSON.stringify(Object.create(r[i]))))
@@ -284,7 +284,8 @@ exports.createComment = (req, res) => {
 }
 exports.updateUserDetails = (req, res) => {
     logger.info(common.debugLine(''))
-    User.updateOne({ address: req.body.address }, { $set: { homephone: req.body.phone, homeaddress: req.body.homeaddress, homepostalcode: req.body.postal } })
+    console.log(req.body)
+    User.updateOne({ address: req.body.address }, { $set: { homePhone: req.body.phone, homeaddress: req.body.homeaddress, homepostalcode: req.body.postal } })
         .then(r => {
             // console.log(r)
             if (r["nModified"] > 0) {
@@ -610,9 +611,9 @@ exports.generateHTML = (req, res) => {
     `
     html = html.replace('{data}', data)
     //console.log(data)
-   // console.log(html)
+    // console.log(html)
     //res.json({ statusCode: 200, result: req.app.locals.history, response: req.app.locals.assetD })
-    res.json({ statusCode: 200, result: html})
+    res.json({ statusCode: 200, result: html })
 }
 
 exports.getUserNameFrmAddressDown = async (req, res, next) => {
@@ -770,7 +771,7 @@ exports.getUserAssets = (req, res) => {
     logger.info(common.debugLine(''))
     var tokenIDs = req.app.locals.tokenIDs
     Asset.find({ tokenID: { $in: tokenIDs } })
-        .select({ picture: 1, name: 1, _id: 1 })
+        .select({ picture: 1, name: 1, _id: 1, hidden: 1 })
         .then(r => {
             res.json({ statusCode: 200, result: r })
         })

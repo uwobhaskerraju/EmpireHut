@@ -26,44 +26,87 @@ export class MyticketsComponent implements OnInit {
     M.CharacterCounter.init(textNeedCount);
     this.ticket = { subject: '' }
     this.ticket['desc'] = ''
+    this.getUserTickets()
+  
+  }
 
+  getUserTickets(){
     this._http.getUserTickets(this._var.userdetails["address"])
-      .subscribe(r => {
-        if (r["statusCode"] == 200) {
-          console.log(r["result"])
-          var temp = []
-          if (r["result"].length == undefined) {
-            temp.push(r["result"])
-            if (r["result"]["resolved"]) {
-              this.resTickets = temp;
-            }
-            else {
-              this.openTickets = temp;
-            }
+    .subscribe(r => {
+      if (r["statusCode"] == 200) {
+        console.log(r["result"])
+        var temp = []
+        if (r["result"].length == undefined) {
+          temp.push(r["result"])
+          if (r["result"]["resolved"]) {
+            this.resTickets = temp;
           }
           else {
-
-            for (var i = 0; i < r["result"].length; i++) {
-
-              if (r["result"][i]["resolved"]) {
-                this.resTickets.push(r["result"][i])
-              }
-              else {
-                this.openTickets.push(r["result"][i])
-              }
-
-            }
+            this.openTickets = temp;
           }
         }
         else {
-          M.toast({ html: "Operation Failed", classes: 'rounded' })
+
+          for (var i = 0; i < r["result"].length; i++) {
+
+            if (r["result"][i]["resolved"]) {
+              this.resTickets.push(r["result"][i])
+            }
+            else {
+              this.openTickets.push(r["result"][i])
+            }
+
+          }
         }
-        console.log(this.openTickets)
-        console.log(this.resTickets)
-      })
-
+      }
+      else {
+        //M.toast({ html: "Operation Failed", classes: 'rounded' })
+      }
+      // console.log(this.openTickets)
+      // console.log(this.resTickets)
+    })
   }
+  // onSearchChange(value) {
+  //  let tempOpen=[...this.openTickets]
+  //  let tempRes=[...this.resTickets]
 
+  // //  for(var i=0;i<this.openTickets.length;i++){
+  // //   tempOpen.push(Object.create(this.openTickets[i]))
+  // //  }
+  // //  for(var i=0;i<this.resTickets.length;i++){
+  // //   tempRes.push(Object.create(this.resTickets[i]))
+  // //  }
+  
+  //  value=String(value).toLowerCase()
+  //   if (String(value).length > 0) {
+  //     var temp = [];
+  //     for (var i = 0; i < this.openTickets.length; i++) {
+  //       if (String(this.openTickets[i]["subject"]).toLowerCase().includes(value)) {
+  //         temp.push(this.openTickets[i])
+  //       }
+  //     }
+  //    // console.log(temp)
+  //     this.openTickets = temp;
+  //     var temp = [];
+  //     for (var i = 0; i < this.resTickets.length; i++) {
+  //      // console.log(this.resTickets[i])
+  //       if (String(this.resTickets[i]["subject"]).toLowerCase().includes(value)) {
+  //         temp.push(this.resTickets[i])
+  //       }
+  //     }
+  //     //console.log(temp)
+  //     this.resTickets = temp;
+  //   }
+  //   else {
+  //     console.log("else")
+  //     console.log(tempOpen)
+  //     console.log(tempRes)
+  //     this.resTickets=tempRes
+  //     this.openTickets = tempOpen;
+     
+  //   }
+
+  // }
   viewTicket(event: any) {
     //console.log(event.srcElement.id)
     this._router.navigate(['user/ticket', event.srcElement.id])
@@ -74,11 +117,20 @@ export class MyticketsComponent implements OnInit {
   }
   createTicket() {
     let errMsg = ''
-
+    const validImageTypes = ['image/jpg', 'image/jpeg', 'image/png'];
     errMsg = errMsg.concat(this._val.validateSubject(String(this.ticket['subject']).trim()))
 
     errMsg = errMsg.concat(this._val.validateTicketDesc(String(this.ticket['desc']).trim()))
 
+    if (this.selectedFile.size <= 0) {
+      errMsg = errMsg.concat('Screenshot is mandatory||')
+    }
+    if(!validImageTypes.includes(this.selectedFile.type.toLowerCase())){
+      errMsg = errMsg.concat('Only jpeg,jpg,png are allowed||')
+    }
+    if(this.selectedFile.name.toLowerCase().includes('_')){
+      errMsg = errMsg.concat('File Name cannot include special Characters||')
+    }
     if (!Boolean(errMsg)) {
       this._http.createTicket(this.selectedFile, this._var.userdetails["address"], this.ticket)
         .subscribe(r => {

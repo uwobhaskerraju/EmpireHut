@@ -17,10 +17,12 @@ export class AdminComponent implements OnInit {
     private router: Router, private _VariableService: VariableService
     , private route: ActivatedRoute) {
     // this.userDetails["balance"] = 0;
+    this.tokenCount=0
+    this.userDetails = { balance: 0 }
   }
   ngOnChanges() {
-    this.userDetails = { balance: 0 }
-    this.tokenCount=0
+    
+    
   }
   ngOnInit() {
     // this should be like this as we are checking token to update userdetails

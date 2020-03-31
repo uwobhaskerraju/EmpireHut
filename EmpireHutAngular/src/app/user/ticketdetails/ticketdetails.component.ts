@@ -26,6 +26,9 @@ export class TicketdetailsComponent implements OnInit {
   }
 
   ngOnInit() {
+    M.AutoInit();
+    var textNeedCount = document.querySelectorAll('input,textarea');
+    M.CharacterCounter.init(textNeedCount);
     this.routeSub = this.route.params.subscribe(params => {
       this.ticketID = params['id']
     });
@@ -42,7 +45,7 @@ export class TicketdetailsComponent implements OnInit {
           else {
             this.ticketResp = r["response"]
           }
-          // console.log(this.ticketResp)
+           console.log(this.ticketResp)
         }
         else {
           M.toast({ html: "Not Authorized", classes: 'rounded' })

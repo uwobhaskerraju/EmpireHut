@@ -19,6 +19,7 @@ export class AssetsComponent implements OnInit {
   constructor(private _http: UserService, private router: Router,
     private route: ActivatedRoute, private _var: VariableService) {
       this.self=true;
+      this._tokenCount.emit(0)
      }
 
   ngOnInit() {

@@ -25,6 +25,9 @@ export class AdminticketdetailsComponent implements OnInit {
   }
 
   ngOnInit() {
+    M.AutoInit();
+    var textNeedCount = document.querySelectorAll('input,textarea');
+    M.CharacterCounter.init(textNeedCount);
     this.routeSub = this._route.params.subscribe(params => {
       this.ticketID = params['id']
     });

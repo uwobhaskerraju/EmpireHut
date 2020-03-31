@@ -36,6 +36,8 @@ export class AssetdetailsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.assetDetails=[]
+    this.assetTrans=null;
     this.imagePath = environment.imagePath
     this.routeSub = this.route.params.subscribe(params => {
       this.assetID = params['id']
@@ -64,6 +66,7 @@ export class AssetdetailsComponent implements OnInit {
       .subscribe(r => {
         if (r["statusCode"] == 200) {
           M.toast({ html: "Operation Succesfull", classes: 'rounded' })
+          this.ngOnInit()
         }
         else {
           M.toast({ html: "Operation failed", classes: 'rounded' })

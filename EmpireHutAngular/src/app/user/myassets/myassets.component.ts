@@ -39,7 +39,7 @@ export class UserDetailsComponent implements OnInit {
             .subscribe(r => {
               this.nomyassets = false;
               if (r["statusCode"] == 200) {
-                // console.log(r)
+                 console.log(r)
                 if (r["result"].length == undefined) {
                   var temp = [];
                   temp.push(r["result"])
@@ -73,9 +73,10 @@ export class UserDetailsComponent implements OnInit {
 
     errMsg = errMsg.concat(this._val.validateAssetPostal(String(this.userDetails['homepostalcode']).trim()))
 
-    errMsg = errMsg.concat(this._val.validatePhoneNumber(String(this.userDetails['homepostalcode']).trim()))
+    errMsg = errMsg.concat(this._val.validatePhoneNumber(String(this.userDetails['homePhone']).trim()))
 
     errMsg = errMsg.concat(this._val.validatecmbdAddress(String(this.userDetails['homeaddress']).trim()))
+   
     if (!Boolean(errMsg)) {
       this._http.updateUserDetails(this.userDetails)
         .subscribe(r => {
