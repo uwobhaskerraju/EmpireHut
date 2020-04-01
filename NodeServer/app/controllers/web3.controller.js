@@ -136,7 +136,7 @@ try {
             }
             EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
                 .then(bal => {
-                    res.json({ statusCode: 200, result: bal });
+                    res.json({ statusCode: 200, result: true });
                 })
                 .catch(err => {
                     logger.error(common.debugLine(err));
@@ -168,7 +168,7 @@ try {
             }
             EMPContract.methods.transfer(_to, value, type).send({ from: _from, value: 1, gas: 1000000 })
                 .then(bal => {
-                    res.json({ statusCode: 200, result: bal });
+                    res.json({ statusCode: 200, result: true });
                 })
                 .catch(err => {
                     logger.error(common.debugLine(err));
@@ -368,6 +368,46 @@ try {
             ////console.log(req.app)
             //console.log(_from + " " + _to + " " + tokenID)
             //res.json("sdfdf")
+            assetcontract.methods.transferAsset(_from, _to, tokenID).estimateGas({ from: _from, value: 5000000 }, function (error, gas) {
+                if (error) {
+                    logger.error(common.debugLine(error));
+                    logger.error(common.debugLine(common.generateReq(req)));
+                    res.json({ statusCode: 500, result: error });
+                }
+                // //console.log("before")
+                assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 5000000, gas: gas })
+                    .on('confirmation', function (confirmationNumber, receipt) {
+                        ////console.log(receipt)
+
+                        next();
+                    })
+                    .on('error', function (error, receipt) {
+                        logger.error(common.debugLine(error));
+                        logger.error(common.debugLine(common.generateReq(req)));
+                        res.json({ statusCode: 500, result: error });
+                    });
+
+            });
+
+        } catch (error) {
+            logger.error(common.debugLine(error));
+            logger.error(common.debugLine(common.generateReq(req)));
+            res.json({ statusCode: 500, result: dataConfig.GlobalErrMsg });
+        }
+    };
+
+    exports.transferAssetTwo = (req, res, next) => {
+
+        try {
+            logger.info(common.debugLine(''));
+            //logger.info(req.app.locals)
+            var _to = req.body.to;//(await web3.eth.getAccounts())[0];
+            var _from = req.body.owner;//(await web3.eth.getAccounts())[3];
+            var tokenID = req.app.locals.tokenID;
+            ////console.log(req.body)
+            ////console.log(req.app)
+            //console.log(_from + " " + _to + " " + tokenID)
+            //res.json("sdfdf")
             assetcontract.methods.transferAsset(_from, _to, tokenID).estimateGas({ from: _from, value: 50000 }, function (error, gas) {
                 if (error) {
                     logger.error(common.debugLine(error));
@@ -378,8 +418,7 @@ try {
                 assetcontract.methods.transferAsset(_from, _to, tokenID).send({ from: _from, value: 50000, gas: gas })
                     .on('confirmation', function (confirmationNumber, receipt) {
                         ////console.log(receipt)
-
-                        next();
+                        res.json({ statusCode: 200, result: true });
                     })
                     .on('error', function (error, receipt) {
                         logger.error(common.debugLine(error));
@@ -600,7 +639,9 @@ try {
                     ////console.log(e)
                     var jsnData = {};
                     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    jsnData.date = (new Date(time)).toLocaleDateString("en-US", options)
+                    var date = new Date(time * 1000);
+                    //console.log(date)
+                    jsnData.date = date.toDateString("en-US", options)
                     //{from:,to:,amount:,date:,type:,description:}
 
                     ////console.log(myaccount)
@@ -615,7 +656,7 @@ try {
                         case "transfer":
                             // //console.log(e.from)
                             // //console.log(abiDecoder.decodeMethod(e.input))
-                            jsnData.type = "Debit"
+                            //jsnData.type = "Debit"
                             // _to
                             for (var i = 0; i < abiDecoder.decodeMethod(e.input)["params"].length; i++) {
                                 // var x=abiDecoder.decodeMethod(e.input)["params"][i]
@@ -624,6 +665,9 @@ try {
                                         jsnData.to = abiDecoder.decodeMethod(e.input)["params"][i]["value"]
                                     }
                                 }
+                            }
+                            if(String(jsnData.to).toLowerCase() == String(myaccount).toLowerCase()){
+                                jsnData.type='Credit'
                             }
                             if (String(e.from).toLowerCase() == String(myaccount).toLowerCase()
                                 || String(jsnData.to).toLowerCase() == String(myaccount).toLowerCase()) {
@@ -650,6 +694,10 @@ try {
                                     }
 
                                 }
+                                if(String(jsnData.from).toLowerCase() == String(myaccount).toLowerCase()){
+                                    jsnData.type='Debit'
+                                }
+                                
                                 var temp = null;
                                 for (x in abiDecoder.decodeMethod(e.input)["params"][2]) {
                                     if (x == "value") {

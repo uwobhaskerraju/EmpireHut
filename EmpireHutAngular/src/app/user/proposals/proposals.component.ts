@@ -16,14 +16,24 @@ export class ProposalsComponent implements OnInit {
   hasProp: boolean
   constructor(private _http: UserService, private _var: VariableService) {
     this.hasProp = true;
+    this.allProposals.length=0
   }
 
   ngOnInit() {
+    this.allProposals=null;
     this._http.reviewProposals(this._var.userdetails["address"])
       .subscribe(r => {
         this.hasProp = false;
         if (r["statusCode"] == 200) {
-          this.allProposals = r["result"];
+          var temp=[]
+          if(r["result"].length==undefined){
+            temp.push(r["result"])
+            this.allProposals=temp
+          }
+          else{
+            this.allProposals = r["result"];
+          }
+         
           console.log(r)
         }
         //console.log(this.allProposals)

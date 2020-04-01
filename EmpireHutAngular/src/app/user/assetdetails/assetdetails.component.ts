@@ -172,7 +172,7 @@ export class AssetdetailsComponent implements OnInit {
     this._http.checkAdmin(this.assetDetails[0]["ownerAdd"])
       .subscribe(r => {
         console.log(r)
-        if (r["result"]) {
+        if (r["result"]=='true') {
           // yes owner is admin(govt), so we can directly buy 
           this._http.purchaseAsset(this.assetDetails[0], this._var.userdetails["address"], this.amount)
             .subscribe(r => {

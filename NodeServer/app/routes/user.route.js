@@ -38,7 +38,7 @@ module.exports = (app) => {
 
     app.get('/user/proposals/:id', checkrequest.CheckToken, user.getAllUserProposals, user.getAllProposalUsers);
 
-    app.post('/user/proposal/approve', checkrequest.CheckToken, user.approveProposal, web3.customTransferTo, user.toggleNotification, web3.transferAsset);
+    app.post('/user/proposal/approve', checkrequest.CheckToken, user.approveProposal, web3.customTransferTo, user.toggleNotification, web3.transferAssetTwo);
 
     app.post('/user/proposal/reject', checkrequest.CheckToken, user.rejectProposal, web3.RejectTransfer);
 
