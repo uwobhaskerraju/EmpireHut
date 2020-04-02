@@ -10,8 +10,8 @@ import { VariableService } from 'src/app/service/variable.service';
   styleUrls: ['./assets.component.css']
 })
 export class AssetsComponent implements OnInit {
-  @Output() _tokenCount: EventEmitter<any> = new EventEmitter();
-
+  @Output() _UsertokenCount: EventEmitter<any> = new EventEmitter();
+  @Output() _userBal: EventEmitter<any> = new EventEmitter();
   allAssets: Object
   imagePath: String
   self: boolean
@@ -19,7 +19,7 @@ export class AssetsComponent implements OnInit {
   constructor(private _http: UserService, private router: Router,
     private route: ActivatedRoute, private _var: VariableService) {
       this.self=true;
-      this._tokenCount.emit(0)
+      this._UsertokenCount.emit(0)
      }
 
   ngOnInit() {
@@ -31,12 +31,13 @@ export class AssetsComponent implements OnInit {
           this._http.getAllAssets(d["result"]["address"])
             .subscribe(data => {
               this.self = false;
-               console.log(data);
+               //console.log(data);
               if (data["statusCode"] == 200) {
                 if (data["result"].length == undefined) {
                   var temp = [];
                   temp.push(data["result"])
                   this.allAssets = temp;
+                  this.getBalance();
                 }
                 else{
                   this.allAssets = data["result"];
@@ -52,6 +53,15 @@ export class AssetsComponent implements OnInit {
   getAssets() {
     console.log("child called")
 
+  }
+
+  getBalance(){
+    this._http.getBalance(this._var.userdetails["address"])
+    .subscribe(r => {
+      if (r["statusCode"] == 200) {
+        this._userBal.emit(r["result"])
+      }
+    })
   }
   showDetails(value: any) {
     //console.log(value.srcElement.id)

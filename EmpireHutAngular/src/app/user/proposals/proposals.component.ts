@@ -20,9 +20,10 @@ export class ProposalsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.allProposals=null;
+    this.allProposals=[];
     this._http.reviewProposals(this._var.userdetails["address"])
       .subscribe(r => {
+       // console.log(r)
         this.hasProp = false;
         if (r["statusCode"] == 200) {
           var temp=[]
@@ -34,8 +35,9 @@ export class ProposalsComponent implements OnInit {
             this.allProposals = r["result"];
           }
          
-          console.log(r)
+          
         }
+        //console.log(this.allProposals.length)
         //console.log(this.allProposals)
       });
   }
